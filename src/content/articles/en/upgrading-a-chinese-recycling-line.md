@@ -29,7 +29,7 @@ It makes sense to work in the direction of material flow: first washing, then de
 
 Whatever is not washed out in the washing section has to be caught by the filter, or it ends up in the pellets. That is why washing should be checked first, before investing in the extrusion section.
 
-For heavily contaminated feedstock, washing is built in two stages. A flotation washer removes sand, stones and heavy contaminants: particles heavier than water settle to the bottom of the tank and are removed periodically. Then a [friction washer](../../equipment/friction-washer/) (Herbold type) cleans the material with hot water and detergents by friction against the blades of a high-speed rotor. A centrifuge after washing reduces moisture to 3–5% and takes load off the dryer.
+For heavily contaminated feedstock, washing is built in two stages. A flotation washer removes sand, stones and heavy contaminants: particles heavier than water settle to the bottom of the tank and are removed periodically. Then a rotor-type [friction washer](../../equipment/friction-washer/) cleans the material with hot water and detergents by friction against the blades of a high-speed rotor. A centrifuge after washing reduces moisture to 3–5% and takes load off the dryer.
 
 When rebuilding, it is important to match the fraction. Himmash friction washers and centrifuges accept film up to 50 mm, PP yarn up to 100 mm and thick-walled plastics up to 30 mm, and shredding is set up for these sizes.
 
@@ -63,7 +63,7 @@ An unbalanced shaft in a high-speed washer or an unbalanced centrifuge rotor cau
 
 ## Water: a closed loop instead of constant discharge
 
-If the washing section runs on once-through water, the upgrade should also include water treatment. The T-5000 system treats washing line wastewater and returns the water to the production cycle up to 20 times. Its capacity is 3 to 10 m³/h; treatment methods are electroflotation, electrocoagulation, electrodialysis, sorption and mechanical filtration. The system is installed in the shop or as a separate container unit, occupies 35 m² and is run by one person.
+If the washing section runs on once-through water, the upgrade should also include water treatment. The T-5000 system treats washing line wastewater and returns the water to the production cycle up to 20 times. Its capacity is 3 to 10 m³/h; treatment methods are electroflotation, electrocoagulation, electrolysis, electrodialysis, sorption and mechanical filtration. The system is installed in the shop or as a separate container unit, occupies 35 m² and is run by one person.
 
 ## How to plan an upgrade and what to prepare
 

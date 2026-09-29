@@ -18,9 +18,9 @@ Use these terms everywhere: UI, product pages, documents, articles. Keep numbers
 | ПНД / ПВД / ПП / ПЭТФ / ПВХ / АБС / ПА-6 / ПА-GF | HDPE / LDPE / PP / PET / PVC / ABS / PA6 / glass-filled PA (PA-GF) | HDPE / LDPE / PP / PET / PVC / ABS / PA6 / 玻纤增强PA（PA-GF） |
 | ТБО (твёрдые бытовые отходы) | municipal solid waste (MSW) | 城市固体废物 |
 | ПТР | MFI (melt flow index) | 熔融指数（MFI） |
-| загрязнённость сырья до 95 % | feedstock contamination up to 95% | 原料污染度高达95% |
+| загрязнённость сырья до 50 % и выше | feedstock contamination of up to 50% and more | 原料污染度高达50%及以上 |
 | флотационная машина (первичной мойки) | flotation washer | 浮选清洗机 |
-| фрикционная мойка (по типу Herbold) | friction washer (Herbold type) | 摩擦清洗机（Herbold 型） |
+| фрикционная мойка роторного типа (не «Herbold»: чужой товарный знак) | rotor-type friction washer | 转子式摩擦清洗机 |
 | центрифуга для обезвоживания | dewatering centrifuge | 脱水离心机 |
 | шнековый питатель (задавливатель) | screw feeder (crammer) | 螺旋强制喂料机 |
 | агломерация / агломератор | agglomeration / agglomerator | 团粒 / 团粒机 |

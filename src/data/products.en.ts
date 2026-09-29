@@ -8,18 +8,18 @@ const en: Record<string, ProductText> = {
   'granulation-lines': {
     name: 'Recycling and pelletizing lines for post-consumer plastics',
     short: 'Pelletizing lines',
-    card: 'Full cycle: shredding, washing, drying and pelletizing of plastics with feedstock contamination up to 95%.',
-    lead: 'Shredding, washing, drying and pelletizing in one line, for feedstock contamination up to 95%. Output: 150 to 400 kg of pellets per hour.',
-    metaDescription: 'Turnkey recycling and pelletizing lines for post-consumer plastics: LDPE, HDPE, PP, PA-GF, ABS, PVC; contamination up to 95%; 150–400 kg/h. NPO Himmash, Taganrog.',
+    card: 'Full cycle: shredding, washing, drying and pelletizing of plastics with feedstock contamination of up to 50% and more.',
+    lead: 'Shredding, washing, drying and pelletizing in one line, for feedstock contamination of up to 50% and more. Output: 150 to 400 kg of pellets per hour.',
+    metaDescription: 'Turnkey recycling and pelletizing lines for post-consumer plastics: LDPE, HDPE, PP, PA-GF, ABS, PVC; contamination up to 50% and more; 150–400 kg/h. NPO Himmash, Taganrog.',
     quick: [
       { value: '150–400', unit: 'kg/h', label: 'Pellet<br>output' },
-      { value: '95', unit: '%', label: 'Max. feedstock<br>contamination' },
+      { value: '50+', unit: '%', label: 'Feedstock<br>contamination' },
       { value: '20', unit: '×', label: 'Water<br>reuse' },
     ],
     price: 'According to specification',
     specs: [
       ['Output', '150 to 400 kg/h of pellets'],
-      ['Feedstock contamination', 'up to 95%'],
+      ['Feedstock contamination', 'up to 50% and more'],
       ['Feedstock', 'LDPE, HDPE, PP, glass-filled PA (PA-GF), ABS, PVC'],
       ['Processes', 'shredding, washing, drying, pelletizing'],
       ['Extruders', 'cascade, single-screw and twin-screw'],
@@ -27,13 +27,14 @@ const en: Record<string, ProductText> = {
       ['Water loop', 'water reused up to 20 times'],
     ],
     body: [
-      'We supply lines that recycle post-consumer plastics into high-quality pellets, based on cascade, single-screw and twin-screw extruders from Chinese manufacturers. Only the shredder and the extruder are Chinese-made; all other units are made in Russia.',
+      'We supply lines that recycle post-consumer plastics into high-quality pellets, based on cascade, single-screw and twin-screw extruders. The extruder type and line composition are chosen for the feedstock and output and fixed in the project specification.',
       'Product quality depends on the right choice of extruder screw, motor power and L/D ratio, and on whether melt degassing and filtration are used. For the washing line wastewater, we have developed a closed-loop treatment system that lets you reuse the water many times, up to 20 times.',
+      'In practice, lines of up to 300 kg/h make the most sense; larger ones are usually inefficient. The line price is calculated from the specification: besides the catalogue units it includes the shredder, extruder, conveyors, water treatment, engineering, installation and commissioning.',
     ],
     bulletsTitle: 'What the line includes',
     bullets: [
       'Flotation washers with special parallel screws for primary treatment of heavily contaminated plastics',
-      'Friction washers (Herbold type) with hot water supply and detergent dosing',
+      'Rotor-type friction washers with hot water supply and detergent dosing',
       'Dewatering centrifuge with a 2,000 mm working shaft',
       'Drum dryers for thick-walled rigid plastics and vertical gravity dryers for film and big-bag (FIBC) yarn',
       'Screw feeder (crammer) into the extruder feed zone, which eliminates the agglomeration step',
@@ -87,9 +88,9 @@ const en: Record<string, ProductText> = {
     short: 'Friction washer',
     card: 'Deep cleaning of film, big-bag (FIBC) yarn, bags and rigid plastics by intensive friction.',
     lead: 'Thorough washing of all types of shredded plastics: polypropylene big-bag (FIBC) yarn, LDPE film, stretch film and rigid plastics.',
-    metaDescription: 'Herbold-type friction washer for plastic washing lines: film and yarn up to 500 kg/h, rigid plastics up to 700 kg/h, PET flakes up to 900 kg/h. Made by NPO Himmash.',
+    metaDescription: 'Rotor-type friction washer for plastic washing lines: film and yarn up to 500 kg/h, rigid plastics up to 700 kg/h, PET flakes up to 900 kg/h. Made by NPO Himmash.',
     body: [
-      'The Herbold-type washer cleans the material under a jet of heated water with detergents, by friction against the blades of a high-speed rotor. The octagonal housing keeps the material moving chaotically, so it is cleaned more thoroughly. Dirty water drains by gravity through the bottom screen.',
+      'The rotor-type washer cleans the material under a jet of heated water with detergents, by friction against the blades of a high-speed rotor. The octagonal housing keeps the material moving chaotically, so it is cleaned more thoroughly. Dirty water drains by gravity through the bottom screen.',
     ],
     bulletsTitle: 'Advantages',
     bullets: [
@@ -204,7 +205,7 @@ const en: Record<string, ProductText> = {
     metaDescription: 'T-5000 wastewater treatment system: 3–10 m³/h, water returned to the cycle up to 20 times, electroflotation, electrocoagulation. For plastic washing lines and more.',
     body: [
       'A local system for wastewater treatment and water recycling at your plant. It is installed inside the shop or as a separate container unit and operates at air temperatures from +5 to +45 °C.',
-      'Treatment uses intensive methods (electroflotation, electrocoagulation, electrodialysis, sorption and mechanical filtration), so the system also suits small production sites. There are two treatment stages: one for water recycling and one for discharge to the sewer.',
+      'Treatment uses intensive methods (electroflotation, electrocoagulation, electrolysis, electrodialysis, sorption and mechanical filtration), so the system also suits small production sites. There are two treatment stages: one for water recycling and one for discharge to the sewer.',
       'Besides plastics recycling, the system is used at dairy, meat and fish processing plants, poultry farms, electroplating shops, and washing facilities for road vehicles and railcars.',
     ],
     bulletsTitle: 'Treatment performance: inlet → after treatment',

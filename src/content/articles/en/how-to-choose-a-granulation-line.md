@@ -19,11 +19,11 @@ Which polymer, and in what form. LDPE film and stretch film, polypropylene big-b
 
 ### Degree of contamination
 
-How dirty the feedstock is, and with what. Clean production scrap (trimmings, rejects, flash) can be pelletized with almost no washing. Agricultural film, the plastic fraction of municipal solid waste (MSW) and big bags that held bulk cargo carry sand, soil, organic matter and paper labels, and they need a full washing section. Himmash lines are designed for feedstock contamination up to 95%, but the dirtier the feedstock, the longer the washing section and the stricter the requirements for water treatment.
+How dirty the feedstock is, and with what. Clean production scrap (trimmings, rejects, flash) can be pelletized with almost no washing. Agricultural film, the plastic fraction of municipal solid waste (MSW) and big bags that held bulk cargo carry sand, soil, organic matter and paper labels, and they need a full washing section. Himmash lines are designed for feedstock contamination of up to 50% and more, but the dirtier the feedstock, the longer the washing section and the stricter the requirements for water treatment.
 
 ### Output
 
-How many pellets per hour you need to produce. Himmash lines are available with an output of 150 to 400 kg/h of pellets. Calculate by pellet output, not by the weight of incoming feedstock: with heavy contamination, a significant part of the incoming mass is dirt and water that will be removed in washing.
+How many pellets per hour you need to produce. Himmash lines are available with an output of 150 to 400 kg/h of pellets. In practice, lines of up to 300 kg/h make the most sense: larger ones are usually inefficient. Calculate by pellet output, not by the weight of incoming feedstock: with heavy contamination, a significant part of the incoming mass is dirt and water that will be removed in washing.
 
 ### Flakes or pellets
 
@@ -37,7 +37,7 @@ Which product you need at the end of the line. If the washed regrind (flakes) is
 |---|---|---|
 | Shredding | shredder or crusher | reduce the feedstock to a fraction that the washer and feeder can accept |
 | Primary washing | flotation washer | separate sand, stones, dirt and heavy contaminants |
-| Secondary washing | friction washer (Herbold type) | wash the material by friction in hot water with detergents |
+| Secondary washing | rotor-type friction washer | wash the material by friction in hot water with detergents |
 | Dewatering | dewatering centrifuge | reduce moisture to 3–5% |
 | Drying | drum dryer for rigid plastics, vertical gravity dryer for film and yarn | remove the remaining moisture |
 | Feeding | storage hopper, screw feeder | feed the extruder evenly, and feed film without agglomeration |
@@ -45,7 +45,7 @@ Which product you need at the end of the line. If the washed regrind (flakes) is
 | Pelletizing | water-ring pelletizing head or strand pelletizing head | cut the pellets |
 | Water treatment | closed-loop water treatment system | reuse the wash water up to 20 times |
 
-In Himmash lines, only the shredder and the extruder are Chinese-made; all other units are made in Russia.
+This is a typical composition: the set and order of washing units are chosen for the specific feedstock, and the line configuration is fixed in the project specification.
 
 ## How to choose an extruder for recycled feedstock
 

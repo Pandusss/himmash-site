@@ -20,6 +20,8 @@ The classic layout for contaminated film, big-bag (FIBC) yarn and rigid waste lo
 5. **Drying.** A drum dryer or a vertical gravity dryer removes the remaining moisture.
 6. **Water treatment.** The wastewater is treated and returned to the cycle.
 
+This is a typical layout. The set and order of washing units are chosen for the specific feedstock: in other lines, such as the KPTBO-300 complex, the number of stages and their sequence differ. The machine figures below refer to their catalogue versions; within complete systems, units may be supplied in other versions with different output and power.
+
 The shredding fraction is set by what the washing units can handle. Himmash friction washers and centrifuges accept film up to 50 mm, PP yarn up to 100 mm and thick-walled plastics up to 30 mm.
 
 The units are matched not only by fraction but also by output: the line runs at the speed of its slowest unit. Between the units, material is usually moved by screw conveyors, and dry flakes by pneumatic conveying.
@@ -32,7 +34,7 @@ Flotation is coarse cleaning. Its job is to remove the bulk of the dirt and take
 
 ## Friction washer: how film and big-bag yarn are washed
 
-The [friction washer](../../equipment/friction-washer/) (Herbold type) is the main washing unit of the line. The material is washed under a jet of heated water with detergents, by friction against the blades of a high-speed rotor. The housing is octagonal: its faces break up the flow and set the material in chaotic motion, so each fragment rubs against the blades and against other fragments many times. The used dirty water drains by gravity through the bottom screen.
+The rotor-type [friction washer](../../equipment/friction-washer/) is the main washing unit of the line. The material is washed under a jet of heated water with detergents, by friction against the blades of a high-speed rotor. The housing is octagonal: its faces break up the flow and set the material in chaotic motion, so each fragment rubs against the blades and against other fragments many times. The used dirty water drains by gravity through the bottom screen.
 
 Hot water and detergents remove what cannot be knocked off mechanically: greasy contamination, label adhesive residue, organic matter. Friction removes dirt stuck to the surface of the film and yarn. Detergents are dosed, which keeps under control both their consumption and the amount of surfactants that will later have to be removed from the water.
 
@@ -76,13 +78,15 @@ Drying is not the last line of defense. The storage hopper in front of the extru
 
 A washing line constantly consumes water and discharges wastewater containing sand, suspended solids, fats, organic matter, surfactants from detergents and nanoplastics. Discharging such wastewater into the municipal sewer is restricted: the maximum permissible concentrations of pollutants are set by the Russian Rules for Cold Water Supply and Sanitation (Правила холодного водоснабжения и водоотведения).
 
-[The T-5000 system](../../equipment/water-treatment-t5000/) is a closed-loop water system that treats the wastewater and returns the water to the production cycle up to 20 times. Its capacity is 3 to 10 m³/h. Treatment uses electroflotation, electrocoagulation, electrodialysis, sorption and mechanical filtration in two stages: one for water recycling and one for discharge to the sewer. The system is installed inside the shop or as a separate container unit; it operates at air temperatures from +5 to +45 °C, occupies 35 m² and is run by one person. Besides suspended solids and sand, the system removes petroleum products and fats, organic impurities, metal hydroxides, nanoplastics and surfactants from the water.
+[The T-5000 system](../../equipment/water-treatment-t5000/) is a closed-loop water system that treats the wastewater and returns the water to the production cycle up to 20 times. Its capacity is 3 to 10 m³/h. Treatment uses electroflotation, electrocoagulation, electrolysis, electrodialysis, sorption and mechanical filtration in two stages: one for water recycling and one for discharge to the sewer. The system is installed inside the shop or as a separate container unit; it operates at air temperatures from +5 to +45 °C, occupies 35 m² and is run by one person. Besides suspended solids and sand, the system removes petroleum products and fats, organic impurities, metal hydroxides, nanoplastics and surfactants from the water.
 
 | Parameter | Inlet | After treatment |
 |---|---|---|
 | Suspended solids | up to 50,000 mg/L | less than 300 mg/L |
 | Fats, petroleum products, oils | up to 5,000 mg/L | less than 0.1 mg/L |
+| Organic matter | up to 5,000 mg/L | less than 300 mg/L |
 | Surfactants | up to 3,000 mg/L | less than 0.5 mg/L |
+| Sand, heavy metal oxides | up to 10,000 mg/L | 0.1–5.0 mg/L (zinc) |
 | Nanoplastics | up to 10,000 mg/L | less than 100 mg/L |
 | COD | up to 20,000 mg/L | 30–150 mg/L |
 

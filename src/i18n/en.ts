@@ -53,7 +53,7 @@ const en: UI = {
       photoSmall: 'NPO Himmash equipment',
     },
     stats: [
-      { value: 'up to 95', unit: '%', label: 'Feedstock contamination our lines handle' },
+      { value: '50+', unit: '%', label: 'Permissible feedstock contamination: up to 50% and more' },
       { value: '150–400', unit: 'kg/h', label: 'Pellet output of our lines' },
       { value: 'up to 20', unit: '×', label: 'Reuse of washing water' },
       { value: '14', unit: '', label: 'Catalog items: lines, machines and units' },
@@ -72,7 +72,7 @@ const en: UI = {
     materials: {
       eyebrow: '02 — Feedstock',
       title: 'What you<br>can recycle.',
-      lead: 'Our lines handle feedstock contamination up to 95%. An engineer will confirm whether your material is suitable from a description or a sample.',
+      lead: 'Our lines handle feedstock contamination of up to 50% and more. An engineer will confirm whether your material is suitable from a description or a sample.',
       items: [
         { code: 'LDPE · HDPE', title: 'Film', text: 'Film waste and stretch film, fragments up to 50 mm' },
         { code: 'PP', title: 'Yarn and bags', text: 'Big-bag (FIBC) yarn and polypropylene bags, fragments up to 100 mm' },
@@ -166,7 +166,7 @@ const en: UI = {
     },
     {
       q: 'What feedstock can be recycled?',
-      a: 'LDPE and HDPE polyethylene, polypropylene (including big-bag (FIBC) yarn and bags), thick-walled plastics and PET flakes, and, as part of complete lines, glass-filled PA (PA-GF), ABS and PVC. The lines are designed for feedstock contamination up to 95%.',
+      a: 'LDPE and HDPE polyethylene, polypropylene (including big-bag (FIBC) yarn and bags), thick-walled plastics and PET flakes, and, as part of complete lines, glass-filled PA (PA-GF), ABS and PVC. The lines are designed for feedstock contamination of up to 50% and more.',
     },
     {
       q: 'Do you only supply complete lines?',
@@ -179,6 +179,10 @@ const en: UI = {
     {
       q: 'What are the lead times and terms of supply?',
       a: 'They depend on the equipment. Lead time is 20 to 60 working days. Payment is usually 70% prepayment, 30% after manufacture. The warranty is 6 or 12 months. Exact terms are listed on each product page.',
+    },
+    {
+      q: 'Why does a line cost more than its catalogue units added up?',
+      a: 'The site lists prices of individual machines and units. A turnkey line also includes the shredder, extruder, conveyors and pneumatic conveying, water treatment, engineering, installation and commissioning, so its price is calculated from a specification for your feedstock and output.',
     },
     {
       q: 'Do you handle installation and commissioning?',
