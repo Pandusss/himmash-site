@@ -1,4 +1,10 @@
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T | null;
+const motionOK = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+/** Soft fade-in for content that changes in place (filters, galleries). */
+function fadeIn(el: Element, delay = 0) {
+  if (!motionOK) return;
+  el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+}
 
 // Mobile menu
 const menuButton = document.querySelector<HTMLButtonElement>('.menu-toggle');
@@ -41,6 +47,7 @@ function setMedia(src: string, caption: string) {
   img.src = src;
   img.alt = caption;
   $('media-caption')!.textContent = caption;
+  if (media?.open) fadeIn(img);
 }
 function showGalleryItem(index: number) {
   galleryIndex = (index + gallery.length) % gallery.length;
@@ -96,7 +103,37 @@ docTabs.forEach((tab) => {
 let pending: HTMLElement[] = [];
 if (document.visibilityState === 'visible' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   pending = [...document.querySelectorAll<HTMLElement>('[data-reveal]')].filter((el) => el.getBoundingClientRect().top > innerHeight);
-  pending.forEach((el) => el.classList.add('reveal'));
+  const itemSelector = '.solution-card, .feedstock, .process-step, .product-card, .step, .cert-card, .article-card, .faq-item, .process-loop';
+  pending.forEach((section) => {
+    section.classList.add('reveal');
+    // Items of one grid follow each other with a short delay.
+    section.querySelectorAll<HTMLElement>(itemSelector).forEach((item, i) => {
+      item.classList.add('stagger-item');
+      item.style.setProperty('--i', String(item.classList.contains('process-step') ? i : Math.min(i, 7)));
+    });
+  });
+}
+
+// Key figures count up from zero while the first screen settles.
+if (motionOK && document.visibilityState === 'visible') {
+  document.querySelectorAll<HTMLElement>('[data-countup]').forEach((el, index) => {
+    const target = el.textContent ?? '';
+    const numbers = target.match(/\d+/g)?.map(Number);
+    if (!numbers) return;
+    const duration = 1400;
+    const start = performance.now() + 450 + index * 100;
+    const render = (progress: number) => {
+      let n = 0;
+      el.textContent = target.replace(/\d+/g, () => String(Math.round(numbers[n++] * progress)));
+    };
+    render(0);
+    const tick = (now: number) => {
+      const t = Math.min(1, Math.max(0, (now - start) / duration));
+      if (t < 1) { render(1 - Math.pow(1 - t, 3)); requestAnimationFrame(tick); } else el.textContent = target;
+    };
+    requestAnimationFrame(tick);
+    setTimeout(() => { el.textContent = target; }, 450 + index * 100 + duration + 400); // in case frames are throttled
+  });
 }
 
 // Product page: a slim bar with the price and inquiry button once the main button scrolls away.
@@ -136,6 +173,7 @@ document.querySelectorAll<HTMLButtonElement>('[data-photo]').forEach((thumb, i, 
     if (!productPhoto) return;
     productPhoto.src = thumb.dataset.photo!;
     productPhoto.alt = thumb.dataset.alt ?? productPhoto.alt;
+    fadeIn(productPhoto);
     all.forEach((t) => t.setAttribute('aria-pressed', String(t === thumb)));
   }),
 );
@@ -165,8 +203,16 @@ document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((catalog) => {
     if (more) more.hidden = expanded || matches.length <= limit;
     buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === active)));
   }
-  buttons.forEach((b) => b.addEventListener('click', () => { active = b.dataset.filter!; expanded = false; render(); }));
-  more?.addEventListener('click', () => { expanded = true; render(); });
+  // Cards that appear after a click fade in one after another.
+  function renderAnimated() {
+    const before = new Set(cards.filter((c) => !c.hidden));
+    render();
+    cards.filter((c) => !c.hidden && !before.has(c)).forEach((c, i) => fadeIn(c, Math.min(i, 8) * 45));
+    if (!before.size) return;
+    cards.filter((c) => !c.hidden && before.has(c)).forEach((c, i) => fadeIn(c, Math.min(i, 8) * 45));
+  }
+  buttons.forEach((b) => b.addEventListener('click', () => { active = b.dataset.filter!; expanded = false; renderAnimated(); }));
+  more?.addEventListener('click', () => { expanded = true; renderAnimated(); });
   phone.addEventListener('change', render);
   render();
 

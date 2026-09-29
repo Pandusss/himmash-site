@@ -57,7 +57,7 @@ const num = () => String(++n).padStart(2, '0');
     <section class="product-hero" aria-labelledby="product-title">
       <div class="gallery">
         <button class="gallery-main" id="zoom-product" type="button" aria-label={p.zoom}>
-          <img id="product-photo" src={asset(`img/${photos[0]}`)} alt={text.name} fetchpriority="high">
+          <img id="product-photo" src={asset(`img/${photos[0]}`)} alt={text.name} fetchpriority="high" style={`view-transition-name: pimg-${product.slug}`}>
           <span class="zoom-label" aria-hidden="true">+</span>
         </button>
         {photos.length > 1 && (

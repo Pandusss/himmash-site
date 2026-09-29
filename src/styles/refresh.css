@@ -108,9 +108,6 @@ h3{letter-spacing:-.03em}
 /* Mobile action bar, as on the current site */
 .mobile-bar{display:none}
 
-/* Reveal on scroll */
-.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
-.reveal.is-visible{opacity:1;transform:none}
 
 @media(max-width:1150px){
   .stat{padding:20px 16px 22px}
@@ -152,7 +149,6 @@ h3{letter-spacing:-.03em}
   .mobile-bar .mobile-bar-main{background:var(--lime);border-color:var(--lime);color:var(--ink)}
   .media-footer{flex-direction:column;align-items:flex-start;padding:0 14px 14px}
 }
-@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
 
 /* ===== Iteration 3 ===== */
 /* Catalog page cards use h2: keep them card-sized. */
@@ -224,3 +220,5 @@ h3{letter-spacing:-.03em}
   .custom-tile{padding:24px}
   .custom-tile h2{font-size:26px}
 }
+
+.stat-num{font-variant-numeric:tabular-nums}
