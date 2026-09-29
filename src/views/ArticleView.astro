@@ -55,6 +55,12 @@ const articleJsonLd = {
     <figure class="article-cover">
       <img src={asset(article.data.cover)} alt={article.data.coverAlt} fetchpriority="high">
     </figure>
+    {toc.length > 1 && (
+      <details class="toc-mobile">
+        <summary><span class="eyebrow">{a.toc}</span><span class="faq-icon" aria-hidden="true"></span></summary>
+        <ol>{toc.map((h: { slug: string; text: string }) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+      </details>
+    )}
     <div class="article-layout">
       <aside class="article-aside">
         {toc.length > 1 && (

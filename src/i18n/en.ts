@@ -23,6 +23,7 @@ const en: UI = {
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     language: 'Site language',
+    theme: 'Dark theme',
     breadcrumbs: 'Breadcrumbs',
   },
   contact: {

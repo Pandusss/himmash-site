@@ -1,0 +1,136 @@
+/* Phone and tablet layer: menu sheet, compact sections, touch behaviour. Loaded last. */
+
+/* Burger icon that turns into a cross */
+.menu-toggle{place-items:center;color:var(--ink)}
+.menu-icon{display:grid;gap:5px;width:20px}
+.menu-icon span{display:block;height:2px;border-radius:2px;background:currentColor;transition:transform .25s ease,opacity .2s ease}
+.menu-toggle[aria-expanded=true] .menu-icon span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-toggle[aria-expanded=true] .menu-icon span:nth-child(2){opacity:0}
+.menu-toggle[aria-expanded=true] .menu-icon span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.toc-mobile{display:none}
+
+@media(max-width:1100px){
+  .menu-toggle{display:grid}
+  /* Full-screen menu sheet under the header */
+  .mobile-nav{position:fixed;left:0;right:0;top:88px;bottom:0;z-index:29;overflow-y:auto;overscroll-behavior:contain;padding:0;border-top:1px solid var(--line);background:var(--paper)}
+  .mobile-nav-inner{width:calc(100% - 40px);max-width:560px;min-height:100%;margin:0 auto;padding:18px 0 calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:24px}
+  .mobile-nav-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .mobile-nav .mobile-langs{padding:0;border:0}
+  .mobile-links{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .mobile-nav .mobile-links a{display:flex;justify-content:space-between;align-items:center;padding:15px 0;font-size:22px;letter-spacing:-.02em;border-bottom:1px solid var(--line)}
+  .mobile-links a span{color:var(--green);font-size:17px}
+  .mobile-links a[aria-current=page]{color:var(--green)}
+  .mobile-contacts{display:flex;flex-direction:column;gap:4px}
+  .mobile-contacts .footer-label{color:var(--muted);margin-bottom:6px}
+  .mobile-nav .mobile-contacts a{border:0;padding:3px 0;font-size:16px}
+  .mobile-nav .mobile-contacts .mobile-phone{font-size:26px;font-weight:500;letter-spacing:-.02em}
+  .mobile-contacts small{color:var(--muted);font-size:13px;margin-top:2px}
+  .mobile-nav-inner>.btn{margin-top:auto}
+  html.menu-open{overflow:hidden}
+  html.menu-open .mobile-bar{display:none}
+}
+@media(max-width:850px){.mobile-nav{top:76px}}
+
+/* Touch screens: no hover lifts that stick after a tap; a light press state instead */
+@media(hover:none){
+  .product-card:hover,.article-card:hover,.solution-card:hover,.cert-scan:hover{transform:none;box-shadow:none}
+  .product-card:hover .product-image img,.solution-card:hover .solution-image img,.article-card:hover .article-image img{transform:none}
+  .btn:hover .arrow,.text-link:hover>span:last-child,a:hover .text-link>span:last-child{transform:none}
+  .product-card:active,.solution-card:active,.article-card:active,.cert-scan:active{opacity:.82}
+}
+
+@media(max-width:920px){
+  .toc-mobile{display:block;margin:-20px 0 28px;border-block:1px solid var(--line)}
+  .toc-mobile summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer}
+  .toc-mobile summary::-webkit-details-marker{display:none}
+  .toc-mobile .eyebrow{color:var(--green)}
+  .toc-mobile[open] .faq-icon:after{transform:translate(-50%,-50%)}
+  .toc-mobile ol{margin:0 0 16px;padding-left:22px;display:flex;flex-direction:column;gap:10px;font-size:15px}
+  .toc-mobile li::marker{color:var(--green);font-size:13px}
+  .article-aside .toc{display:none}
+}
+
+@media(max-width:650px){
+  .mobile-nav{top:72px}
+  /* Header slides away while scrolling down */
+  .site-header{transition:transform .3s ease,box-shadow .2s}
+  .site-header.is-hidden{transform:translateY(-100%)}
+  .menu-toggle{width:44px;height:44px}
+
+  .section{padding:48px 0}
+  .hero-media{min-height:280px}
+
+  /* Chips that do not fit scroll sideways instead of wrapping */
+  .filters,.product-jumps{flex-wrap:nowrap;overflow-x:auto;margin-inline:-20px;padding-inline:20px;scrollbar-width:none;scroll-padding-inline:20px}
+  .filters::-webkit-scrollbar,.product-jumps::-webkit-scrollbar{display:none}
+  .filter{flex-shrink:0}
+  .product-jumps{gap:8px;justify-content:flex-start;border:0;padding-block:6px 14px}
+  .product-jumps a{flex-shrink:0;display:flex;align-items:center;min-height:40px;padding:8px 15px;border:1px solid var(--line);border-radius:30px;background:var(--white);font-size:13px}
+
+  /* Solutions: compact cards with the photo on the left */
+  .solution-card{display:grid;grid-template-columns:112px 1fr}
+  .solution-image{aspect-ratio:auto;height:100%;min-height:150px}
+  .solution-body{padding:16px 16px 12px}
+  .solution-body .eyebrow{margin-bottom:8px}
+  .solution-body h3{font-size:20px;margin-bottom:6px}
+  .solution-body p{font-size:13px;margin-bottom:8px}
+  .solution-body .text-link{font-size:13px;min-height:38px;padding:6px 0}
+
+  /* Feedstock: two columns */
+  .feedstock-grid{grid-template-columns:1fr 1fr}
+  .feedstock,.feedstock+.feedstock,.feedstock:nth-child(3){padding:18px 12px 18px 0;border-right:0;border-top:1px solid var(--line)}
+  .feedstock:nth-child(-n+2){border-top:0}
+  .feedstock:nth-child(even){padding-left:14px;border-left:1px solid var(--line)}
+  .feedstock-code{margin-bottom:10px;font-size:11px;padding:5px 9px}
+  .feedstock h3{font-size:18px;margin-bottom:6px}
+  .feedstock p{font-size:12px}
+
+  /* Process: tighter timeline */
+  .process-step,.process-step+.process-step,.process-step:nth-child(4){padding:14px 0 14px 24px}
+  .process-step:before,.process-step+.process-step:before,.process-step:nth-child(4):before{top:18px}
+  .process-num{margin-bottom:6px}
+  .process-step h3{font-size:18px;margin-bottom:4px}
+  .process-step p{font-size:13px;margin-bottom:10px}
+
+  /* Home articles and related equipment: swipeable rows, like the home catalog */
+  .articles-teaser .article-grid,.related .product-grid{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:20px;margin:0 -20px;padding:0 20px 10px;scrollbar-width:none}
+  .articles-teaser .article-grid::-webkit-scrollbar,.related .product-grid::-webkit-scrollbar{display:none}
+  .articles-teaser .article-card,.related .product-card{flex:0 0 84%;scroll-snap-align:start}
+
+  .steps{gap:18px}
+  .step h3{font-size:22px}
+  .about-photo{min-height:220px}
+
+  /* Catalog page: compact rows instead of tall cards */
+  .catalog-page .product-card{display:grid;grid-template-columns:124px 1fr;gap:14px;align-items:start;padding-bottom:16px;border-bottom:1px solid var(--line)}
+  .catalog-page .product-image{aspect-ratio:1.15}
+  .catalog-page .product-image .corner{display:none}
+  .catalog-page .product-info{padding:0;border:0}
+  .catalog-page .product-info .eyebrow{margin-bottom:6px}
+  .catalog-page .product-info h2{font-size:19px;margin-bottom:6px}
+  .catalog-page .product-info p{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .catalog-page .product-meta{margin-top:10px;padding-top:10px}
+  .catalog-page .product-meta dd{font-size:14px}
+  .catalog-page .product-grid{gap:16px}
+  .catalog-page .custom-tile{grid-column:auto}
+
+  /* Inquiry form as a bottom sheet */
+  #inquiry-dialog{width:100%;max-width:100%;margin:auto 0 0;border-radius:18px 18px 0 0;max-height:94dvh}
+  #inquiry-dialog::before{content:"";position:absolute;top:8px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:2px;background:var(--line)}
+  #inquiry-dialog .dialog-content{padding:30px 20px calc(22px + env(safe-area-inset-bottom))}
+  #inquiry-dialog .dialog-intro{margin-bottom:16px}
+
+  /* Footer: languages spaced, links easy to tap, sections in two columns */
+  .site-footer .footer-bottom .footer-langs{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px}
+  .footer-langs a{padding:6px 0}
+  .footer-nav{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
+  .footer-nav .footer-label{grid-column:1/-1}
+  .footer-nav a{padding:9px 0}
+  .footer-contact a{padding:4px 0}
+}
+@media(max-width:650px) and (prefers-reduced-motion:no-preference){
+  #inquiry-dialog{transform:translateY(60px)}
+  #inquiry-dialog[open]{transform:none}
+  @starting-style{#inquiry-dialog[open]{transform:translateY(60px)}}
+  .mobile-nav:not([hidden]){animation:fade .25s ease both}
+}

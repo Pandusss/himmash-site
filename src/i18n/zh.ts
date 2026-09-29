@@ -23,6 +23,7 @@ const zh: UI = {
     openMenu: '打开菜单',
     closeMenu: '关闭菜单',
     language: '网站语言',
+    theme: '深色模式',
     breadcrumbs: '面包屑导航',
   },
   contact: {

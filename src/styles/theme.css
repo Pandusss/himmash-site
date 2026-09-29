@@ -1,0 +1,70 @@
+/* Colour tokens for light and dark themes.
+   The theme is set on <html data-theme> by an inline script before first paint;
+   without JavaScript the system preference applies. */
+:root{
+  color-scheme:light;
+  --deep:#145445;--on-deep:#fff;
+  --band:#e5ebdf;--band-line:#c9d4c4;
+  --footer-bg:#202d28;
+  --header-bg:rgba(243,244,239,.98);
+  --field-bg:#fff;--field-border:#bbc8ba;
+  --on-lime:#1b2a23;
+  --img-dim:none;
+}
+:root[data-theme=dark]{
+  color-scheme:dark;
+  --paper:#111613;--white:#182019;--ink:#e4ebe5;--muted:#9aa89f;
+  --green:#7fcfa9;--green-hover:#9adbbd;--line:#29332d;--soft:#1d2621;
+  --lime:#b8d48f;--error:#ff8f85;
+  --deep:#183d32;--on-deep:#eef4ef;
+  --band:#161d19;--band-line:#2c3731;
+  --footer-bg:#0b0f0d;
+  --header-bg:rgba(17,22,19,.94);
+  --field-bg:#111613;--field-border:#3a483f;
+  --img-dim:brightness(.9) saturate(.95);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme]){
+    color-scheme:dark;
+    --paper:#111613;--white:#182019;--ink:#e4ebe5;--muted:#9aa89f;
+    --green:#7fcfa9;--green-hover:#9adbbd;--line:#29332d;--soft:#1d2621;
+    --lime:#b8d48f;--error:#ff8f85;
+    --deep:#183d32;--on-deep:#eef4ef;
+    --band:#161d19;--band-line:#2c3731;
+    --footer-bg:#0b0f0d;
+    --header-bg:rgba(17,22,19,.94);
+    --field-bg:#111613;--field-border:#3a483f;
+    --img-dim:brightness(.9) saturate(.95);
+  }
+}
+
+/* Surfaces that the original styles painted with fixed colours */
+.site-header,.product-bar{background:var(--header-bg)}
+.modernize{background:var(--deep);color:var(--on-deep)}
+.custom-tile{background:var(--deep);color:var(--on-deep)}
+.contact-section{background:var(--band)}
+.channel,.channel:first-child{border-color:var(--band-line)}
+.site-footer,.mobile-bar{background:var(--footer-bg)}
+.inquiry-form input,.inquiry-form textarea{background:var(--field-bg);border-color:var(--field-border);color:var(--ink)}
+.btn.light{color:var(--on-lime)}
+.zoom-label{background:var(--white);color:var(--ink)}
+.product-image img,.solution-image img,.article-image img,.about-photo img,.modernize img,.article-cover img,.gallery-main img,.catalog-table img{filter:var(--img-dim)}
+
+/* Dark-only details */
+:root[data-theme=dark] ::selection{background:#2e6a55;color:#fff}
+:root[data-theme=dark] .brand img,:root[data-theme=dark] .footer-mark{mix-blend-mode:normal;background:#f3f4ef;border-radius:50%;padding:2px}
+:root[data-theme=dark] .hero-media{box-shadow:0 0 0 1px var(--line)}
+:root[data-theme=dark] dialog::backdrop{background:rgba(0,0,0,.7)}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme]) .brand img{mix-blend-mode:normal;background:#f3f4ef;border-radius:50%;padding:2px}
+}
+
+/* Theme toggle */
+.theme-toggle{display:inline-grid;place-items:center;width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--ink);flex-shrink:0}
+.theme-toggle:hover{color:var(--green);border-color:var(--green)}
+.theme-toggle .icon-sun{display:none}
+:root[data-theme=dark] .theme-toggle .icon-sun{display:block}
+:root[data-theme=dark] .theme-toggle .icon-moon{display:none}
+
+/* Short colour cross-fade while switching themes */
+html.theme-switching,html.theme-switching *{transition:background-color .3s ease,color .3s ease,border-color .3s ease,fill .3s ease!important}

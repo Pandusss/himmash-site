@@ -6,18 +6,59 @@ function fadeIn(el: Element, delay = 0) {
   el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
 }
 
-// Mobile menu
+// Theme: light / dark, remembered in this browser; follows the system until chosen.
+const themeButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')];
+function syncThemeButtons() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  themeButtons.forEach((b) => b.setAttribute('aria-pressed', String(dark)));
+}
+function setTheme(theme: 'light' | 'dark', remember: boolean) {
+  const root = document.documentElement;
+  root.classList.add('theme-switching');
+  root.dataset.theme = theme;
+  syncThemeButtons();
+  if (remember) try { localStorage.setItem('theme', theme); } catch {}
+  setTimeout(() => root.classList.remove('theme-switching'), 350);
+}
+themeButtons.forEach((b) => b.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true)));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+  let saved: string | null = null;
+  try { saved = localStorage.getItem('theme'); } catch {}
+  if (!saved) setTheme(event.matches ? 'dark' : 'light', false);
+});
+syncThemeButtons();
+
+// Mobile menu: a full-screen sheet; the page underneath does not scroll.
 const menuButton = document.querySelector<HTMLButtonElement>('.menu-toggle');
 const mobileNav = $('mobile-nav');
 function setMenu(open: boolean) {
   if (!menuButton || !mobileNav) return;
   mobileNav.hidden = !open;
+  document.documentElement.classList.toggle('menu-open', open);
   menuButton.setAttribute('aria-expanded', String(open));
   menuButton.setAttribute('aria-label', (open ? menuButton.dataset.closeLabel : menuButton.dataset.openLabel) ?? '');
-  menuButton.textContent = open ? '×' : '☰';
 }
 menuButton?.addEventListener('click', () => setMenu(menuButton.getAttribute('aria-expanded') !== 'true'));
-mobileNav?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+mobileNav?.querySelectorAll('a, [data-inquiry]').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !mobileNav?.hidden) { setMenu(false); menuButton?.focus(); } });
+matchMedia('(min-width: 1101px)').addEventListener('change', (event) => { if (event.matches) setMenu(false); });
+
+/** Horizontal swipe on touch screens; calls back with -1 (previous) or 1 (next). */
+function onSwipe(el: HTMLElement, callback: (direction: number) => void) {
+  let startX = 0, startY = 0, tracking = false;
+  el.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') return; startX = e.clientX; startY = e.clientY; tracking = true; });
+  el.addEventListener('pointerup', (e) => {
+    if (!tracking) return;
+    tracking = false;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      el.dataset.swiped = '1';
+      callback(dx < 0 ? 1 : -1);
+      setTimeout(() => delete el.dataset.swiped, 400);
+    }
+  });
+  el.addEventListener('pointercancel', () => { tracking = false; });
+}
 
 // Dialogs
 const inquiry = $<HTMLDialogElement>('inquiry-dialog');
@@ -69,6 +110,8 @@ document.querySelectorAll<HTMLElement>('[data-media]').forEach((b) =>
 );
 $('media-prev')?.addEventListener('click', () => showGalleryItem(galleryIndex - 1));
 $('media-next')?.addEventListener('click', () => showGalleryItem(galleryIndex + 1));
+const mediaPhoto = $('media-photo');
+if (mediaPhoto) onSwipe(mediaPhoto, (direction) => { if (gallery.length > 1) showGalleryItem(galleryIndex + direction); });
 media?.addEventListener('keydown', (event) => {
   if (gallery.length < 2) return;
   if (event.key === 'ArrowLeft') showGalleryItem(galleryIndex - 1);
@@ -144,8 +187,19 @@ const header = document.querySelector<HTMLElement>('.site-header');
 const progressBar = $('read-progress-bar');
 const prose = document.querySelector<HTMLElement>('.prose');
 
+// On phones the header slides away while scrolling down and returns on the way up.
+const phoneWidth = matchMedia('(max-width: 650px)');
+let lastY = scrollY;
+
 function onScroll() {
-  header?.classList.toggle('is-scrolled', scrollY > 8);
+  const y = scrollY;
+  header?.classList.toggle('is-scrolled', y > 8);
+  if (header) {
+    const menuOpen = document.documentElement.classList.contains('menu-open');
+    if (!phoneWidth.matches || menuOpen || y < 120 || y < lastY - 6) header.classList.remove('is-hidden');
+    else if (y > lastY + 6) header.classList.add('is-hidden');
+  }
+  lastY = y;
   if (progressBar && prose) {
     const rect = prose.getBoundingClientRect();
     const total = rect.height - innerHeight * 0.6;
@@ -177,7 +231,19 @@ document.querySelectorAll<HTMLButtonElement>('[data-photo]').forEach((thumb, i, 
     all.forEach((t) => t.setAttribute('aria-pressed', String(t === thumb)));
   }),
 );
-$('zoom-product')?.addEventListener('click', () => productPhoto && showMedia(productPhoto.currentSrc || productPhoto.src, productPhoto.alt));
+const zoomButton = $('zoom-product');
+zoomButton?.addEventListener('click', () => {
+  if (zoomButton.dataset.swiped) return; // the tap was a swipe between photos
+  if (productPhoto) showMedia(productPhoto.currentSrc || productPhoto.src, productPhoto.alt);
+});
+// Swipe through product photos on touch screens.
+const thumbs = [...document.querySelectorAll<HTMLButtonElement>('[data-photo]')];
+if (zoomButton && thumbs.length > 1) {
+  onSwipe(zoomButton, (direction) => {
+    const current = thumbs.findIndex((t) => t.getAttribute('aria-pressed') === 'true');
+    thumbs[(current + direction + thumbs.length) % thumbs.length].click();
+  });
+}
 
 // Catalog filters
 // On phones the home catalog is a horizontal carousel, so it shows every card.

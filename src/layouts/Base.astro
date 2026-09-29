@@ -2,7 +2,9 @@
 import '../styles/global.css';
 import '../styles/site.css';
 import '../styles/refresh.css';
+import '../styles/theme.css';
 import '../styles/motion.css';
+import '../styles/mobile.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import InquiryDialog from '../components/InquiryDialog.astro';
@@ -42,8 +44,18 @@ const previewBuild = import.meta.env.PUBLIC_NOINDEX === 'true';
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f3f4ef">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f3f4ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111613" media="(prefers-color-scheme: dark)">
+  <script is:inline>
+    // Apply the saved or system theme before the first paint to avoid a flash.
+    (function () {
+      var theme;
+      try { theme = localStorage.getItem('theme'); } catch (e) {}
+      if (theme !== 'light' && theme !== 'dark') theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
   <title>{title}</title>
   <meta name="description" content={description}>
   {previewBuild && <meta name="robots" content="noindex, nofollow">}

@@ -1,4 +1,5 @@
 ---
+import ThemeToggle from './ThemeToggle.astro';
 import { type Lang, locales, langMeta, localePath, asset, useTranslations } from '../i18n';
 import { company, phoneDisplay } from '../data/company';
 
@@ -27,6 +28,7 @@ const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/')
       {links.map((l) => <a href={l.href} aria-current={current(l.match)}>{l.label}</a>)}
     </nav>
     <div class="header-side">
+      <ThemeToggle lang={lang} />
       <nav class="lang-switch" aria-label={t.nav.language}>
         {locales.map((l) => (
           <a href={langHref(l)} hreflang={langMeta[l].hreflang} lang={langMeta[l].htmlLang} aria-current={l === lang ? 'true' : undefined} title={langMeta[l].name}>{langMeta[l].label}</a>
@@ -38,15 +40,28 @@ const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/')
       </div>
       <button class="btn header-cta" type="button" data-inquiry={t.form.defaultSubject}>{t.nav.cta}</button>
     </div>
-    <button class="menu-toggle" type="button" aria-label={t.nav.openMenu} data-open-label={t.nav.openMenu} data-close-label={t.nav.closeMenu} aria-controls="mobile-nav" aria-expanded="false">☰</button>
+    <button class="menu-toggle" type="button" aria-label={t.nav.openMenu} data-open-label={t.nav.openMenu} data-close-label={t.nav.closeMenu} aria-controls="mobile-nav" aria-expanded="false"><span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span></button>
   </div>
   <nav id="mobile-nav" class="mobile-nav" aria-label={t.nav.mobile} hidden>
-    <div class="mobile-langs">
-      {locales.map((l) => (
-        <a href={langHref(l)} hreflang={langMeta[l].hreflang} lang={langMeta[l].htmlLang} aria-current={l === lang ? 'true' : undefined}>{langMeta[l].label}</a>
-      ))}
+    <div class="mobile-nav-inner">
+      <div class="mobile-nav-top">
+        <div class="mobile-langs">
+          {locales.map((l) => (
+            <a href={langHref(l)} hreflang={langMeta[l].hreflang} lang={langMeta[l].htmlLang} aria-current={l === lang ? 'true' : undefined}>{langMeta[l].label}</a>
+          ))}
+        </div>
+        <ThemeToggle lang={lang} />
+      </div>
+      <div class="mobile-links">
+        {mobileLinks.map((l) => <a href={l.href} aria-current={current(l.match)}>{l.label}<span aria-hidden="true">↗</span></a>)}
+      </div>
+      <div class="mobile-contacts">
+        <div class="footer-label">{t.footer.discuss}</div>
+        <a class="mobile-phone" href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
+        <a href={`mailto:${company.email}`}>{company.email}</a>
+        <small>{t.contact.hours}</small>
+      </div>
+      <button class="btn full" type="button" data-inquiry={t.form.defaultSubject}>{t.nav.cta} <span class="arrow" aria-hidden="true">↗</span></button>
     </div>
-    {mobileLinks.map((l) => <a href={l.href} aria-current={current(l.match)}>{l.label}</a>)}
-    <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
   </nav>
 </header>
