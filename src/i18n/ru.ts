@@ -303,7 +303,7 @@ const ru = {
     modernizationSubject: 'Модернизация действующей линии',
     generalSubject: 'Обсуждение задачи переработки',
   },
-  mobileBar: { call: 'Позвонить', max: 'MAX', request: 'Заявка' },
+  mobileBar: { call: 'Позвонить', max: 'MAX', email: 'Почта', request: 'Заявка' },
   media: { label: 'Просмотр изображения', close: 'Закрыть изображение' },
   footer: {
     route: 'Построить маршрут',

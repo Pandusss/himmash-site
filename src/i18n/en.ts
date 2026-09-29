@@ -303,7 +303,7 @@ const en: UI = {
     modernizationSubject: 'Upgrading an existing line',
     generalSubject: 'Discussing a recycling project',
   },
-  mobileBar: { call: 'Call', max: 'MAX', request: 'Request' },
+  mobileBar: { call: 'Call', max: 'MAX', email: 'Email', request: 'Request' },
   media: { label: 'Image viewer', close: 'Close image' },
   footer: {
     route: 'Get directions',

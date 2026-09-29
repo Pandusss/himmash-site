@@ -303,7 +303,7 @@ const zh: UI = {
     modernizationSubject: '现有生产线改造升级',
     generalSubject: '回收项目咨询',
   },
-  mobileBar: { call: '致电', max: 'MAX', request: '咨询' },
+  mobileBar: { call: '致电', max: 'MAX', email: '邮件', request: '咨询' },
   media: { label: '查看图片', close: '关闭图片' },
   footer: {
     route: '查看路线',

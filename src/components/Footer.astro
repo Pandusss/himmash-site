@@ -1,6 +1,6 @@
 ---
 import { type Lang, locales, langMeta, localePath, useTranslations } from '../i18n';
-import { company, phoneDisplay } from '../data/company';
+import { company, hasMax, phoneDisplay } from '../data/company';
 
 interface Props { lang: Lang; path: string; alternates: readonly Lang[] }
 const { lang, path, alternates } = Astro.props;
@@ -20,7 +20,7 @@ const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/')
         <div class="footer-label">{t.footer.discuss}</div>
         <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
         <a href={`mailto:${company.email}`}>{company.email}</a>
-        <a class="text-link footer-link small" href={company.max} target="_blank" rel="noopener">{t.contact.max} <span aria-hidden="true">↗</span></a>
+        {hasMax(lang) && <a class="text-link footer-link small" href={company.max} target="_blank" rel="noopener">{t.contact.max} <span aria-hidden="true">↗</span></a>}
       </div>
       <div class="footer-address">
         <div class="footer-label">{t.footer.company}</div>

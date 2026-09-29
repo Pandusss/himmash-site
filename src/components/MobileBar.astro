@@ -1,6 +1,6 @@
 ---
 import { type Lang, useTranslations } from '../i18n';
-import { company } from '../data/company';
+import { company, hasMax } from '../data/company';
 
 interface Props { lang: Lang; subject?: string }
 const { lang } = Astro.props;
@@ -9,6 +9,8 @@ const { subject = t.form.defaultSubject } = Astro.props;
 ---
 <div class="mobile-bar" aria-label={t.home.contactCta.eyebrow} role="group">
   <a href={`tel:${company.phone}`}><span aria-hidden="true">☎</span>{t.mobileBar.call}</a>
-  <a href={company.max} target="_blank" rel="noopener"><span aria-hidden="true">✉</span>{t.mobileBar.max}</a>
+  {hasMax(lang)
+    ? <a href={company.max} target="_blank" rel="noopener"><span aria-hidden="true">✉</span>{t.mobileBar.max}</a>
+    : <a href={`mailto:${company.email}`}><span aria-hidden="true">✉</span>{t.mobileBar.email}</a>}
   <button type="button" class="mobile-bar-main" data-inquiry={subject}>{t.mobileBar.request} <span aria-hidden="true">↗</span></button>
 </div>

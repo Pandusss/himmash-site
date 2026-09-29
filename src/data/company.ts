@@ -15,6 +15,11 @@ export const company = {
   name: { ru: 'НПО «Химмаш»', en: 'NPO Himmash', zh: 'NPO Himmash' },
 };
 
+/** MAX is a Russian messenger: offered on the Russian site only. */
+export function hasMax(lang: Lang): boolean {
+  return lang === 'ru';
+}
+
 export function phoneDisplay(lang: Lang): string {
   return lang === 'ru' ? company.phoneDisplay.ru : company.phoneDisplay.intl;
 }
