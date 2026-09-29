@@ -1,0 +1,87 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { type Lang, locales, langMeta, localePath, asset, useTranslations } from '../i18n';
+import { documents, documentText } from '../data/documents';
+import { breadcrumbJsonLd } from '../data/company';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const d = t.documents;
+const crumbs = [
+  { name: t.product.home, href: localePath(lang, '/') },
+  { name: t.nav.documents, href: localePath(lang, '/certificates/') },
+];
+const absolute = (href: string) => new URL(href, Astro.site).href;
+---
+<Base lang={lang} path="/certificates/" title={d.metaTitle} description={d.metaDescription} jsonLd={[breadcrumbJsonLd(crumbs, absolute)]}>
+  <div class="wrap">
+    <Breadcrumbs label={t.nav.breadcrumbs} items={[crumbs[0], { name: t.nav.documents }]} />
+    <header class="page-head">
+      <div class="eyebrow">{d.eyebrow}</div>
+      <h1 set:html={d.title} />
+      <p>{d.lead}</p>
+    </header>
+    <nav class="doc-index" aria-label={d.eyebrow}>
+      {documents.map((doc, i) => { const text = documentText(doc.id, lang); return (
+        <a href={`#${doc.id}`}><span class="num">0{i + 1}</span><span>{text.title}<small>{text.kind} · {doc.years}</small></span></a>
+      ); })}
+    </nav>
+  </div>
+
+  {documents.map((doc, i) => {
+    const text = documentText(doc.id, lang);
+    const caption = `${text.title} · ${doc.years}`;
+    return (
+      <section class="doc-section" id={doc.id} aria-labelledby={`${doc.id}-title`}>
+        <div class="wrap">
+          <div class="doc-heading">
+            <span class="eyebrow">0{i + 1} — {text.kind}</span>
+            <h2 id={`${doc.id}-title`}>{text.title}</h2>
+            <div class="doc-badges">
+              <span class="badge">{doc.years}</span>
+              {doc.archive && <span class="badge muted">{d.archive}</span>}
+            </div>
+          </div>
+          <div class="doc-pair">
+            <figure class="doc-original">
+              <figcaption class="doc-label">{d.original} · RU</figcaption>
+              <button class="doc-scan" type="button" data-media={asset(`img/docs/${doc.image}`)} data-caption={caption} data-gallery="certificates" aria-label={`${d.zoom}: ${text.title}`}>
+                <img src={asset(`img/docs/${doc.image}`)} width={doc.width} height={doc.height} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" alt={caption} lang="ru">
+                <span class="zoom-label" aria-hidden="true">+</span>
+              </button>
+            </figure>
+            <article class="doc-text">
+              <div class="doc-text-head">
+                <div class="doc-label">{d.translation}</div>
+                <div class="doc-lang-tabs" role="tablist" aria-label={d.textLanguage}>
+                  {locales.map((l) => (
+                    <button type="button" role="tab" id={`${doc.id}-tab-${l}`} aria-controls={`${doc.id}-text-${l}`} aria-selected={String(l === lang)} tabindex={l === lang ? 0 : -1} data-doc-lang={l} lang={langMeta[l].htmlLang} title={langMeta[l].name}>{langMeta[l].label}</button>
+                  ))}
+                </div>
+              </div>
+              {locales.map((l) => {
+                const version = documentText(doc.id, l);
+                return (
+                  <div class="doc-version" role="tabpanel" id={`${doc.id}-text-${l}`} aria-labelledby={`${doc.id}-tab-${l}`} data-doc-panel={l} lang={langMeta[l].htmlLang} hidden={l !== lang}>
+                    <p class="doc-header">{version.header}</p>
+                    <h3>{version.heading}</h3>
+                    <dl class="doc-fields">
+                      {version.fields.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}
+                    </dl>
+                    {version.footer && <p class="doc-footer">{version.footer}</p>}
+                  </div>
+                );
+              })}
+              <p class="doc-note">{d.note}</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    );
+  })}
+
+  <ContactCta lang={lang} />
+</Base>

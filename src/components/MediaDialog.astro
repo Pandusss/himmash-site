@@ -1,0 +1,18 @@
+---
+import { type Lang, useTranslations } from '../i18n';
+
+interface Props { lang: Lang }
+const t = useTranslations(Astro.props.lang);
+---
+<dialog id="media-dialog" class="media-dialog" aria-label={t.media.label}>
+  <button class="dialog-close" type="button" data-close="media-dialog" aria-label={t.media.close}>×</button>
+  <img id="media-photo" src="data:," alt="">
+  <div class="media-footer">
+    <p class="media-caption" id="media-caption"></p>
+    <div class="media-nav" id="media-nav" hidden>
+      <button type="button" id="media-prev" aria-label="←">←</button>
+      <span id="media-count"></span>
+      <button type="button" id="media-next" aria-label="→">→</button>
+    </div>
+  </div>
+</dialog>

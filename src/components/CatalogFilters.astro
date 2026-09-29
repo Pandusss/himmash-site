@@ -1,0 +1,17 @@
+---
+import { type Lang, useTranslations } from '../i18n';
+import { products, categoryOrder } from '../data/products';
+
+interface Props { lang: Lang }
+const t = useTranslations(Astro.props.lang);
+const count = (c: string) => products.filter((p) => p.category === c).length;
+---
+<div class="catalog-controls">
+  <div class="filters" role="group" aria-label={t.home.catalog.filterLabel}>
+    <button class="filter" type="button" data-filter="all" aria-pressed="true">{t.home.catalog.all} <span class="filter-count">{products.length}</span></button>
+    {categoryOrder.map((c) => (
+      <button class="filter" type="button" data-filter={c} aria-pressed="false">{t.categories[c]} <span class="filter-count">{count(c)}</span></button>
+    ))}
+  </div>
+  <span class="results-count" data-count aria-live="polite"></span>
+</div>

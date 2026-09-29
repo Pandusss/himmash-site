@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ProductCard from '../components/ProductCard.astro';
+import ContactCta from '../components/ContactCta.astro';
+import CatalogFilters from '../components/CatalogFilters.astro';
+import { type Lang, localePath, useTranslations } from '../i18n';
+import { products, productText } from '../data/products';
+import { breadcrumbJsonLd } from '../data/company';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const e = t.equipment;
+const crumbs = [
+  { name: t.product.home, href: localePath(lang, '/') },
+  { name: t.product.equipment, href: localePath(lang, '/equipment/') },
+];
+const absolute = (href: string) => new URL(href, Astro.site).href;
+const itemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: products.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: productText(p.slug, lang).name, url: absolute(localePath(lang, `/equipment/${p.slug}/`)) })),
+};
+---
+<Base lang={lang} path="/equipment/" title={e.metaTitle} description={e.metaDescription} jsonLd={[breadcrumbJsonLd(crumbs, absolute), itemList]}>
+  <div class="wrap">
+    <Breadcrumbs label={t.nav.breadcrumbs} items={[crumbs[0], { name: t.product.equipment }]} />
+    <header class="page-head">
+      <div class="eyebrow">{e.eyebrow}</div>
+      <h1 set:html={e.title} />
+      <p>{e.lead}</p>
+    </header>
+  </div>
+  <section class="section catalog catalog-page" data-catalog aria-label={e.eyebrow}>
+    <div class="wrap">
+      <CatalogFilters lang={lang} />
+      <div class="product-grid">
+        {products.map((p) => <ProductCard product={p} lang={lang} headingLevel="h2" />)}
+      </div>
+    </div>
+  </section>
+  <ContactCta lang={lang} />
+</Base>

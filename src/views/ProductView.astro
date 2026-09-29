@@ -1,0 +1,172 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SectionHead from '../components/SectionHead.astro';
+import ProductCard from '../components/ProductCard.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { type Lang, localePath, asset, useTranslations } from '../i18n';
+import { type ProductMeta, productText, productBySlug } from '../data/products';
+import { breadcrumbJsonLd, company } from '../data/company';
+
+interface Props { lang: Lang; product: ProductMeta }
+const { lang, product } = Astro.props;
+const t = useTranslations(lang);
+const p = t.product;
+const text = productText(product.slug, lang);
+const photos = product.photos ?? [product.image];
+const related = product.related.map(productBySlug);
+const path = `/equipment/${product.slug}/`;
+const absolute = (href: string) => new URL(href, Astro.site).href;
+const crumbs = [
+  { name: p.home, href: localePath(lang, '/') },
+  { name: p.equipment, href: localePath(lang, '/equipment/') },
+  { name: text.short, href: localePath(lang, path) },
+];
+// Offer data comes from the Russian source text: prices are in roubles in every language.
+const ruPrice = productText(product.slug, 'ru').price ?? '';
+const priceValue = /\d/.test(ruPrice) ? ruPrice.replace(/[^\d]/g, '') : '';
+const priceFrom = /^от\s/i.test(ruPrice);
+const productJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: text.name,
+  description: text.lead,
+  image: photos.map((ph) => absolute(asset(`img/${ph}`))),
+  category: t.categories[product.category],
+  brand: { '@type': 'Brand', name: company.name[lang] },
+  manufacturer: { '@type': 'Organization', name: company.name[lang] },
+  ...(priceValue && {
+    offers: priceFrom
+      ? { '@type': 'AggregateOffer', lowPrice: priceValue, priceCurrency: 'RUB', availability: 'https://schema.org/MadeToOrder', url: absolute(localePath(lang, path)) }
+      : { '@type': 'Offer', price: priceValue, priceCurrency: 'RUB', availability: 'https://schema.org/MadeToOrder', url: absolute(localePath(lang, path)) },
+  }),
+};
+const hasSpecs = Boolean(text.specs?.length);
+const jumps = [
+  hasSpecs ? { href: '#specs', label: p.jumpSpecs } : { href: '#about-product', label: p.jumpAbout },
+  text.materials && { href: '#materials', label: p.jumpMaterials },
+  text.terms && { href: '#terms', label: p.jumpTerms },
+  { href: '#contacts', label: p.jumpContact },
+].filter(Boolean) as { href: string; label: string }[];
+let n = 0;
+const num = () => String(++n).padStart(2, '0');
+---
+<Base lang={lang} path={path} title={`${text.name} — ${t.meta.brandShort}`} description={text.metaDescription} image={`img/${photos[0]}`} jsonLd={[breadcrumbJsonLd(crumbs, absolute), productJsonLd]} inquirySubject={text.name}>
+  <div class="wrap">
+    <Breadcrumbs label={t.nav.breadcrumbs} items={[crumbs[0], crumbs[1], { name: text.short }]} />
+    <section class="product-hero" aria-labelledby="product-title">
+      <div class="gallery">
+        <button class="gallery-main" id="zoom-product" type="button" aria-label={p.zoom}>
+          <img id="product-photo" src={asset(`img/${photos[0]}`)} alt={text.name} fetchpriority="high">
+          <span class="zoom-label" aria-hidden="true">+</span>
+        </button>
+        {photos.length > 1 && (
+          <div class="gallery-thumbs" role="group" aria-label={p.photosLabel}>
+            {photos.map((ph, i) => (
+              <button class="thumb" type="button" data-photo={asset(`img/${ph}`)} data-alt={`${text.name} — ${p.photo.toLowerCase()} ${i + 1}`} aria-label={`${p.photo} ${i + 1}`} aria-pressed={String(i === 0)}>
+                <img src={asset(`img/${ph}`)} alt="" loading="lazy">
+              </button>
+            ))}
+          </div>
+        )}
+        <p class="gallery-caption">{p.galleryCaption}</p>
+      </div>
+      <div class="product-summary">
+        <div class="eyebrow">{t.categories[product.category]} / {company.name[lang]}</div>
+        <h1 id="product-title">{text.name}</h1>
+        <p class="product-description">{text.lead}</p>
+        {text.quick && (
+          <div class="quick-specs">
+            {text.quick.map((q) => <div><strong>{q.value} <small>{q.unit}</small></strong><span set:html={q.label} /></div>)}
+          </div>
+        )}
+        {(text.price || text.deliveryTime) && (
+          <div class="commercial">
+            {text.price && <div><span class="price-label">{p.price}</span><div class="price">{text.price}</div>{text.priceNote && <span class="price-note">{text.priceNote}</span>}</div>}
+            {text.deliveryTime && <div class="delivery"><b>{text.deliveryTime}</b>{p.delivery}</div>}
+          </div>
+        )}
+        {!text.quick && (
+          <div class="inquiry-box">
+            <h2>{p.genericTitle}</h2>
+            <p>{p.genericText}</p>
+          </div>
+        )}
+        <button class="btn full" id="product-inquiry" type="button" data-inquiry={text.name}>{p.inquiry} <span class="arrow" aria-hidden="true">↗</span></button>
+        <p class="summary-note">{p.inquiryNote}</p>
+      </div>
+    </section>
+    <nav class="product-jumps" aria-label={p.jumpsLabel}>
+      {jumps.map((j) => <a href={j.href}>{j.label}</a>)}
+    </nav>
+
+    {hasSpecs && (
+      <section id="specs" class="section details-layout" aria-labelledby="specs-title">
+        <div><div class="eyebrow muted">{num()} — {p.specsEyebrow}</div><h2 id="specs-title" set:html={p.specsTitle} /></div>
+        <table class="spec-table">
+          <caption class="visually-hidden">{text.name}</caption>
+          <tbody>
+            {text.specs!.map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}
+          </tbody>
+        </table>
+      </section>
+    )}
+
+    {(!hasSpecs || text.body || text.bullets) && (
+      <section id="about-product" class="section details-layout" aria-labelledby="about-product-title">
+        <div><div class="eyebrow muted">{num()} — {p.aboutEyebrow}</div><h2 id="about-product-title" set:html={p.aboutTitle} /></div>
+        <div class="product-body">
+          {!hasSpecs && !text.body && <p>{text.lead}</p>}
+          {text.body?.map((para) => <p>{para}</p>)}
+          {text.bulletsTitle && text.bullets && <h3>{text.bulletsTitle}</h3>}
+          {text.bullets && <ul>{text.bullets.map((b) => <li>{b}</li>)}</ul>}
+          {!hasSpecs && (
+            <>
+              <p class="muted">{p.selectionText}</p>
+              <button class="btn secondary" type="button" data-inquiry={text.name}>{p.clarify} <span aria-hidden="true">↗</span></button>
+            </>
+          )}
+        </div>
+      </section>
+    )}
+
+    {text.materials && (
+      <section id="materials" class="section section-flush" aria-labelledby="materials-title">
+        <SectionHead id="materials-title" eyebrow={`${num()} — ${p.materialsEyebrow}`} title={p.materialsTitle} />
+        <div class="material-grid">
+          {text.materials.map((m, i) => (
+            <article class="material">
+              <div class="eyebrow">0{i + 1}</div>
+              <h3 set:html={m.title} />
+              <dl><dt>{p.size}</dt><dd>{m.size}</dd><dt>{p.moisture}</dt><dd>{m.moisture}</dd></dl>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {text.terms && (
+      <section id="terms" class="section section-flush" aria-labelledby="terms-title">
+        <SectionHead id="terms-title" eyebrow={`${num()} — ${p.termsEyebrow}`} title={p.termsTitle} />
+        <div class="terms">
+          {text.terms.map((term) => <article class="term"><strong>{term.value}</strong><p>{term.text}</p></article>)}
+        </div>
+      </section>
+    )}
+
+    <section class="section section-flush related" aria-labelledby="related-title">
+      <SectionHead id="related-title" eyebrow={p.relatedEyebrow} title={p.relatedTitle} />
+      <div class="product-grid">
+        {related.map((r) => <ProductCard product={r} lang={lang} />)}
+      </div>
+    </section>
+  </div>
+  <ContactCta lang={lang} subject={text.name} />
+  <div class="product-bar" id="product-bar">
+    <div class="wrap product-bar-inner">
+      <img src={asset(`img/${product.image}`)} width="96" height="54" alt="" loading="lazy">
+      <div class="product-bar-name"><b>{text.short}</b>{text.price && <span>{text.price}{text.priceNote && ` · ${text.priceNote}`}</span>}</div>
+      <button class="btn" type="button" data-inquiry={text.name}>{p.inquiry} <span class="arrow" aria-hidden="true">↗</span></button>
+    </div>
+  </div>
+</Base>

@@ -1,0 +1,10 @@
+---
+import ProductView from '../../../views/ProductView.astro';
+import { products } from '../../../data/products';
+import type { Lang } from '../../../i18n';
+export function getStaticPaths() {
+  return ['en', 'zh'].flatMap((lang) => products.map((product) => ({ params: { lang, slug: product.slug }, props: { product } })));
+}
+const lang = Astro.params.lang as Lang;
+---
+<ProductView lang={lang} product={Astro.props.product} />

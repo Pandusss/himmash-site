@@ -1,0 +1,9 @@
+---
+import EquipmentView from '../../../views/EquipmentView.astro';
+import type { Lang } from '../../../i18n';
+export function getStaticPaths() {
+  return [{ params: { lang: "en" } }, { params: { lang: "zh" } }];
+}
+const lang = Astro.params.lang as Lang;
+---
+<EquipmentView lang={lang} />

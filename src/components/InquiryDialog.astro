@@ -1,0 +1,72 @@
+---
+import { type Lang, useTranslations } from '../i18n';
+import { company } from '../data/company';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+// Without PUBLIC_FORM_ENDPOINT the form prepares an email in the visitor's mail app.
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
+---
+<dialog id="inquiry-dialog" aria-labelledby="inquiry-title">
+  <button class="dialog-close" type="button" data-close="inquiry-dialog" aria-label={t.form.close}>×</button>
+  <div class="dialog-content">
+    <div id="form-view">
+      <div class="eyebrow">{t.form.eyebrow}</div>
+      <h2 id="inquiry-title" set:html={t.form.title} />
+      <p class="dialog-intro">{t.form.intro}</p>
+      <div class="inquiry-subject" id="inquiry-subject"></div>
+      <form
+        class="inquiry-form"
+        id="inquiry-form"
+        novalidate
+        data-endpoint={endpoint}
+        data-mailto={company.email}
+        data-mail-subject={t.form.mailSubject}
+        data-error-empty={t.form.errorEmpty}
+        data-error-invalid={t.form.errorInvalid}
+        data-error-send={t.form.errorSend}
+        data-sending={t.form.sending}
+        data-labels={JSON.stringify({ name: t.form.name, contact: t.form.contact, message: t.form.message })}
+      >
+        {accessKey && <input type="hidden" name="access_key" value={accessKey}>}
+        <input type="hidden" name="subject" id="inquiry-subject-field">
+        <input type="hidden" name="page" id="inquiry-page-field">
+        <input type="hidden" name="lang" value={lang}>
+        <div class="hp-field" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <div class="field">
+          <label for="contact-name">{t.form.name} <small>{t.form.optional}</small></label>
+          <input id="contact-name" name="name" autocomplete="name" placeholder={t.form.namePlaceholder}>
+        </div>
+        <div class="field">
+          <label for="contact-value">{t.form.contact}</label>
+          <input id="contact-value" name="contact" autocomplete="off" required placeholder={t.form.contactPlaceholder} aria-describedby="contact-error">
+          <p id="contact-error" class="field-error" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="contact-message">{t.form.message} <small>{t.form.optional}</small></label>
+          <textarea id="contact-message" name="message" rows="3" placeholder={t.form.messagePlaceholder}></textarea>
+        </div>
+        <button class="btn full" type="submit"><span class="btn-label">{t.form.submit}</span> <span class="arrow" aria-hidden="true">↗</span></button>
+        <p class="form-note">{t.form.note}</p>
+        <p class="field-error send-error" id="send-error" role="alert" hidden>{t.form.errorSend} <a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a> · <a href={`mailto:${company.email}`}>{company.email}</a></p>
+      </form>
+    </div>
+    <div id="success-view" class="success-view" role="status" hidden>
+      <div class="success-symbol" aria-hidden="true">✓</div>
+      <div class="eyebrow">{t.form.successEyebrow}</div>
+      <h2 set:html={t.form.successTitle} />
+      <p>{t.form.successText}</p>
+      <button class="btn full" type="button" data-close="inquiry-dialog">{t.form.back} <span aria-hidden="true">↗</span></button>
+    </div>
+    <div id="mailto-view" class="success-view" role="status" hidden>
+      <div class="success-symbol" aria-hidden="true">✉</div>
+      <div class="eyebrow">{t.form.mailtoEyebrow}</div>
+      <h2 set:html={t.form.mailtoTitle} />
+      <p>{t.form.mailtoText}</p>
+      <p class="mailto-contacts"><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a></p>
+      <button class="btn full" type="button" data-close="inquiry-dialog">{t.form.back} <span aria-hidden="true">↗</span></button>
+    </div>
+  </div>
+</dialog>

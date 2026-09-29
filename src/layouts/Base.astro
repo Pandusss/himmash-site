@@ -1,0 +1,86 @@
+---
+import '../styles/global.css';
+import '../styles/site.css';
+import '../styles/refresh.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import InquiryDialog from '../components/InquiryDialog.astro';
+import MediaDialog from '../components/MediaDialog.astro';
+import MobileBar from '../components/MobileBar.astro';
+import '@fontsource-variable/golos-text';
+import { type Lang, locales, langMeta, localePath, asset, useTranslations } from '../i18n';
+import { organizationJsonLd } from '../data/company';
+
+interface Props {
+  lang: Lang;
+  /** Locale-neutral path of this page, e.g. "/equipment/centrifuge/". */
+  path: string;
+  title: string;
+  description: string;
+  /** Image in /public for social previews. */
+  image?: string;
+  type?: 'website' | 'article';
+  jsonLd?: object[];
+  /** Languages this page exists in. */
+  alternates?: readonly Lang[];
+  /** Pages that should stay out of search (404): no canonical or hreflang. */
+  noindex?: boolean;
+  /** Subject for inquiries started from the mobile bar. */
+  inquirySubject?: string;
+}
+
+const { lang, path, title, description, image = 'img/og-cover.jpg', type = 'website', jsonLd = [], alternates = locales, noindex = false, inquirySubject } = Astro.props;
+const t = useTranslations(lang);
+const absolute = (href: string) => new URL(href, Astro.site).href;
+const canonical = absolute(localePath(lang, path));
+// Preview deployments (GitHub Pages) must stay out of search so they don't compete with the real domain.
+const previewBuild = import.meta.env.PUBLIC_NOINDEX === 'true';
+---
+<!doctype html>
+<html lang={langMeta[lang].htmlLang}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f3f4ef">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  {previewBuild && <meta name="robots" content="noindex, nofollow">}
+  {noindex ? <meta name="robots" content="noindex"> : (
+    <>
+      <link rel="canonical" href={canonical}>
+      {alternates.map((l) => <link rel="alternate" hreflang={langMeta[l].hreflang} href={absolute(localePath(l, path))}>)}
+      {alternates.includes('ru') && <link rel="alternate" hreflang="x-default" href={absolute(localePath('ru', path))}>}
+    </>
+  )}
+  <link rel="icon" type="image/webp" href={asset('img/logo-01-122x122.webp')}>
+  <link rel="apple-touch-icon" href={asset('img/logo-01-122x122.webp')}>
+  <link rel="sitemap" href={asset('sitemap-index.xml')}>
+  <meta property="og:type" content={type}>
+  <meta property="og:site_name" content={t.meta.siteName}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:url" content={canonical}>
+  <meta property="og:image" content={absolute(asset(image))}>
+  <meta property="og:locale" content={langMeta[lang].ogLocale}>
+  {alternates.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={langMeta[l].ogLocale}>)}
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd(lang, absolute))} />
+  {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+  <slot name="head" />
+</head>
+<body>
+  <a class="skip" href="#main">{t.skip}</a>
+  <Header lang={lang} path={path} alternates={alternates} />
+  <main id="main">
+    <slot />
+  </main>
+  <Footer lang={lang} path={path} alternates={alternates} />
+  <MobileBar lang={lang} subject={inquirySubject} />
+  <InquiryDialog lang={lang} />
+  <MediaDialog lang={lang} />
+  <script>
+    import '../scripts/site.ts';
+  </script>
+</body>
+</html>

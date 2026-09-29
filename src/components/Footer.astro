@@ -1,0 +1,48 @@
+---
+import { type Lang, locales, langMeta, localePath, useTranslations } from '../i18n';
+import { company, phoneDisplay } from '../data/company';
+
+interface Props { lang: Lang; path: string; alternates: readonly Lang[] }
+const { lang, path, alternates } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/');
+---
+<footer class="site-footer" id="contacts">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a class="footer-brand" href={localePath(lang, '/')}>{t.brand.name}</a>
+        <p class="footer-tagline">{t.footer.tagline}</p>
+        <a class="text-link footer-link" href={localePath(lang, '/equipment/')}>{t.footer.catalog} <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="footer-contact">
+        <div class="footer-label">{t.footer.discuss}</div>
+        <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
+        <a href={`mailto:${company.email}`}>{company.email}</a>
+        <a class="text-link footer-link small" href={company.max} target="_blank" rel="noopener">{t.contact.max} <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="footer-address">
+        <div class="footer-label">{t.footer.company}</div>
+        <Fragment set:html={t.contact.address} />
+        <small set:html={t.contact.hoursLong} />
+      </div>
+      <nav class="footer-nav" aria-label={t.footer.sections}>
+        <div class="footer-label">{t.footer.sections}</div>
+        <a href={localePath(lang, '/equipment/')}>{t.nav.equipment}</a>
+        <a href={localePath(lang, '/#modernization')}>{t.nav.modernization}</a>
+        <a href={localePath(lang, '/#about')}>{t.nav.about}</a>
+        <a href={localePath(lang, '/certificates/')}>{t.nav.documents}</a>
+        <a href={localePath(lang, '/articles/')}>{t.nav.articles}</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>{t.footer.rights}, {year}</span>
+      <span class="footer-langs">
+        {locales.map((l) => (
+          <a href={langHref(l)} hreflang={langMeta[l].hreflang} lang={langMeta[l].htmlLang} aria-current={l === lang ? 'true' : undefined}>{langMeta[l].name}</a>
+        ))}
+      </span>
+    </div>
+  </div>
+</footer>

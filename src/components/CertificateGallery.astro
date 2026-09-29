@@ -1,0 +1,32 @@
+---
+import { type Lang, localePath, asset, useTranslations } from '../i18n';
+import { documents, documentText } from '../data/documents';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+<ul class="cert-gallery">
+  {documents.map((doc) => {
+    const text = documentText(doc.id, lang);
+    const src = asset(`img/docs/${doc.image}`);
+    const caption = `${text.title} · ${doc.years}`;
+    return (
+      <li class="cert-card">
+        <button class="cert-scan" type="button" data-media={src} data-caption={caption} data-gallery="certificates" aria-label={`${t.documents.zoom}: ${text.title}`}>
+          <img src={src} width={doc.width} height={doc.height} loading="lazy" decoding="async" alt={caption} lang="ru">
+          <span class="zoom-label" aria-hidden="true">+</span>
+        </button>
+        <div class="cert-info">
+          <div class="eyebrow">{text.kind}</div>
+          <h3>{text.title}</h3>
+          <div class="cert-badges">
+            <span class="badge">{doc.years}</span>
+            {doc.archive && <span class="badge muted">{t.documents.archive}</span>}
+          </div>
+          <a class="text-link" href={localePath(lang, `/certificates/#${doc.id}`)}>{t.home.certificates.read} <span aria-hidden="true">↗</span></a>
+        </div>
+      </li>
+    );
+  })}
+</ul>

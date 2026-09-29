@@ -1,0 +1,52 @@
+---
+import { type Lang, locales, langMeta, localePath, asset, useTranslations } from '../i18n';
+import { company, phoneDisplay } from '../data/company';
+
+interface Props { lang: Lang; path: string; alternates: readonly Lang[] }
+const { lang, path, alternates } = Astro.props;
+const t = useTranslations(lang);
+const links = [
+  { href: localePath(lang, '/equipment/'), label: t.nav.equipment, match: '/equipment/' },
+  { href: localePath(lang, '/#modernization'), label: t.nav.modernization },
+  { href: localePath(lang, '/certificates/'), label: t.nav.documents, match: '/certificates/' },
+  { href: localePath(lang, '/articles/'), label: t.nav.articles, match: '/articles/' },
+  { href: '#contacts', label: t.nav.contacts },
+];
+const mobileLinks = [...links.slice(0, 3), { href: localePath(lang, '/#about'), label: t.nav.about }, ...links.slice(3)];
+const current = (match?: string) => (match && path.startsWith(match) ? 'page' : undefined);
+// Pages missing in a language link to that language's home page.
+const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/');
+---
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href={localePath(lang, '/')} aria-label={t.brand.homeLabel}>
+      <img src={asset('img/logo-01-122x122.webp')} width="47" height="47" alt="">
+      <span><strong>{t.brand.name}</strong><small>{t.brand.tagline}</small></span>
+    </a>
+    <nav class="main-nav" aria-label={t.nav.main}>
+      {links.map((l) => <a href={l.href} aria-current={current(l.match)}>{l.label}</a>)}
+    </nav>
+    <div class="header-side">
+      <nav class="lang-switch" aria-label={t.nav.language}>
+        {locales.map((l) => (
+          <a href={langHref(l)} hreflang={langMeta[l].hreflang} lang={langMeta[l].htmlLang} aria-current={l === lang ? 'true' : undefined} title={langMeta[l].name}>{langMeta[l].label}</a>
+        ))}
+      </nav>
+      <div class="header-contact">
+        <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
+        <small>{t.contact.hours}</small>
+      </div>
+      <button class="btn header-cta" type="button" data-inquiry={t.form.defaultSubject}>{t.nav.cta}</button>
+    </div>
+    <button class="menu-toggle" type="button" aria-label={t.nav.openMenu} data-open-label={t.nav.openMenu} data-close-label={t.nav.closeMenu} aria-controls="mobile-nav" aria-expanded="false">☰</button>
+  </div>
+  <nav id="mobile-nav" class="mobile-nav" aria-label={t.nav.mobile} hidden>
+    <div class="mobile-langs">
+      {locales.map((l) => (
+        <a href={langHref(l)} hreflang={langMeta[l].hreflang} lang={langMeta[l].htmlLang} aria-current={l === lang ? 'true' : undefined}>{langMeta[l].label}</a>
+      ))}
+    </div>
+    {mobileLinks.map((l) => <a href={l.href} aria-current={current(l.match)}>{l.label}</a>)}
+    <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
+  </nav>
+</header>

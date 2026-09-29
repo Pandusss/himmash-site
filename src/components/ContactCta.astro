@@ -1,0 +1,43 @@
+---
+import { type Lang, useTranslations } from '../i18n';
+import { company, phoneDisplay } from '../data/company';
+
+interface Props { lang: Lang; title?: string; text?: string; button?: string; subject?: string }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const c = t.home.contactCta;
+const {
+  title = c.title,
+  text = c.text,
+  button = c.request,
+  subject = t.form.generalSubject,
+} = Astro.props;
+---
+<section class="contact-section">
+  <div class="wrap contact-content">
+    <div class="contact-copy">
+      <div class="eyebrow">{c.eyebrow}</div>
+      <h2 set:html={title} />
+      <p>{text}</p>
+    </div>
+    <div class="contact-channels">
+      <a class="channel" href={`tel:${company.phone}`}>
+        <span class="channel-label">{c.call}</span>
+        <strong>{phoneDisplay(lang)}</strong>
+        <span class="arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="channel" href={`mailto:${company.email}`}>
+        <span class="channel-label">{c.email}</span>
+        <strong>{company.email}</strong>
+        <span class="arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="channel" href={company.max} target="_blank" rel="noopener">
+        <span class="channel-label">MAX</span>
+        <strong>{t.contact.max}</strong>
+        <span class="arrow" aria-hidden="true">↗</span>
+      </a>
+      <p class="channel-or">{c.or}</p>
+      <button class="btn full" type="button" data-inquiry={subject}>{button} <span class="arrow" aria-hidden="true">↗</span></button>
+    </div>
+  </div>
+</section>

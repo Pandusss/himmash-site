@@ -1,0 +1,14 @@
+---
+import ArticleView from '../../../views/ArticleView.astro';
+import { getArticles, articleSlug } from '../../../data/articles';
+import type { Lang } from '../../../i18n';
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of ['en', 'zh'] as const) {
+    for (const article of await getArticles(lang)) paths.push({ params: { lang, slug: articleSlug(article) }, props: { article } });
+  }
+  return paths;
+}
+const lang = Astro.params.lang as Lang;
+---
+<ArticleView lang={lang} article={Astro.props.article} />

@@ -1,0 +1,20 @@
+---
+import { type Lang, localePath, asset, formatDate, useTranslations } from '../i18n';
+import { type Article, articleSlug, readingMinutes } from '../data/articles';
+
+interface Props { article: Article; lang: Lang; headingLevel?: 'h2' | 'h3' }
+const { article, lang, headingLevel = 'h3' } = Astro.props;
+const t = useTranslations(lang);
+const Heading = headingLevel;
+---
+<a class="article-card" href={localePath(lang, `/articles/${articleSlug(article)}/`)}>
+  <div class="article-image">
+    <img src={asset(article.data.cover)} alt={article.data.coverAlt} loading="lazy" decoding="async">
+  </div>
+  <div class="article-info">
+    <div class="eyebrow"><time datetime={article.data.date.toISOString().slice(0, 10)}>{formatDate(article.data.date, lang)}</time> · {readingMinutes(article)} {t.articles.minutes}</div>
+    <Heading>{article.data.title}</Heading>
+    <p>{article.data.description}</p>
+    <span class="text-link">{t.articles.read} <span aria-hidden="true">↗</span></span>
+  </div>
+</a>
