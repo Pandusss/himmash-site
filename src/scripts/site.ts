@@ -103,7 +103,18 @@ if (document.visibilityState === 'visible' && !matchMedia('(prefers-reduced-moti
 const stickyBar = $('product-bar');
 const mainInquiry = $('product-inquiry');
 
+const header = document.querySelector<HTMLElement>('.site-header');
+const progressBar = $('read-progress-bar');
+const prose = document.querySelector<HTMLElement>('.prose');
+
 function onScroll() {
+  header?.classList.toggle('is-scrolled', scrollY > 8);
+  if (progressBar && prose) {
+    const rect = prose.getBoundingClientRect();
+    const total = rect.height - innerHeight * 0.6;
+    const done = Math.min(1, Math.max(0, (innerHeight * 0.4 - rect.top) / total));
+    progressBar.style.transform = `scaleX(${done})`;
+  }
   if (pending.length) {
     const limit = innerHeight * 0.92;
     pending = pending.filter((el) => {
@@ -131,27 +142,46 @@ document.querySelectorAll<HTMLButtonElement>('[data-photo]').forEach((thumb, i, 
 $('zoom-product')?.addEventListener('click', () => productPhoto && showMedia(productPhoto.currentSrc || productPhoto.src, productPhoto.alt));
 
 // Catalog filters
+// On phones the home catalog is a horizontal carousel, so it shows every card.
+const phone = matchMedia('(max-width: 650px)');
 document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((catalog) => {
-  const cards = [...catalog.querySelectorAll<HTMLElement>('[data-category]')];
+  const cards = [...catalog.querySelectorAll<HTMLElement>('.product-grid [data-category]')];
+  const rows = [...catalog.querySelectorAll<HTMLElement>('.catalog-table [data-category]')];
   const buttons = [...catalog.querySelectorAll<HTMLButtonElement>('[data-filter]')];
   const count = catalog.querySelector<HTMLElement>('[data-count]');
   const more = catalog.querySelector<HTMLButtonElement>('[data-show-more]');
-  const limit = Number(catalog.dataset.limit) || Infinity;
   const fromUrl = new URLSearchParams(location.search).get('category');
   let active = buttons.some((b) => b.dataset.filter === fromUrl) ? fromUrl! : 'all';
   let expanded = false;
+  const matchesFilter = (el: HTMLElement) => active === 'all' || el.dataset.category === active;
   function render() {
-    const matches = cards.filter((c) => active === 'all' || c.dataset.category === active);
+    const limit = phone.matches ? Infinity : Number(catalog.dataset.limit) || Infinity;
+    const matches = cards.filter(matchesFilter);
     const visible = expanded ? matches.length : Math.min(limit, matches.length);
     cards.forEach((c) => { c.hidden = true; });
     matches.slice(0, visible).forEach((c) => { c.hidden = false; });
+    rows.forEach((r) => { r.hidden = !matchesFilter(r); });
     if (count) count.textContent = `${visible} / ${matches.length}`;
     if (more) more.hidden = expanded || matches.length <= limit;
     buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === active)));
   }
   buttons.forEach((b) => b.addEventListener('click', () => { active = b.dataset.filter!; expanded = false; render(); }));
   more?.addEventListener('click', () => { expanded = true; render(); });
+  phone.addEventListener('change', render);
   render();
+
+  // Cards / table view on the catalog page; the choice is remembered in this browser.
+  const viewButtons = [...catalog.querySelectorAll<HTMLButtonElement>('[data-view]')];
+  if (!viewButtons.length) return;
+  function setView(view: string) {
+    viewButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
+    catalog.querySelectorAll<HTMLElement>('[data-view-panel]').forEach((panel) => { panel.hidden = panel.dataset.viewPanel !== view; });
+    try { localStorage.setItem('catalog-view', view); } catch {}
+  }
+  viewButtons.forEach((b) => b.addEventListener('click', () => setView(b.dataset.view!)));
+  let saved: string | null = new URLSearchParams(location.search).get('view');
+  if (!saved) try { saved = localStorage.getItem('catalog-view'); } catch {}
+  if (saved === 'table') setView('table');
 });
 
 // Inquiry form

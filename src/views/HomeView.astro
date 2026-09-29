@@ -20,6 +20,9 @@ const solutions = [
   { href: localePath(lang, '/equipment/'), image: 'img/products/02-01-1200x900.webp' },
   { href: '#modernization', image: 'img/products/11-01-1200.webp' },
 ];
+// "до 95" → small "до" + large "95".
+const statPrefix = (value: string) => value.match(/^(\D+?)\s*(?=\d)/)?.[1] ?? '';
+const statNumber = (value: string) => value.slice(statPrefix(value).length).trim();
 const productLink = (slug: string) => ({ href: localePath(lang, `/equipment/${slug}/`), name: productText(slug, lang).short });
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -41,7 +44,7 @@ const faqJsonLd = {
         <div class="hero-footnote" set:html={h.hero.footnote} />
       </div>
       <div class="hero-media">
-        <img src={asset('img/bg-02-1920x1080.webp')} width="1920" height="1080" alt={h.hero.photoAlt} fetchpriority="high">
+        <img src={asset('img/bg-02-1920x1080.webp')} srcset={`${asset('img/bg-02-960.webp')} 960w, ${asset('img/bg-02-1440.webp')} 1440w, ${asset('img/bg-02-1920x1080.webp')} 1920w`} sizes="(max-width: 650px) 100vw, 50vw" width="1920" height="1080" alt={h.hero.photoAlt} fetchpriority="high">
         <span class="photo-label">{h.hero.photoLabel}</span>
         <div class="photo-caption">
           <div><p set:html={h.hero.photoCaption} /><small>{h.hero.photoSmall}</small></div>
@@ -53,7 +56,7 @@ const faqJsonLd = {
       {h.stats.map((s) => (
         <div class="stat">
           <dt>{s.label}</dt>
-          <dd class="stat-value">{s.value}{s.unit && <small>{s.unit}</small>}</dd>
+          <dd class="stat-value">{statPrefix(s.value) && <span class="stat-prefix">{statPrefix(s.value)}</span>}{statNumber(s.value)}{s.unit && <small>{s.unit}</small>}</dd>
         </div>
       ))}
     </dl>
@@ -112,7 +115,7 @@ const faqJsonLd = {
     </div>
   </section>
 
-  <section id="catalog" class="section catalog" aria-labelledby="catalog-title" data-catalog data-limit="6">
+  <section id="catalog" class="section catalog catalog-home" aria-labelledby="catalog-title" data-catalog data-limit="6">
     <div class="wrap">
       <SectionHead id="catalog-title" eyebrow={h.catalog.eyebrow} title={h.catalog.title} lead={h.catalog.lead} />
       <CatalogFilters lang={lang} />
@@ -121,6 +124,7 @@ const faqJsonLd = {
       </div>
       <div class="catalog-bottom">
         <button class="btn secondary" type="button" data-show-more>{h.catalog.showAll} <span aria-hidden="true">↓</span></button>
+        <a class="btn secondary catalog-link-mobile" href={localePath(lang, '/equipment/')}>{t.footer.catalog} <span aria-hidden="true">↗</span></a>
       </div>
     </div>
   </section>
@@ -157,7 +161,7 @@ const faqJsonLd = {
         </div>
       </div>
       <figure class="about-photo">
-        <img src={asset('img/covers/line-upgrade-1600.webp')} width="1600" height="750" loading="lazy" decoding="async" alt={h.about.photoAlt}>
+        <img src={asset('img/covers/line-upgrade-1600.webp')} srcset={`${asset('img/covers/line-upgrade-800.webp')} 800w, ${asset('img/covers/line-upgrade-1600.webp')} 1600w`} sizes="(max-width: 920px) 100vw, 50vw" width="1600" height="750" loading="lazy" decoding="async" alt={h.about.photoAlt}>
       </figure>
     </div>
   </section>

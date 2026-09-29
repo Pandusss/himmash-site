@@ -44,6 +44,7 @@ const articleJsonLd = {
 ---
 <Base lang={lang} path={path} title={`${article.data.title} — ${t.meta.brandShort}`} description={article.data.description} image={article.data.cover} type="article" alternates={alternates} inquirySubject={article.data.title} jsonLd={[breadcrumbJsonLd(crumbs, absolute), articleJsonLd]}>
   <meta slot="head" property="article:published_time" content={isoDate(article.data.date)}>
+  <div class="read-progress" aria-hidden="true"><span id="read-progress-bar"></span></div>
   <div class="wrap">
     <Breadcrumbs label={t.nav.breadcrumbs} items={[crumbs[0], crumbs[1], { name: article.data.title }]} />
     <header class="article-head">

@@ -4,8 +4,8 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import ProductCard from '../components/ProductCard.astro';
 import ContactCta from '../components/ContactCta.astro';
 import CatalogFilters from '../components/CatalogFilters.astro';
-import { type Lang, localePath, useTranslations } from '../i18n';
-import { products, productText } from '../data/products';
+import { type Lang, localePath, asset, useTranslations } from '../i18n';
+import { products, productText, quickLabel } from '../data/products';
 import { breadcrumbJsonLd } from '../data/company';
 
 interface Props { lang: Lang }
@@ -34,9 +34,42 @@ const itemList = {
   </div>
   <section class="section catalog catalog-page" data-catalog aria-label={e.eyebrow}>
     <div class="wrap">
-      <CatalogFilters lang={lang} />
-      <div class="product-grid">
+      <CatalogFilters lang={lang} views />
+      <div class="product-grid" data-view-panel="cards">
         {products.map((p) => <ProductCard product={p} lang={lang} headingLevel="h2" />)}
+        <div class="custom-tile">
+          <div class="eyebrow">{t.home.hero.eyebrow}</div>
+          <h2>{e.customTitle}</h2>
+          <p>{e.customText}</p>
+          <button class="btn light" type="button" data-inquiry={t.form.defaultSubject}>{e.customButton} <span class="arrow" aria-hidden="true">↗</span></button>
+        </div>
+      </div>
+      <div class="catalog-table-wrap" data-view-panel="table" hidden>
+        <table class="catalog-table">
+          <thead>
+            <tr><th scope="col">{e.colName}</th><th scope="col">{e.colCategory}</th><th scope="col">{e.colKey}</th><th scope="col">{e.colPrice}</th><th scope="col">{e.colDelivery}</th></tr>
+          </thead>
+          <tbody>
+            {products.map((p) => {
+              const x = productText(p.slug, lang);
+              const key = x.quick?.[0];
+              return (
+                <tr data-category={p.category}>
+                  <th scope="row">
+                    <a href={localePath(lang, `/equipment/${p.slug}/`)}>
+                      <img src={asset(`img/${p.image}`)} width="96" height="54" alt="" loading="lazy" decoding="async">
+                      <span>{x.short}</span>
+                    </a>
+                  </th>
+                  <td>{t.categories[p.category]}</td>
+                  <td>{key ? <><b>{key.value}{key.unit && ` ${key.unit}`}</b><small>{quickLabel(key.label)}</small></> : '—'}</td>
+                  <td>{x.price ? <><b>{x.price}</b>{x.priceNote && <small>{x.priceNote}</small>}</> : '—'}</td>
+                  <td>{x.deliveryTime ?? '—'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   </section>

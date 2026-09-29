@@ -53,8 +53,8 @@ const previewBuild = import.meta.env.PUBLIC_NOINDEX === 'true';
       {alternates.includes('ru') && <link rel="alternate" hreflang="x-default" href={absolute(localePath('ru', path))}>}
     </>
   )}
-  <link rel="icon" type="image/webp" href={asset('img/logo-01-122x122.webp')}>
-  <link rel="apple-touch-icon" href={asset('img/logo-01-122x122.webp')}>
+  <link rel="icon" type="image/png" sizes="32x32" href={asset('favicon-32.png')}>
+  <link rel="apple-touch-icon" href={asset('apple-touch-icon.png')}>
   <link rel="sitemap" href={asset('sitemap-index.xml')}>
   <meta property="og:type" content={type}>
   <meta property="og:site_name" content={t.meta.siteName}>

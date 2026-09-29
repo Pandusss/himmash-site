@@ -71,6 +71,17 @@ export const processLoop: string[] = ['water-treatment-t5000'];
 
 const texts: Record<Lang, Record<string, ProductText>> = { ru, en, zh };
 
+/** One-line label of a quick spec for cards and the table: "Производительность<br>до 500 кг/час" → "Производительность". */
+export function quickLabel(label: string): string {
+  return label
+    .replace(/<br\s*\/?>/g, ' ')
+    .replace(/(?:^|\s)(?:до|up to)\s+\d[\d\s,.–-]*\S*$/i, '') // "… до 500 кг/час" repeats the value
+    .replace(/(?:最高|不超过)\s*\d[\d\s,.–-]*\S*$/, '')
+    .replace(/,?\s*(?:до|up to)$/i, '') // "Отбор паров влаги, до"
+    .replace(/([一-鿿])\s+(?=[一-鿿])/g, '$1') // no spaces between Chinese characters
+    .trim();
+}
+
 export function productText(slug: string, lang: Lang): ProductText {
   const text = texts[lang][slug];
   if (!text) throw new Error(`Missing ${lang} text for product "${slug}"`);

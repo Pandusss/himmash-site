@@ -1,6 +1,6 @@
 ---
 import { type Lang, localePath, asset, useTranslations } from '../i18n';
-import { type ProductMeta, productText } from '../data/products';
+import { type ProductMeta, productText, quickLabel } from '../data/products';
 
 interface Props { product: ProductMeta; lang: Lang; headingLevel?: 'h2' | 'h3' }
 const { product, lang, headingLevel = 'h3' } = Astro.props;
@@ -9,7 +9,7 @@ const text = productText(product.slug, lang);
 const Heading = headingLevel;
 // Key figure for quick comparison: the first quick spec, with its label's first line.
 const key = text.quick?.[0];
-const keyLabel = key?.label.split('<br>')[0];
+const keyLabel = key && quickLabel(key.label);
 const price = text.price && /\d/.test(text.price) ? text.price : undefined;
 ---
 <a class="product-card" href={localePath(lang, `/equipment/${product.slug}/`)} data-category={product.category}>

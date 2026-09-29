@@ -2,7 +2,8 @@
 import { type Lang, useTranslations } from '../i18n';
 import { products, categoryOrder } from '../data/products';
 
-interface Props { lang: Lang }
+interface Props { lang: Lang; views?: boolean }
+const { views = false } = Astro.props;
 const t = useTranslations(Astro.props.lang);
 const count = (c: string) => products.filter((p) => p.category === c).length;
 ---
@@ -13,5 +14,13 @@ const count = (c: string) => products.filter((p) => p.category === c).length;
       <button class="filter" type="button" data-filter={c} aria-pressed="false">{t.categories[c]} <span class="filter-count">{count(c)}</span></button>
     ))}
   </div>
-  <span class="results-count" data-count aria-live="polite"></span>
+  <div class="catalog-side">
+    <span class="results-count" data-count aria-live="polite"></span>
+    {views && (
+      <div class="view-toggle" role="group" aria-label={t.equipment.viewLabel}>
+        <button type="button" data-view="cards" aria-pressed="true"><span aria-hidden="true">▦</span> {t.equipment.viewCards}</button>
+        <button type="button" data-view="table" aria-pressed="false"><span aria-hidden="true">☰</span> {t.equipment.viewTable}</button>
+      </div>
+    )}
+  </div>
 </div>

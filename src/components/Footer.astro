@@ -26,6 +26,7 @@ const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/')
         <div class="footer-label">{t.footer.company}</div>
         <Fragment set:html={t.contact.address} />
         <small set:html={t.contact.hoursLong} />
+        <a class="text-link footer-link small" href={company.route} target="_blank" rel="noopener">{t.footer.route} <span aria-hidden="true">↗</span></a>
       </div>
       <nav class="footer-nav" aria-label={t.footer.sections}>
         <div class="footer-label">{t.footer.sections}</div>
