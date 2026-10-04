@@ -31,7 +31,7 @@ const zh: UI = {
     hours: '周一至周六 · 09:00–17:00（莫斯科时间）',
     hoursLong: '周一至周六：09:00–17:00（莫斯科时间）<br>周日休息',
     max: '通过 MAX 通讯软件联系',
-    address: '罗斯托夫州塔甘罗格<br>Sotsialisticheskaya 街154号',
+    address: '俄罗斯罗斯托夫州塔甘罗格，邮编347905<br>Sotsialisticheskaya 街154号',
   },
   categories: {
     line: '交钥匙生产线',

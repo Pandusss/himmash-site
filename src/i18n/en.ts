@@ -31,7 +31,7 @@ const en: UI = {
     hours: 'Mon–Sat · 09:00–17:00 (Moscow time)',
     hoursLong: 'Mon–Sat: 09:00–17:00 (Moscow time)<br>Sunday: closed',
     max: 'Message us on MAX messenger',
-    address: 'Taganrog, Rostov Oblast, Russia<br>154 Sotsialisticheskaya St.',
+    address: '154 Sotsialisticheskaya St.<br>Taganrog, Rostov Oblast, 347905, Russia',
   },
   categories: {
     line: 'Turnkey lines',

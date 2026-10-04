@@ -51,7 +51,7 @@ const articleJsonLd = {
   <div class="wrap">
     <Breadcrumbs label={t.nav.breadcrumbs} items={[crumbs[0], crumbs[1], { name: article.data.title }]} />
     <header class="article-head">
-      <div class="eyebrow"><time datetime={isoDate(article.data.date)}>{formatDate(article.data.date, lang)}</time> · {readingMinutes(article)} {a.minutes}</div>
+      <div class="eyebrow"><time datetime={isoDate(article.data.date)}>{formatDate(article.data.date, lang)}</time> · {readingMinutes(article)} {a.minutes} · {company.name[lang]}</div>
       <h1>{article.data.title}</h1>
       <p>{article.data.description}</p>
     </header>

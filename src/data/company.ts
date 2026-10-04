@@ -10,6 +10,7 @@ export const company = {
     streetAddress: { ru: 'ул. Социалистическая, 154', en: '154 Sotsialisticheskaya St.', zh: 'Sotsialisticheskaya 街 154 号' },
     addressLocality: { ru: 'Таганрог', en: 'Taganrog', zh: '塔甘罗格' },
     addressRegion: { ru: 'Ростовская область', en: 'Rostov Oblast', zh: '罗斯托夫州' },
+    postalCode: '347905',
     addressCountry: 'RU',
   },
   name: { ru: 'НПО «Химмаш»', en: 'NPO Himmash', zh: 'NPO Himmash' },
@@ -38,6 +39,7 @@ export function organizationJsonLd(lang: Lang, absolute: (href: string) => strin
       streetAddress: company.address.streetAddress[lang],
       addressLocality: company.address.addressLocality[lang],
       addressRegion: company.address.addressRegion[lang],
+      postalCode: company.address.postalCode,
       addressCountry: company.address.addressCountry,
     },
     contactPoint: {
