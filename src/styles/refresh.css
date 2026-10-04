@@ -235,10 +235,15 @@ h3{letter-spacing:-.03em}
 .catalog-note{font-size:12px;color:var(--muted);margin-top:26px;max-width:none}
 /* A2: consent checkbox and policy link */
 .consent-field{margin-bottom:16px}
-.consent-label{display:flex!important;gap:10px;align-items:flex-start;font-weight:400!important;font-size:13px!important;line-height:1.45;cursor:pointer;margin:0!important}
-.consent-label input{flex-shrink:0;width:20px;height:20px;margin:0;accent-color:var(--green);cursor:pointer}
+.consent-label{display:flex!important;gap:12px;align-items:flex-start;font-weight:400!important;font-size:14px!important;line-height:20px;cursor:pointer;margin:0!important}
+/* Own checkbox: the generic .inquiry-form input rules (48px height, padding) must not apply. */
+.inquiry-form .consent-label input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:0 0 20px;width:20px;height:20px;min-height:0;margin:0;padding:0;border:1.5px solid var(--field-border);border-radius:5px;background:var(--field-bg) center/12px 12px no-repeat;cursor:pointer;transition:background-color .15s,border-color .15s}
+.inquiry-form .consent-label input[type=checkbox]:hover{border-color:var(--green)}
+.inquiry-form .consent-label input[type=checkbox]:checked{background-color:var(--green);border-color:var(--green);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.3 4.8 8.8 9.8 3.4' fill='none' stroke='%23fff' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+:root[data-theme=dark] .inquiry-form .consent-label input[type=checkbox]:checked{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.3 4.8 8.8 9.8 3.4' fill='none' stroke='%23111613' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.inquiry-form .consent-label input[type=checkbox]:focus-visible{outline:3px solid #b27c25;outline-offset:2px}
 .consent-label a,.form-note a{color:var(--green);text-decoration:underline;text-underline-offset:2px}
-.consent-label input[aria-invalid=true]{outline:2px solid var(--error);outline-offset:2px}
+.inquiry-form .consent-label input[type=checkbox][aria-invalid=true]{border-color:var(--error);box-shadow:0 0 0 3px color-mix(in srgb,var(--error) 22%,transparent)}
 /* Legal pages */
 .legal-head{padding-bottom:20px}
 .legal-head h1{font-size:clamp(34px,3.6vw,52px)}
