@@ -128,6 +128,15 @@
   .footer-nav a{padding:9px 0}
   .footer-contact a{padding:4px 0}
 }
+/* C1: touch targets of at least 44px on phones */
+@media(max-width:650px){
+  .process-links a,.filter,.product-jumps a,.mobile-nav .mobile-langs a,.toc-mobile summary{min-height:44px}
+  .process-links a{display:inline-flex;align-items:center}
+  .theme-toggle{width:44px;height:44px}
+  .footer-nav a,.footer-langs a,.footer-legal a,.footer-contact a,.footer-link{display:inline-flex;align-items:center;min-height:44px;padding-block:0}
+  .footer-nav a{display:flex}
+  .catalog-page .product-meta{grid-template-columns:1fr}
+}
 @media(max-width:650px) and (prefers-reduced-motion:no-preference){
   #inquiry-dialog{transform:translateY(60px)}
   #inquiry-dialog[open]{transform:none}

@@ -8,6 +8,7 @@ import ContactCta from '../components/ContactCta.astro';
 import { type Lang, localePath, asset, formatDate, langMeta, useTranslations } from '../i18n';
 import { type Article, articleSlug, articleLanguages, getArticles, readingMinutes } from '../data/articles';
 import { productBySlug } from '../data/products';
+import { imageSize, responsiveSrcset } from '../data/images';
 import { breadcrumbJsonLd, company } from '../data/company';
 
 interface Props { lang: Lang; article: Article }
@@ -22,6 +23,8 @@ const alternates = await articleLanguages(slug);
 const related = article.data.products.map(productBySlug);
 const more = (await getArticles(lang)).filter((other) => articleSlug(other) !== slug).slice(0, 2);
 const absolute = (href: string) => new URL(href, Astro.site).href;
+const coverSize = await imageSize(article.data.cover);
+const coverSrcset = await responsiveSrcset(article.data.cover, asset);
 const crumbs = [
   { name: t.product.home, href: localePath(lang, '/') },
   { name: t.nav.articles, href: localePath(lang, '/articles/') },
@@ -53,7 +56,7 @@ const articleJsonLd = {
       <p>{article.data.description}</p>
     </header>
     <figure class="article-cover">
-      <img src={asset(article.data.cover)} alt={article.data.coverAlt} fetchpriority="high">
+      <img src={asset(article.data.cover)} srcset={coverSrcset} sizes="(max-width: 1360px) calc(100vw - 40px), 1320px" width={coverSize.width} height={coverSize.height} alt={article.data.coverAlt} fetchpriority="high">
     </figure>
     {toc.length > 1 && (
       <details class="toc-mobile">

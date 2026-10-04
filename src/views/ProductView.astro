@@ -7,6 +7,7 @@ import ContactCta from '../components/ContactCta.astro';
 import { type Lang, localePath, asset, useTranslations } from '../i18n';
 import { type ProductMeta, productText, productBySlug } from '../data/products';
 import { breadcrumbJsonLd, company } from '../data/company';
+import { imageSize } from '../data/images';
 
 interface Props { lang: Lang; product: ProductMeta }
 const { lang, product } = Astro.props;
@@ -15,6 +16,7 @@ const p = t.product;
 const text = productText(product.slug, lang);
 const photos = product.photos ?? [product.image];
 const related = product.related.map(productBySlug);
+const photoSizes = await Promise.all(photos.map((ph) => imageSize(`img/${ph}`)));
 const path = `/equipment/${product.slug}/`;
 const absolute = (href: string) => new URL(href, Astro.site).href;
 const crumbs = [
@@ -57,14 +59,14 @@ const num = () => String(++n).padStart(2, '0');
     <section class="product-hero" aria-labelledby="product-title">
       <div class="gallery">
         <button class="gallery-main" id="zoom-product" type="button" aria-label={p.zoom}>
-          <img id="product-photo" src={asset(`img/${photos[0]}`)} alt={text.name} fetchpriority="high" style={`view-transition-name: pimg-${product.slug}`}>
+          <img id="product-photo" src={asset(`img/${photos[0]}`)} width={photoSizes[0].width} height={photoSizes[0].height} alt={text.name} fetchpriority="high" style={`view-transition-name: pimg-${product.slug}`}>
           <span class="zoom-label" aria-hidden="true">+</span>
         </button>
         {photos.length > 1 && (
           <div class="gallery-thumbs" role="group" aria-label={p.photosLabel}>
             {photos.map((ph, i) => (
               <button class="thumb" type="button" data-photo={asset(`img/${ph}`)} data-alt={`${text.name} — ${p.photo.toLowerCase()} ${i + 1}`} aria-label={`${p.photo} ${i + 1}`} aria-pressed={String(i === 0)}>
-                <img src={asset(`img/${ph}`)} alt="" loading="lazy">
+                <img src={asset(`img/${ph}`)} width={photoSizes[i].width} height={photoSizes[i].height} alt="" loading="lazy">
               </button>
             ))}
           </div>
@@ -86,6 +88,7 @@ const num = () => String(++n).padStart(2, '0');
             {text.deliveryTime && <div class="delivery"><b>{text.deliveryTime}</b>{p.delivery}</div>}
           </div>
         )}
+        {text.price && /\d/.test(text.price) && <p class="price-disclaimer">{p.priceDisclaimer}</p>}
         {!text.quick && (
           <div class="inquiry-box">
             <h2>{p.genericTitle}</h2>

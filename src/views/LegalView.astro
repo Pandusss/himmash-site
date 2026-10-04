@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { type Lang, localePath, formatDate, useTranslations } from '../i18n';
+import { legalTexts, LEGAL_DATE, CONSENT_VERSION } from '../data/legal';
+
+interface Props { lang: Lang; doc: 'privacy' | 'consent' }
+const { lang, doc } = Astro.props;
+const t = useTranslations(lang);
+const l = t.legal;
+const title = doc === 'privacy' ? l.privacyTitle : l.consentTitle;
+const description = doc === 'privacy' ? l.privacyMeta : l.consentMeta;
+const sections = legalTexts[lang][doc];
+const other = doc === 'privacy'
+  ? { href: localePath(lang, '/consent/'), label: l.consentTitle }
+  : { href: localePath(lang, '/privacy/'), label: l.privacyTitle };
+---
+<Base lang={lang} path={`/${doc}/`} title={`${title} — ${t.meta.brandShort}`} description={description}>
+  <div class="wrap">
+    <Breadcrumbs label={t.nav.breadcrumbs} items={[{ name: t.product.home, href: localePath(lang, '/') }, { name: title }]} />
+    <header class="page-head legal-head">
+      <div class="eyebrow">{l.eyebrow}</div>
+      <h1>{title}</h1>
+      <p class="legal-meta">{l.version} {CONSENT_VERSION.replace('-draft', '')} · {formatDate(new Date(LEGAL_DATE), lang)}</p>
+    </header>
+    <p class="legal-draft">{l.draft}</p>
+    <article class="prose legal-text">
+      {sections.map((s) => (
+        <>
+          {s.heading && <h2>{s.heading}</h2>}
+          {s.paragraphs?.map((p) => <p>{p}</p>)}
+          {s.bullets && <ul>{s.bullets.map((b) => <li>{b}</li>)}</ul>}
+        </>
+      ))}
+      <p><a href={other.href}>{other.label}</a></p>
+    </article>
+  </div>
+</Base>

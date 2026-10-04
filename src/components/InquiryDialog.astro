@@ -1,6 +1,7 @@
 ---
-import { type Lang, useTranslations } from '../i18n';
+import { type Lang, localePath, useTranslations } from '../i18n';
 import { company } from '../data/company';
+import { CONSENT_VERSION } from '../data/legal';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -26,6 +27,8 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
         data-mail-subject={t.form.mailSubject}
         data-error-empty={t.form.errorEmpty}
         data-error-invalid={t.form.errorInvalid}
+        data-error-consent={t.form.errorConsent}
+        data-consent-text={`${t.form.consentMail}: ${t.form.consentGiven} (${t.form.consentVersion} ${CONSENT_VERSION})`}
         data-error-send={t.form.errorSend}
         data-sending={t.form.sending}
         data-labels={JSON.stringify({ name: t.form.name, contact: t.form.contact, message: t.form.message })}
@@ -34,6 +37,8 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
         <input type="hidden" name="subject" id="inquiry-subject-field">
         <input type="hidden" name="page" id="inquiry-page-field">
         <input type="hidden" name="lang" value={lang}>
+        <input type="hidden" name="consent_version" value={CONSENT_VERSION}>
+        <input type="hidden" name="consent_at" id="consent-at-field">
         <div class="hp-field" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
         <div class="field">
           <label for="contact-name">{t.form.name} <small>{t.form.optional}</small></label>
@@ -48,8 +53,15 @@ const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
           <label for="contact-message">{t.form.message} <small>{t.form.optional}</small></label>
           <textarea id="contact-message" name="message" rows="3" placeholder={t.form.messagePlaceholder}></textarea>
         </div>
+        <div class="field consent-field">
+          <label class="consent-label">
+            <input type="checkbox" id="consent-check" name="consent" value="yes" required aria-describedby="consent-error">
+            <span>{t.form.consentPrefix}<a href={localePath(lang, '/consent/')} target="_blank" rel="noopener">{t.form.consentLink}</a></span>
+          </label>
+          <p id="consent-error" class="field-error" role="alert"></p>
+        </div>
         <button class="btn full" type="submit"><span class="btn-label">{t.form.submit}</span> <span class="arrow" aria-hidden="true">↗</span></button>
-        <p class="form-note">{t.form.note}</p>
+        <p class="form-note">{t.form.note} <a href={localePath(lang, '/privacy/')} target="_blank" rel="noopener">{t.form.policyLink}</a></p>
         <p class="field-error send-error" id="send-error" role="alert" hidden>{t.form.errorSend} <a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a> · <a href={`mailto:${company.email}`}>{company.email}</a></p>
       </form>
     </div>

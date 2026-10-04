@@ -6,6 +6,6 @@ export const GET: APIRoute = ({ site }) => {
   if (import.meta.env.PUBLIC_NOINDEX === 'true') {
     return new Response('User-agent: *\nDisallow: /\n', { headers });
   }
-  const sitemap = new URL(`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}sitemap-index.xml`, site);
+  const sitemap = new URL(`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}sitemap.xml`, site);
   return new Response(`User-agent: *\nAllow: /\n\nSitemap: ${sitemap.href}\n`, { headers });
 };

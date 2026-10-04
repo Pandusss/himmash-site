@@ -262,8 +262,9 @@ document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((catalog) => {
     const limit = phone.matches ? Infinity : Number(catalog.dataset.limit) || Infinity;
     const matches = cards.filter(matchesFilter);
     const visible = expanded ? matches.length : Math.min(limit, matches.length);
-    cards.forEach((c) => { c.hidden = true; });
-    matches.slice(0, visible).forEach((c) => { c.hidden = false; });
+    // Touch only cards whose visibility changes: re-showing visible cards would delay their paint (LCP).
+    const shown = new Set(matches.slice(0, visible));
+    cards.forEach((c) => { if (c.hidden === shown.has(c)) c.hidden = !shown.has(c); });
     rows.forEach((r) => { r.hidden = !matchesFilter(r); });
     if (count) count.textContent = `${visible} / ${matches.length}`;
     if (more) more.hidden = expanded || matches.length <= limit;
@@ -301,6 +302,12 @@ const form = $<HTMLFormElement>('inquiry-form');
 const contactField = $<HTMLInputElement>('contact-value');
 const contactError = $('contact-error');
 const sendError = $('send-error');
+const consentCheck = $<HTMLInputElement>('consent-check');
+const consentError = $('consent-error');
+consentCheck?.addEventListener('change', () => {
+  consentError!.textContent = '';
+  consentCheck.removeAttribute('aria-invalid');
+});
 const views = { form: $('form-view'), success: $('success-view'), mailto: $('mailto-view') };
 
 function showView(name: keyof typeof views) {
@@ -314,6 +321,8 @@ function openInquiry(subject: string) {
   $<HTMLInputElement>('inquiry-page-field')!.value = location.href;
   contactError!.textContent = '';
   contactField!.removeAttribute('aria-invalid');
+  consentError!.textContent = '';
+  consentCheck!.removeAttribute('aria-invalid');
   sendError!.hidden = true;
   showView('form');
   openDialog(inquiry);
@@ -340,6 +349,14 @@ form?.addEventListener('submit', async (event) => {
     contactField!.focus();
     return;
   }
+  // Consent to personal data processing is a separate, unticked checkbox (152-FZ).
+  if (!consentCheck!.checked) {
+    consentError!.textContent = form.dataset.errorConsent!;
+    consentCheck!.setAttribute('aria-invalid', 'true');
+    consentCheck!.focus();
+    return;
+  }
+  $<HTMLInputElement>('consent-at-field')!.value = new Date().toISOString();
   const data = new FormData(form);
   if (data.get('website')) return; // bot filled the honeypot
   data.delete('website');
@@ -353,6 +370,7 @@ form?.addEventListener('submit', async (event) => {
       `${labels.name}: ${data.get('name') || '—'}`,
       `${labels.contact}: ${data.get('contact')}`,
       `${labels.message}: ${data.get('message') || '—'}`,
+      `${form.dataset.consentText}, ${data.get('consent_at')}`,
       '',
       String(data.get('page') ?? ''),
     ].join('\n');

@@ -18,7 +18,7 @@ const zh: Record<string, ProductText> = {
     ],
     price: '按技术规格报价',
     specs: [
-      ['产能', '颗粒150–400 kg/h'],
+      ['产能（按颗粒计）', '150–400 kg/h'],
       ['原料污染度', '50%及以上'],
       ['原料', 'LDPE、HDPE、PP、玻纤增强PA（PA-GF）、ABS、PVC'],
       ['工序', '破碎、清洗、干燥、造粒'],
@@ -54,14 +54,14 @@ const zh: Record<string, ProductText> = {
     metaDescription: '塑料脱水离心机：产能最高500 kg/h，残余含水率3–5%，工作轴2,000 mm，适用于薄膜、吨袋丝和破碎料。价格1,500,000 卢布。',
     body: ['作为清洗系统的一部分运行：降低后续干燥工序的负荷和能耗。'],
     quick: [
-      { value: '500', unit: 'kg/h', label: '产能<br>最高500 kg/h' },
+      { value: '500', unit: 'kg/h', label: '产能<br>（按原料计）' },
       { value: '3–5', unit: '%', label: '残余<br>含水率' },
       { value: '37–55', unit: 'kW', label: '装机<br>功率' },
     ],
     price: '1,500,000 卢布',
     deliveryTime: '60个工作日',
     specs: [
-      ['产能', '最高500 kg/h'],
+      ['产能（按原料计）', '最高500 kg/h'],
       ['塑料残余含水率', '3–5%'],
       ['装机功率', '37–55 kW'],
       ['工作轴长度', '不小于2,000 mm'],
@@ -100,16 +100,16 @@ const zh: Record<string, ProductText> = {
       '底部轴承组件强劲可靠——可运行三年以上',
     ],
     quick: [
-      { value: '500', unit: 'kg/h', label: '薄膜和丝料' },
+      { value: '500', unit: 'kg/h', label: '薄膜和丝料<br>（按原料计）' },
       { value: '700', unit: 'kg/h', label: '硬质料' },
       { value: '900', unit: 'kg/h', label: 'PET碎片' },
     ],
     price: '按需报价',
     deliveryTime: '50个工作日',
     specs: [
-      ['产能：薄膜、丝料', '最高500 kg/h'],
-      ['产能：硬质料', '最高700 kg/h'],
-      ['产能：PET碎片', '最高900 kg/h'],
+      ['按原料计产能：薄膜、丝料', '最高500 kg/h'],
+      ['按原料计产能：硬质料', '最高700 kg/h'],
+      ['按原料计产能：PET碎片', '最高900 kg/h'],
       ['装机功率', '≤22 kW'],
       ['长度', '≤3,500 mm'],
       ['宽度', '≤1,000 mm'],
@@ -137,7 +137,7 @@ const zh: Record<string, ProductText> = {
       '喂料机的主要优势在于回收企业可省去团粒工序，节省团粒机、刀具刃磨、原料干燥、维护保养、人工工资、税费和电费等开支。',
     ],
     quick: [
-      { value: '500', unit: 'kg/h', label: '产能<br>最高500 kg/h' },
+      { value: '500', unit: 'kg/h', label: '产能<br>（按原料计）' },
       { value: '5.5', unit: 'kW', label: '装机<br>功率' },
       { value: '200', unit: 'kg', label: '重量<br>不超过200 kg' },
     ],
@@ -145,7 +145,7 @@ const zh: Record<string, ProductText> = {
     priceNote: '不含增值税',
     deliveryTime: '不超过40个工作日',
     specs: [
-      ['产能', '最高500 kg/h'],
+      ['产能（按原料计）', '最高500 kg/h'],
       ['碎片尺寸：薄膜原料', '≤50 mm'],
       ['碎片尺寸：PP丝', '≤100 mm'],
       ['碎片尺寸：厚壁塑料', '≤30 mm'],
@@ -176,7 +176,7 @@ const zh: Record<string, ProductText> = {
     bulletsTitle: '适用造粒原料',
     bullets: ['HDPE — 高密度聚乙烯', 'LDPE — 低密度聚乙烯', 'PP — 聚丙烯', 'PA6 — 聚酰胺6', 'PS — 聚苯乙烯类'],
     quick: [
-      { value: '400', unit: 'kg/h', label: '产能<br>最高400 kg/h' },
+      { value: '400', unit: 'kg/h', label: '产能<br>（按颗粒计）' },
       { value: '15', unit: 'kW', label: '装机<br>功率' },
       { value: '2,800', unit: 'rpm', label: '切刀轴<br>转速可调' },
     ],
@@ -184,7 +184,7 @@ const zh: Record<string, ProductText> = {
     priceNote: '不含增值税',
     deliveryTime: '50个工作日',
     specs: [
-      ['产能', '最高400 kg/h'],
+      ['产能（按颗粒计）', '最高400 kg/h'],
       ['装机功率', '≤15 kW'],
       ['切刀轴转速', '可调，最高2,800 rpm'],
       ['高度（含电驱动）', '1,000 mm'],
@@ -287,7 +287,7 @@ const zh: Record<string, ProductText> = {
       '该机承担粗洗任务，减轻后续工序负荷：经预清洗的物料进入摩擦清洗机，加入清洗剂进行二次清洗。',
     ],
     quick: [
-      { value: '500', unit: 'kg/h', label: '产能<br>最高500 kg/h' },
+      { value: '500', unit: 'kg/h', label: '产能<br>（按原料计）' },
       { value: '5', unit: 'kW', label: '装机<br>功率' },
       { value: '1,000', unit: 'kg', label: '设备<br>干重' },
     ],
@@ -295,7 +295,7 @@ const zh: Record<string, ProductText> = {
     priceNote: '不含增值税',
     deliveryTime: '55个工作日',
     specs: [
-      ['产能', '最高500 kg/h'],
+      ['产能（按原料计）', '最高500 kg/h'],
       ['装机功率', '≤5 kW'],
       ['长度', '≤5,700 mm'],
       ['宽度', '≤1,300 mm'],
@@ -359,7 +359,7 @@ const zh: Record<string, ProductText> = {
       '由此获得高品质成品：无水珠、无分层，拉伸和断裂等物理力学性能更好。',
     ],
     quick: [
-      { value: '5', unit: '%', label: '水蒸气<br>抽除量最高' },
+      { value: '≤5', unit: '%', label: '塑料中<br>水蒸气抽除量' },
       { value: '0.75–4', unit: 'kW', label: '真空泵<br>功率' },
       { value: '1.5', unit: 'm²', label: '占地<br>面积' },
     ],

@@ -18,7 +18,7 @@ const en: Record<string, ProductText> = {
     ],
     price: 'According to specification',
     specs: [
-      ['Output', '150 to 400 kg/h of pellets'],
+      ['Output (by pellets)', '150 to 400 kg/h'],
       ['Feedstock contamination', 'up to 50% and more'],
       ['Feedstock', 'LDPE, HDPE, PP, glass-filled PA (PA-GF), ABS, PVC'],
       ['Processes', 'shredding, washing, drying, pelletizing'],
@@ -54,14 +54,14 @@ const en: Record<string, ProductText> = {
     metaDescription: 'Dewatering centrifuge for plastics: up to 500 kg/h, residual moisture 3–5%, 2,000 mm shaft. For film, big-bag (FIBC) yarn and regrind. Price 1,500,000 RUB.',
     body: ['Works as part of a washing line: it reduces the load on the downstream dryer and cuts energy costs.'],
     quick: [
-      { value: '500', unit: 'kg/h', label: 'Output<br>up to 500 kg/h' },
+      { value: '500', unit: 'kg/h', label: 'Output<br>(by feedstock)' },
       { value: '3–5', unit: '%', label: 'Residual<br>moisture' },
       { value: '37–55', unit: 'kW', label: 'Installed<br>power' },
     ],
     price: '1,500,000 RUB',
     deliveryTime: '60 working days',
     specs: [
-      ['Output', 'up to 500 kg/h'],
+      ['Output (by feedstock)', 'up to 500 kg/h'],
       ['Residual moisture of plastics', '3–5%'],
       ['Installed electrical power', '37–55 kW'],
       ['Working shaft length', 'at least 2,000 mm'],
@@ -100,16 +100,16 @@ const en: Record<string, ProductText> = {
       'Heavy-duty, reliable lower bearing unit: more than three years of service',
     ],
     quick: [
-      { value: '500', unit: 'kg/h', label: 'Film and yarn' },
+      { value: '500', unit: 'kg/h', label: 'Film and yarn<br>(by feedstock)' },
       { value: '700', unit: 'kg/h', label: 'Rigid<br>plastics' },
       { value: '900', unit: 'kg/h', label: 'PET flakes' },
     ],
     price: 'On request',
     deliveryTime: '50 working days',
     specs: [
-      ['Output: film, yarn', 'up to 500 kg/h'],
-      ['Output: rigid plastics', 'up to 700 kg/h'],
-      ['Output: PET flakes', 'up to 900 kg/h'],
+      ['Output by feedstock: film, yarn', 'up to 500 kg/h'],
+      ['Output by feedstock: rigid plastics', 'up to 700 kg/h'],
+      ['Output by feedstock: PET flakes', 'up to 900 kg/h'],
       ['Installed electrical power', 'up to 22 kW'],
       ['Length', 'up to 3,500 mm'],
       ['Width', 'up to 1,000 mm'],
@@ -137,7 +137,7 @@ const en: Record<string, ProductText> = {
       'The main advantage of the feeder: you skip the agglomeration step and save on the agglomerator, knife sharpening, feedstock drying, maintenance, operator wages, taxes and electricity.',
     ],
     quick: [
-      { value: '500', unit: 'kg/h', label: 'Output<br>up to 500 kg/h' },
+      { value: '500', unit: 'kg/h', label: 'Output<br>(by feedstock)' },
       { value: '5.5', unit: 'kW', label: 'Installed<br>power' },
       { value: '200', unit: 'kg', label: 'Weight<br>up to 200 kg' },
     ],
@@ -145,7 +145,7 @@ const en: Record<string, ProductText> = {
     priceNote: 'excl. VAT',
     deliveryTime: 'up to 40 working days',
     specs: [
-      ['Output', 'up to 500 kg/h'],
+      ['Output (by feedstock)', 'up to 500 kg/h'],
       ['Fragment size: film', 'up to 50 mm'],
       ['Fragment size: PP yarn', 'up to 100 mm'],
       ['Fragment size: thick-walled plastics', 'up to 30 mm'],
@@ -176,7 +176,7 @@ const en: Record<string, ProductText> = {
     bulletsTitle: 'Suitable for pelletizing',
     bullets: ['HDPE (high-density polyethylene)', 'LDPE (low-density polyethylene)', 'PP (polypropylene)', 'PA6 (polyamide 6)', 'Polystyrene systems (PS)'],
     quick: [
-      { value: '400', unit: 'kg/h', label: 'Output<br>up to 400 kg/h' },
+      { value: '400', unit: 'kg/h', label: 'Output<br>(by pellets)' },
       { value: '15', unit: 'kW', label: 'Installed<br>power' },
       { value: '2,800', unit: 'rpm', label: 'Cutter shaft,<br>adjustable' },
     ],
@@ -184,7 +184,7 @@ const en: Record<string, ProductText> = {
     priceNote: 'excl. VAT',
     deliveryTime: '50 working days',
     specs: [
-      ['Output', 'up to 400 kg/h'],
+      ['Output (by pellets)', 'up to 400 kg/h'],
       ['Installed electrical power', 'up to 15 kW'],
       ['Cutter shaft speed', 'adjustable, up to 2,800 rpm'],
       ['Height with electric drive', '1,000 mm'],
@@ -287,7 +287,7 @@ const en: Record<string, ProductText> = {
       'The machine handles coarse cleaning and takes load off the downstream stages: the pre-washed material goes on to the friction washer for secondary washing with detergents.',
     ],
     quick: [
-      { value: '500', unit: 'kg/h', label: 'Output<br>up to 500 kg/h' },
+      { value: '500', unit: 'kg/h', label: 'Output<br>(by feedstock)' },
       { value: '5', unit: 'kW', label: 'Installed<br>power' },
       { value: '1,000', unit: 'kg', label: 'Dry<br>weight' },
     ],
@@ -295,7 +295,7 @@ const en: Record<string, ProductText> = {
     priceNote: 'excl. VAT',
     deliveryTime: '55 working days',
     specs: [
-      ['Output', 'up to 500 kg/h'],
+      ['Output (by feedstock)', 'up to 500 kg/h'],
       ['Installed power', 'up to 5 kW'],
       ['Length', 'up to 5,700 mm'],
       ['Width', 'up to 1,300 mm'],
@@ -359,7 +359,7 @@ const en: Record<string, ProductText> = {
       'The result is a high-quality finished product: no moisture droplets or delamination, and better physical and mechanical properties in tensile and break tests.',
     ],
     quick: [
-      { value: '5', unit: '%', label: 'Moisture vapor<br>removal, up to' },
+      { value: 'up to 5', unit: '%', label: 'Moisture vapor<br>removal from the polymer' },
       { value: '0.75–4', unit: 'kW', label: 'Vacuum pump<br>power' },
       { value: '1.5', unit: 'm²', label: 'Floor<br>space' },
     ],

@@ -1,15 +1,18 @@
 ---
 import { type Lang, localePath, asset, formatDate, useTranslations } from '../i18n';
 import { type Article, articleSlug, readingMinutes } from '../data/articles';
+import { imageSize, responsiveSrcset } from '../data/images';
 
 interface Props { article: Article; lang: Lang; headingLevel?: 'h2' | 'h3' }
 const { article, lang, headingLevel = 'h3' } = Astro.props;
 const t = useTranslations(lang);
 const Heading = headingLevel;
+const size = await imageSize(article.data.cover);
+const srcset = await responsiveSrcset(article.data.cover, asset);
 ---
 <a class="article-card" href={localePath(lang, `/articles/${articleSlug(article)}/`)}>
   <div class="article-image">
-    <img src={asset(article.data.cover)} alt={article.data.coverAlt} loading="lazy" decoding="async">
+    <img src={asset(article.data.cover)} srcset={srcset} sizes="(max-width: 650px) 84vw, (max-width: 920px) 50vw, 440px" width={size.width} height={size.height} alt={article.data.coverAlt} loading="lazy" decoding="async">
   </div>
   <div class="article-info">
     <div class="eyebrow"><time datetime={article.data.date.toISOString().slice(0, 10)}>{formatDate(article.data.date, lang)}</time> · {readingMinutes(article)} {t.articles.minutes}</div>

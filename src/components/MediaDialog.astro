@@ -6,7 +6,7 @@ const t = useTranslations(Astro.props.lang);
 ---
 <dialog id="media-dialog" class="media-dialog" aria-label={t.media.label}>
   <button class="dialog-close" type="button" data-close="media-dialog" aria-label={t.media.close}>×</button>
-  <img id="media-photo" src="data:," alt="">
+  <img id="media-photo" src="data:," width="800" height="1132" alt="">
   <div class="media-footer">
     <p class="media-caption" id="media-caption"></p>
     <div class="media-nav" id="media-nav" hidden>

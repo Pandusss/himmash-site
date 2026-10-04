@@ -14,7 +14,8 @@ export default defineConfig({
   site,
   base,
   trailingSlash: 'always',
-  build: { format: 'directory' },
+  // Styles are inlined into each page: no render-blocking request before the first paint.
+  build: { format: 'directory', inlineStylesheets: 'always' },
   integrations: [
     sitemap({
       i18n: {

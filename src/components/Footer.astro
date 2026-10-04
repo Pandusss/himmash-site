@@ -38,7 +38,11 @@ const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/')
       </nav>
     </div>
     <div class="footer-bottom">
-      <span>{t.footer.rights}, {year}</span>
+      <span class="footer-legal">
+        <span>{t.footer.rights}, {year}</span>
+        <a href={localePath(lang, '/privacy/')}>{t.footer.privacy}</a>
+        <a href={localePath(lang, '/consent/')}>{t.footer.consent}</a>
+      </span>
       <span class="footer-langs">
         {locales.map((l) => (
           <a href={langHref(l)} hreflang={langMeta[l].hreflang} lang={langMeta[l].htmlLang} aria-current={l === lang ? 'true' : undefined}>{langMeta[l].name}</a>

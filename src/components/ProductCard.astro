@@ -2,30 +2,29 @@
 import { type Lang, localePath, asset, useTranslations } from '../i18n';
 import { type ProductMeta, productText, quickLabel } from '../data/products';
 
-interface Props { product: ProductMeta; lang: Lang; headingLevel?: 'h2' | 'h3' }
-const { product, lang, headingLevel = 'h3' } = Astro.props;
+/** priority: the card is on the first screen — load its photo eagerly ('high' for the very first one). */
+interface Props { product: ProductMeta; lang: Lang; headingLevel?: 'h2' | 'h3'; priority?: 'high' | 'eager' }
+const { product, lang, headingLevel = 'h3', priority } = Astro.props;
 const t = useTranslations(lang);
 const text = productText(product.slug, lang);
 const Heading = headingLevel;
-// Key figure for quick comparison: the first quick spec, with its label's first line.
-const key = text.quick?.[0];
-const keyLabel = key && quickLabel(key.label);
-const price = text.price && /\d/.test(text.price) ? text.price : undefined;
+// One template for every card: up to two key figures, then the price or "on request".
+const keys = (text.quick ?? []).slice(0, 2).map((q) => ({ label: quickLabel(q.label), value: q.unit ? `${q.value} ${q.unit}` : q.value }));
+const price = text.price ?? t.product.onRequest;
+const numericPrice = /\d/.test(price);
 ---
 <a class="product-card" href={localePath(lang, `/equipment/${product.slug}/`)} data-category={product.category}>
   <div class="product-image">
-    <img src={asset(`img/${product.image}`)} width="696" height="392" loading="lazy" decoding="async" alt={text.name} style={`view-transition-name: pimg-${product.slug}`}>
+    <img src={asset(`img/${product.image}`)} width="696" height="392" loading={priority ? 'eager' : 'lazy'} fetchpriority={priority === 'high' ? 'high' : undefined} decoding="async" alt={text.name} style={`view-transition-name: pimg-${product.slug}`}>
     <span class="corner" aria-hidden="true">↗</span>
   </div>
   <div class="product-info">
     <div class="eyebrow">{t.categories[product.category]}</div>
     <Heading>{text.short}</Heading>
     <p>{text.card}</p>
-    {(key || price) && (
-      <dl class="product-meta">
-        {key && <div><dt>{keyLabel}</dt><dd>{key.value}{key.unit && ` ${key.unit}`}</dd></div>}
-        {price && <div class="product-price"><dt>{t.product.price}</dt><dd>{price}</dd></div>}
-      </dl>
-    )}
+    <dl class="product-meta">
+      {keys.map((k) => <div><dt>{k.label}</dt><dd>{k.value}</dd></div>)}
+      <div class:list={['product-price', { muted: !numericPrice }]}><dt>{t.product.price}</dt><dd>{price}</dd></div>
+    </dl>
   </div>
 </a>

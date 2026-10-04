@@ -9,11 +9,12 @@ const t = useTranslations(lang);
 const links = [
   { href: localePath(lang, '/equipment/'), label: t.nav.equipment, match: '/equipment/' },
   { href: localePath(lang, '/#modernization'), label: t.nav.modernization },
+  { href: localePath(lang, '/#about'), label: t.nav.about },
   { href: localePath(lang, '/certificates/'), label: t.nav.documents, match: '/certificates/' },
   { href: localePath(lang, '/articles/'), label: t.nav.articles, match: '/articles/' },
   { href: '#contacts', label: t.nav.contacts },
 ];
-const mobileLinks = [...links.slice(0, 3), { href: localePath(lang, '/#about'), label: t.nav.about }, ...links.slice(3)];
+const mobileLinks = links;
 const current = (match?: string) => (match && path.startsWith(match) ? 'page' : undefined);
 // Pages missing in a language link to that language's home page.
 const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/');

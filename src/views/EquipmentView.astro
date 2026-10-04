@@ -36,7 +36,7 @@ const itemList = {
     <div class="wrap">
       <CatalogFilters lang={lang} views />
       <div class="product-grid" data-view-panel="cards">
-        {products.map((p) => <ProductCard product={p} lang={lang} headingLevel="h2" />)}
+        {products.map((p, i) => <ProductCard product={p} lang={lang} headingLevel="h2" priority={i === 0 ? 'high' : undefined} />)}
         <div class="custom-tile">
           <div class="eyebrow">{t.home.hero.eyebrow}</div>
           <h2>{e.customTitle}</h2>
@@ -63,7 +63,7 @@ const itemList = {
                   </th>
                   <td>{t.categories[p.category]}</td>
                   <td>{key ? <><b>{key.value}{key.unit && ` ${key.unit}`}</b><small>{quickLabel(key.label)}</small></> : '—'}</td>
-                  <td>{x.price ? <><b>{x.price}</b>{x.priceNote && <small>{x.priceNote}</small>}</> : '—'}</td>
+                  <td>{x.price ? <><b>{x.price}</b>{x.priceNote && <small>{x.priceNote}</small>}</> : <b>{t.product.onRequest}</b>}</td>
                   <td>{x.deliveryTime ?? '—'}</td>
                 </tr>
               );
@@ -71,6 +71,7 @@ const itemList = {
           </tbody>
         </table>
       </div>
+      <p class="catalog-note">{e.priceNote}</p>
     </div>
   </section>
   <ContactCta lang={lang} />

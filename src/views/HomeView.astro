@@ -9,6 +9,7 @@ import CertificateGallery from '../components/CertificateGallery.astro';
 import { type Lang, localePath, asset, useTranslations } from '../i18n';
 import { products, processSteps, processLoop, productText } from '../data/products';
 import { getArticles } from '../data/articles';
+import { imageSize } from '../data/images';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -23,6 +24,7 @@ const solutions = [
 // "до 95" → small "до" + large "95".
 const statPrefix = (value: string) => value.match(/^(\D+?)\s*(?=\d)/)?.[1] ?? '';
 const statNumber = (value: string) => value.slice(statPrefix(value).length).trim();
+const solutionSizes = await Promise.all(solutions.map((s) => imageSize(s.image)));
 const productLink = (slug: string) => ({ href: localePath(lang, `/equipment/${slug}/`), name: productText(slug, lang).short });
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -67,7 +69,7 @@ const faqJsonLd = {
     <div class="solution-cards">
       {h.solutions.items.map((s, i) => (
         <a class="solution-card" href={solutions[i].href}>
-          <div class="solution-image"><img src={asset(solutions[i].image)} alt={h.solutions.imageAlts[i]} loading="lazy" decoding="async"></div>
+          <div class="solution-image"><img src={asset(solutions[i].image)} width={solutionSizes[i].width} height={solutionSizes[i].height} alt={h.solutions.imageAlts[i]} loading="lazy" decoding="async"></div>
           <div class="solution-body">
             <div class="eyebrow">{s.eyebrow}</div>
             <h3>{s.title}</h3>
