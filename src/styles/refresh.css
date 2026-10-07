@@ -264,3 +264,6 @@ h3{letter-spacing:-.03em}
 @media(min-width:1101px) and (max-width:1240px){.brand small{display:none}.main-nav{gap:14px}.header-cta{padding:10px 14px}}
 @media(min-width:1101px) and (max-width:1300px){.header-inner{gap:16px}.main-nav{gap:14px}.header-side{gap:10px}}
 @media(min-width:1641px){.main-nav{gap:22px}.header-side{gap:16px}}
+
+/* Gallery photos carry width/height for layout stability; let the aspect-ratio set the height, not the attribute. */
+.gallery-main img,.thumb img{height:auto}
