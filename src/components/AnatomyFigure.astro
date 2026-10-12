@@ -68,8 +68,20 @@ const { width, height, ...rest } = data;
   .anatomy-stage[data-flash] :global([data-hit] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 2.2px; }
   .anatomy-stage :global([data-hit]:hover .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)),
   .anatomy-stage[data-flash] :global([data-hit] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
+  .anatomy-stage :global([data-hl] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 2.2px; }
+  .anatomy-stage :global([data-hl] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
+  /* Hotspots on the clickable parts: a dot and a ripple that settles after the first tap. */
+  .anatomy-stage :global(.fig-spot) { cursor: pointer; }
+  .anatomy-stage :global(.fig-spot-pad) { fill: transparent; }
+  .anatomy-stage :global(.fig-spot-halo) { fill: var(--anatomy-lit); opacity: .18; }
+  .anatomy-stage :global(.fig-spot-dot) { fill: var(--anatomy-lit); stroke: var(--white); stroke-width: 2.5; }
+  .anatomy-stage :global(.fig-spot-ring) { fill: color-mix(in srgb, var(--anatomy-lit) 18%, transparent); stroke: var(--anatomy-lit); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: anatomy-spot 1.8s ease-out infinite; }
+  .anatomy-stage :global(.fig-spot:hover .fig-spot-dot) { stroke-width: 3; }
+  .anatomy-stage:not([data-hint]) :global(.fig-spot-ring) { animation: none; opacity: 0; }
+  @keyframes anatomy-spot { 0% { transform: scale(.7); opacity: .95; } 100% { transform: scale(2.4); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .anatomy-hint::before { animation: none; }
+    .anatomy-stage :global(.fig-spot-ring) { animation: none; transform: scale(1.5); opacity: .6; }
     .anatomy-stage[data-hint] :global([data-hit] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 1.6px; }
     .anatomy-stage[data-hint] :global([data-hit] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
   }
