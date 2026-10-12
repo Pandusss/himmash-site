@@ -253,11 +253,19 @@ export function mount(stage, { text: T, data: F }) {
     if (name !== hovered) { hovered = name; takeOver(); refresh(); }
   });
   svg.addEventListener("pointerleave", () => { if (!hovered) return; hovered = null; takeOver(); refresh(); });
+  // A click on a part takes the unit apart and shows that part; a click on the shown part (or beside the
+  // unit) puts it back together; a click on another part while apart shows that one.
   svg.addEventListener("click", (event) => {
     const name = partOf(event);
     takeOver();
-    selected = name && name !== selected ? name : null;
+    if (name && !wantApart) { setApart(true); armRestart(); selected = name; }
+    else if (name && name !== selected) selected = name;
+    else if (wantApart) { setApart(false); running = true; selected = null; }
+    else selected = null;
     afterInput();
+    if (still.matches) {
+      if (wantApart) { running = false; load = 0; speed = 0; schedule(true); } else { schedule(false); running = true; }
+    }
     refresh();
   });
   stage.addEventListener("keydown", (event) => {
