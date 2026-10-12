@@ -37,7 +37,9 @@ ${extra}`;
 
 // Writes the drawing (with its styles inside) and the data for the live script. Returns the SVG markup.
 export function writeFigure({ id, svg, css, data = {}, width, height }) {
-  const file = svg.replace(/^<svg([^>]*)>/, `<svg$1><style>${css.replace(/\s*\n\s*/g, "")}</style>`);
+  // Degenerate faces (a top seen edge-on, a thinned-away outline) come out as "M0 NaN": drop them.
+  const clean = svg.replace(/<path[^>]*\sd="[^"]*NaN[^"]*"[^>]*\/>/g, "");
+  const file = clean.replace(/^<svg([^>]*)>/, `<svg$1><style>${css.replace(/\s*\n\s*/g, "")}</style>`);
   mkdirSync(join(SITE, "public", "figures"), { recursive: true });
   mkdirSync(join(SITE, "src", "figures", id), { recursive: true });
   writeFileSync(join(SITE, "public", "figures", `${id}.svg`), file);
