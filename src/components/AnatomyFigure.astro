@@ -55,16 +55,24 @@ const { width, height, ...rest } = data;
   .anatomy-hint:focus { outline: none; }
   .anatomy-hint:focus-visible { outline: 1px solid var(--muted); outline-offset: 1px; }
   @keyframes anatomy-dot { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent); } 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
-  /* Clickable parts: a soft pulse until the reader first acts, and the lit outline on hover. */
-  @keyframes anatomy-hint { 0%, 100% { stroke: var(--anatomy-hi); stroke-width: var(--anatomy-weight); } 50% { stroke: var(--anatomy-lit); stroke-width: 1.5px; } }
-  .anatomy-stage[data-hint] :global([data-hit] .iso-solid > .iso-edge) { animation: anatomy-hint 1.8s ease-in-out infinite; }
+  /* Clickable parts: two strong pulses every few seconds until the reader first acts; tinted on hover
+     and while the hint is hovered or has just been pressed. */
+  .anatomy-stage { --fig-hl: #cfe7da; }
+  :global(:root[data-theme=dark]) .anatomy-stage { --fig-hl: #2a5244; }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme])) .anatomy-stage { --fig-hl: #2a5244; } }
+  @keyframes anatomy-hint-edge { 0%, 40%, 100% { stroke: var(--anatomy-hi); stroke-width: var(--anatomy-weight); } 10%, 30% { stroke: var(--anatomy-lit); stroke-width: 2.2px; } 20% { stroke: var(--anatomy-lit); stroke-width: 1.2px; } }
+  @keyframes anatomy-hint-fill { 10%, 30% { fill: var(--fig-hl); } }
+  .anatomy-stage[data-hint] :global([data-hit] .iso-solid > .iso-edge) { animation: anatomy-hint-edge 4.5s ease-in-out infinite; }
+  .anatomy-stage[data-hint] :global([data-hit] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: anatomy-hint-fill 4.5s ease-in-out infinite; }
   .anatomy-stage :global([data-hit]:hover .iso-solid > .iso-edge),
-  .anatomy-stage[data-hint-hover] :global([data-hit] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 1.5px; }
+  .anatomy-stage[data-flash] :global([data-hit] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 2.2px; }
+  .anatomy-stage :global([data-hit]:hover .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)),
+  .anatomy-stage[data-flash] :global([data-hit] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
   @media (prefers-reduced-motion: reduce) {
     .anatomy-hint::before { animation: none; }
-    .anatomy-stage[data-hint] :global([data-hit] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 1.2px; }
+    .anatomy-stage[data-hint] :global([data-hit] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 1.6px; }
+    .anatomy-stage[data-hint] :global([data-hit] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
   }
-  .anatomy-foot [data-readout] { color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
   .anatomy-stage { position: relative; margin: 6px -10px; touch-action: pan-y; border-radius: 4px; }
   .anatomy-stage:focus { outline: none; }
   .anatomy-stage:focus-visible { outline: 1px solid var(--muted); outline-offset: 2px; }

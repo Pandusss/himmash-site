@@ -1,9 +1,10 @@
 /* Design iteration 2: typography, header CTA, stats, cards, certificates gallery, contacts, bars. */
 :root{--font-body:"Golos Text Variable","Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;--font-display:"Golos Text Variable",Arial,"Helvetica Neue",sans-serif}
-:lang(zh){--font-body:"Golos Text Variable","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;--font-display:"Golos Text Variable","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif}
+:lang(zh){--font-body:"Golos Text Variable","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","Noto Sans SC","Noto Sans SC Web",sans-serif;--font-display:"Golos Text Variable","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","Noto Sans SC","Noto Sans SC Web",sans-serif;--font-mono:Consolas,"SF Mono",Menlo,"Liberation Mono","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","Noto Sans SC","Noto Sans SC Web",monospace}
 h1,h2,h3{letter-spacing:-.04em;overflow-wrap:break-word}
 h3{letter-spacing:-.03em}
 :lang(zh) h1,:lang(zh) h2,:lang(zh) h3{letter-spacing:0}
+:lang(zh) .quick-specs strong,:lang(zh) .price{font-family:Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","Noto Sans SC","Noto Sans SC Web",sans-serif}
 
 /* Header call to action */
 .header-cta{min-height:42px;padding:10px 18px;gap:10px;font-size:13px;white-space:nowrap}
