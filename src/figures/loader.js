@@ -122,6 +122,16 @@ function feedback(stage) {
     setTimeout(() => parts.forEach((el) => el.removeAttribute('data-pressed')), 900);
   }, true);
   stage.addEventListener('keydown', act, true);
+  // A figure can put its own message in the toast (a step of a demo), whenever it happens.
+  stage.addEventListener('anatomy-toast', (event) => {
+    actedAt = performance.now();
+    title.textContent = cap(event.detail.title || '');
+    detail.textContent = event.detail.detail || '';
+    phrase = event.detail.title || ''; phraseAt = actedAt + 1;
+    toast.removeAttribute('data-show'); void toast.offsetWidth; toast.setAttribute('data-show', '');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => toast.removeAttribute('data-show'), TOAST_MS);
+  });
 }
 
 document.querySelectorAll('.anatomy-stage[data-figure-id]').forEach(load);

@@ -76,6 +76,18 @@ const controlsLabel = { ru: 'Управление схемой', en: 'Figure con
   .anatomy-stage[data-flash] :global([data-hit] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
   .anatomy-stage :global([data-hl] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 2.2px; }
   .anatomy-stage :global([data-hl] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
+  /* Focus: a figure that marks a picked part (data-on) and sets data-focus on its drawing fades every
+     other part and the frame, and lights the picked one: a glow (which also reaches parts drawn through
+     <use>, where fills can't be restyled) plus an accent fill on parts drawn directly. */
+  .anatomy-stage :global(.fig-svg :is([data-part], path, circle)) { transition: opacity .35s ease; }
+  .anatomy-stage :global(.fig-svg[data-focus] [data-part]:not([data-on])) { opacity: .14; }
+  .anatomy-stage :global(.fig-svg[data-focus] :is(path, circle, ellipse, polygon, line):not([data-part], [data-part] *, defs *, .fig-ripple)) { opacity: .14; }
+  .anatomy-stage :global(.fig-svg[data-focus] [data-on]) { filter: drop-shadow(0 0 1.2px var(--anatomy-lit)) drop-shadow(0 0 6px color-mix(in srgb, var(--anatomy-lit) 70%, transparent)); }
+  .anatomy-stage :global(.fig-svg[data-focus] [data-on] path:not(.iso-line, .iso-halo)) { fill: color-mix(in srgb, var(--anatomy-lit) var(--fig-focus-mix, 30%), var(--anatomy-paper)); stroke: none; }
+  .anatomy-stage :global(.fig-svg[data-focus] [data-on] .iso-line) { stroke: var(--anatomy-lit); }
+  :global(:root[data-theme=dark]) .anatomy-stage { --fig-focus-mix: 42%; }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme])) .anatomy-stage { --fig-focus-mix: 42%; } }
+  .anatomy-stage :global(.fig-svg[data-focus] [data-on] .iso-solid > .iso-edge) { stroke: var(--anatomy-lit); stroke-width: 1.6px; }
   /* Control buttons under the drawing: each presses one of the figure's keys and flashes its part. */
   .anatomy-controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
   .anatomy-control { min-height: 38px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink); font: 500 13px/1.2 var(--font-body); cursor: pointer; transition: background-color .15s, border-color .15s, color .15s, transform .1s; }

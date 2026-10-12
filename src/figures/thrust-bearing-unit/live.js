@@ -7,6 +7,14 @@ const SPIN = 1.3;          // sleeve, rad/s of figure time (slowed down)
 const CAGE = 0.44;         // roller crown of a thrust bearing turns at a little under half the shaft speed
 const RESUME_MS = 8000;    // the tour resumes this long after the last input (wall clock)
 const RESTART_MS = 6000;   // a unit the reader took apart goes back together by itself this long after the last input
+// "Load path": four steps that follow the axial load from the screw into the frame, one part at a time.
+const PATH = [
+  { part: "sleeve", text: "path1" },
+  { part: "thrust", text: "path2" },
+  { part: "housing", text: "path3" },
+  { part: "housing", text: "path4" },
+];
+const PATH_STEP_MS = 3200;
 const TOUR = [
   { run: true, part: null, dur: 3 },
   { part: "sleeve", dur: 2.2 },
@@ -56,6 +64,9 @@ export function mount(stage, { text: T, data: F }) {
   let touring = !still.matches, tourStep = 0, tourClock = 0, quiet = 0;
   let frame = 0, last = 0, visible = false, phrase = "";
   let restartAt = 0, restartTimer = 0, startPending = false;
+  let pathAt = 0, pathStep = -1, pathWait = false, focused = null;
+  // A message for the card's toast (the loader shows it in large type over the drawing).
+  const toast = (title) => stage.dispatchEvent(new CustomEvent("anatomy-toast", { detail: { title } }));
 
   const number = (v) => String(Math.round(v * 100));
   function say(text) {
@@ -103,7 +114,7 @@ export function mount(stage, { text: T, data: F }) {
         tourClock = 0;
         enter(TOUR[tourStep]);
       }
-    } else if (!touring && !calm && !hovered && quiet && performance.now() - quiet >= RESUME_MS) {
+    } else if (!touring && !calm && !hovered && quiet && pathStep < 0 && !pathWait && performance.now() - quiet >= RESUME_MS) {
       resumeTour();
     }
     // Arming: stop before taking apart; take apart only once the sleeve has stopped.
@@ -114,6 +125,13 @@ export function mount(stage, { text: T, data: F }) {
     const home = pieces.cover.x === 0 && pieces.cartridge.x === 0 && pieces.cover.goal === 0 && pieces.cartridge.goal === 0;
     if (!wantApart && home && !apart && !running && touring) running = true;
     if (startPending && home && !apart && running) { startPending = false; announce(T.started); }
+    // Load path: wait until the unit is together and loaded, then walk the four steps.
+    if (pathWait && home && !apart && running && load > 0.6) { pathWait = false; pathStep = 0; pathAt = performance.now(); showPath(); }
+    if (pathStep >= 0) {
+      const next = Math.floor((performance.now() - pathAt) / PATH_STEP_MS);
+      if (next >= PATH.length) { pathStep = -1; selected = null; quiet = performance.now(); toast(T.pathDone); announce(T.pathDone); }
+      else if (next !== pathStep) { pathStep = next; showPath(); }
+    }
     // Drive and load: the motor brings the sleeve up to speed, melt pressure builds behind it.
     const on = running && home;
     const k1 = calm ? 1 : 1 - Math.exp(-dt / (on ? 0.5 : 0.25));
@@ -128,6 +146,22 @@ export function mount(stage, { text: T, data: F }) {
     return moving;
   }
 
+  function showPath() {
+    const s = PATH[pathStep];
+    selected = s.part;
+    toast(T[s.text]);
+    announce(T[s.text]);
+  }
+  // Start the load-path demo: put the unit together and running first if it is apart or stopped.
+  function startPath() {
+    disarmRestart();
+    if (wantApart || apart) setApart(false);
+    running = true;
+    selected = null;
+    pathStep = -1;
+    pathWait = true;
+    if (still.matches) { pathWait = false; pathStep = 0; pathAt = performance.now(); showPath(); }
+  }
   function enter(s) {
     if (s.run) { running = true; announce(T.started); }
     if ("part" in s) selected = s.part;
@@ -203,6 +237,9 @@ export function mount(stage, { text: T, data: F }) {
       lastOn = on;
       PARTS.forEach((name) => groups[name].forEach((node) => node.toggleAttribute("data-on", name === on)));
     }
+    // Focus: a picked part is filled with the accent and everything else fades, so it reads even inside.
+    const focus = hovered || selected || null;
+    if (focus !== focused) { focused = focus; svg.toggleAttribute("data-focus", !!focus); }
     // Readout.
     const p = number(load);
     const moving = pieces.cover.x !== pieces.cover.goal || pieces.cartridge.x !== pieces.cartridge.goal || pieces.cover.goalNext !== undefined || pieces.cartridge.goalNext !== undefined;
@@ -258,6 +295,7 @@ export function mount(stage, { text: T, data: F }) {
   svg.addEventListener("click", (event) => {
     const name = partOf(event);
     takeOver();
+    pathStep = -1; pathWait = false;
     if (name && !wantApart) { setApart(true); armRestart(); selected = name; }
     else if (name && name !== selected) selected = name;
     else if (wantApart) { setApart(false); running = true; selected = null; }
@@ -271,11 +309,13 @@ export function mount(stage, { text: T, data: F }) {
   stage.addEventListener("keydown", (event) => {
     const key = event.key;
     let handled = true;
-    if (/^[1-5]$/.test(key)) selected = PARTS[Number(key) - 1];
-    else if (key === "ArrowRight" || key === "ArrowDown") selected = PARTS[(PARTS.indexOf(selected) + 1) % PARTS.length];
-    else if (key === "ArrowLeft" || key === "ArrowUp") selected = PARTS[(PARTS.indexOf(selected) + PARTS.length - 1) % PARTS.length];
-    else if (key === " " || key === "Enter") { setApart(!wantApart); if (!wantApart) running = true; if (wantApart) armRestart(); }
-    else if (key === "Escape") selected = null;
+    const pick = (name) => { pathStep = -1; pathWait = false; selected = name; if (!wantApart) { setApart(true); armRestart(); } };
+    if (key === "p" || key === "P" || key === "з" || key === "З") startPath();
+    else if (/^[1-5]$/.test(key)) pick(PARTS[Number(key) - 1]);
+    else if (key === "ArrowRight" || key === "ArrowDown") pick(PARTS[(PARTS.indexOf(selected) + 1) % PARTS.length]);
+    else if (key === "ArrowLeft" || key === "ArrowUp") pick(PARTS[(PARTS.indexOf(selected) + PARTS.length - 1) % PARTS.length]);
+    else if (key === " " || key === "Enter") { pathStep = -1; pathWait = false; setApart(!wantApart); if (!wantApart) running = true; if (wantApart) armRestart(); }
+    else if (key === "Escape") { pathStep = -1; pathWait = false; selected = null; }
     else handled = false;
     if (!handled) return;
     event.preventDefault();
