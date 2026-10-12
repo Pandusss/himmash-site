@@ -9,6 +9,8 @@ const SPEED_TAU = 0.7;     // inverter ramp
 const FILL_TAU = 1.6;      // the extruder channel fills or empties
 const TOUR = [[0, 1], [7, 0.6], [12, 0], [17, 1]];
 const TOUR_LEN = 20;
+const RESTART_MS = 6000;   // a stop made by the reader switches itself back on after this (wall clock)
+const RESUME_MS = 8000;    // the tour resumes this long after the last input (wall clock)
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
@@ -59,8 +61,12 @@ export function mount(stage, { text: T, data: F }) {
   let clock = 0, last = 0, frame = 0, visible = false, phrase = "";
   let touring = !still.matches, tourAt = 0, quiet = 0, hovering = false;
   let drawnPhi = NaN;
+  let restartAt = 0, restartTimer = 0;
 
-  function say(text) { if (readout && readout.textContent !== text) readout.textContent = text; }
+  function say(text) {
+    if (restartAt) text += " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000)));
+    if (readout && readout.textContent !== text) readout.textContent = text;
+  }
   function announce(text) { if (live && phrase !== text) { phrase = text; live.textContent = text; } }
 
   const quad = (cx, cy, h, s) => `M${f1(cx + s[0][0] * h)} ${f1(cy + s[0][1] * h)}L${f1(cx + s[1][0] * h)} ${f1(cy + s[1][1] * h)}L${f1(cx + s[2][0] * h)} ${f1(cy + s[2][1] * h)}L${f1(cx + s[3][0] * h)} ${f1(cy + s[3][1] * h)}Z`;
@@ -166,8 +172,8 @@ export function mount(stage, { text: T, data: F }) {
       let v = TOUR[0][1];
       for (const [at, value] of TOUR) if (t >= at) v = value;
       if (v !== target) setTarget(v, false);
-    } else if (!still.matches && !hovering && quiet > 0 && clock - quiet > 10) {
-      touring = true;
+    } else if (!still.matches && !hovering && quiet > 0 && performance.now() - quiet >= RESUME_MS) {
+      touring = true; tourAt = 0; disarmRestart();
     }
     const calm = still.matches;
     speed = calm ? target : speed + (target - speed) * (1 - Math.exp(-dt / SPEED_TAU));
@@ -214,8 +220,20 @@ export function mount(stage, { text: T, data: F }) {
 
   function takeOver() {
     touring = false;
-    quiet = clock || 1e-3;
+    quiet = performance.now();
   }
+
+  // A stop made by the reader comes back on by itself RESTART_MS later; any further input restarts the wait.
+  function armRestart() { restartAt = performance.now() + RESTART_MS; clearTimeout(restartTimer); restartTimer = setTimeout(restartTick, 1005); }
+  function disarmRestart() { restartAt = 0; clearTimeout(restartTimer); restartTimer = 0; }
+  function restartTick() {
+    const left = restartAt - performance.now();
+    if (left > 20) { if (still.matches) draw(); restartTimer = setTimeout(restartTick, (left % 1000 || 1000) + 5); return; }
+    disarmRestart();
+    setTarget(lastOn, false);
+    run(); if (still.matches) draw();
+  }
+  const afterInput = () => (target === 0 ? armRestart() : disarmRestart());
 
   function tick(now) {
     const dt = last ? Math.min((now - last) / 1000, 1 / 30) : 1 / 60;
@@ -232,7 +250,7 @@ export function mount(stage, { text: T, data: F }) {
   const toggle = () => setTarget(target > 0 ? 0 : lastOn, true);
   svg.addEventListener("click", (event) => {
     if (!event.target.closest || !event.target.closest("[data-hit]")) return;
-    takeOver(); toggle(); run(); if (still.matches) draw();
+    takeOver(); toggle(); afterInput(); run(); if (still.matches) draw();
   });
   stage.addEventListener("keydown", (event) => {
     let handled = true;
@@ -242,10 +260,15 @@ export function mount(stage, { text: T, data: F }) {
     else handled = false;
     if (!handled) return;
     event.preventDefault();
-    takeOver(); run(); if (still.matches) draw();
+    takeOver(); afterInput(); run(); if (still.matches) draw();
   });
-  stage.addEventListener("pointerenter", () => { hovering = true; if (touring) takeOver(); });
-  stage.addEventListener("pointerleave", () => { hovering = false; quiet = clock || 1e-3; });
+  // Only a real mouse pauses the tour on hover; a tap on a phone fires pointerenter too.
+  stage.addEventListener("pointerenter", (event) => {
+    if (event.pointerType !== "mouse") return;
+    hovering = true;
+    if (touring) { takeOver(); if (target === 0 && !restartAt) armRestart(); }
+  });
+  stage.addEventListener("pointerleave", () => { if (!hovering) return; hovering = false; quiet = performance.now(); });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));
   new IntersectionObserver((entries) => { visible = entries[entries.length - 1].isIntersecting; if (visible) run(); }, { rootMargin: "120px 0px" }).observe(stage);
   draw();

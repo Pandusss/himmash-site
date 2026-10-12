@@ -170,7 +170,7 @@ export function mount(stage, { text: T, data: F }) {
 
   // ---------- state
   const FULL = F.rps * TAU;
-  let theta = 0, water = true, wetness = 1, material = 0, touring = !still.matches, quietUntil = 0, clock = 0;
+  let theta = 0, water = true, wetness = 1, material = 0, touring = !still.matches, lastInput = 0, tourAt = 0, clock = 0;
   let last = 0, frame = 0, visible = false, lastText = "", spoken = "";
   const name = () => T.materials[material];
   function say(text) { if (readout && lastText !== text) { lastText = text; readout.textContent = text; } }
@@ -186,14 +186,34 @@ export function mount(stage, { text: T, data: F }) {
     announce(water ? T.waterOn : T.waterOff);
     if (still.matches) wetness = water ? 1 : 0;
   }
-  const takeOver = () => { touring = false; quietUntil = clock + 12; };
+  // The idle tour resumes 8 s after the reader's last input (wall clock), from its start with the water on.
+  const RESUME = 8000;
+  const takeOver = () => { touring = false; lastInput = performance.now(); };
+  // Water left off while the reader is in control comes back on by itself 6 s after the reader's last input (wall clock,
+  // so it also works with reduced motion, where there is no animation loop and the readout is redrawn by a timer instead).
+  const RESTART = 6000;
+  let restartAt = 0, restartTimer = 0, countTimer = 0;
+  function dropRestart() { clearTimeout(restartTimer); clearInterval(countTimer); restartAt = 0; }
+  function holdOff() {
+    dropRestart();
+    if (water) return;
+    restartAt = performance.now() + RESTART;
+    restartTimer = setTimeout(restart, RESTART);
+    if (still.matches) countTimer = setInterval(() => draw(), 500);
+  }
+  function restart() {
+    dropRestart();
+    if (!water) toggleWater();
+    run(); draw();
+  }
+  const countdown = () => (restartAt ? " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000))) : "");
 
   function step(dt) {
     clock += dt;
-    if (!touring && !still.matches && clock > quietUntil) touring = true;
+    if (!touring && !still.matches && performance.now() - lastInput > RESUME) { touring = true; tourAt = clock; }
     if (touring) {
       // Tour: each feed in turn with the water on, then the film again with the water shut off, to show why it is there.
-      const cycle = Math.floor(clock / 6.5) % 5;
+      const cycle = Math.floor((clock - tourAt) / 6.5) % 5;
       const want = cycle === 4 ? 0 : cycle;
       if (want !== material) choose(want, false);
       const dryNow = cycle === 4;
@@ -288,7 +308,7 @@ export function mount(stage, { text: T, data: F }) {
     };
     fallers(out, 500, (f) => smooth(f.age / 0.05) * smooth((0.6 - f.age) / 0.25));
     fallers(inFlakes, 300, (f) => smooth((F.hopper.z + 380 - f.z) / 120));
-    say((water ? T.run : T.dry).replace("{m}", name()).replace("{q}", F.materials[material].q));
+    say((water ? T.run : T.dry + countdown()).replace("{m}", name()).replace("{q}", F.materials[material].q));
   }
 
   function tick(now) {
@@ -306,6 +326,7 @@ export function mount(stage, { text: T, data: F }) {
     if (!event.target.closest || !event.target.closest("[data-hit]")) return;
     takeOver();
     choose(material + 1, true);
+    holdOff();
     run(); draw();
   });
   stage.addEventListener("keydown", (event) => {
@@ -313,6 +334,7 @@ export function mount(stage, { text: T, data: F }) {
     else if (event.key === " " || event.key === "Enter") { takeOver(); toggleWater(); }
     else return;
     event.preventDefault();
+    holdOff();
     run(); draw();
   });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));

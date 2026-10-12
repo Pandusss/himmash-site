@@ -6,6 +6,8 @@
 const PELLET_AT_MAX = 3.5;   // mm, pellet length assumed at the top shaft speed (sets the strand speed)
 const FLIGHT = 0.45, FALL = 1.3, OUT = 0.7;
 const TAU = Math.PI * 2;
+const RESUME_MS = 8000;    // the tour resumes this long after the last input (wall clock)
+const RESTART_MS = 6000;   // a stop made by the reader comes back on by itself this long after the last input
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const wrap = (a) => ((a % TAU) + TAU) % TAU;
@@ -97,6 +99,7 @@ export function mount(stage, { text: T, data: F }) {
   let level = levels.length - 1, rpm = maxRpm, running = true;
   let phase = 0.3, clock = 0, last = 0, frame = 0, visible = false, hover = "", phrase = "", shown = "";
   let touring = !still.matches, tourAt = 0, quietUntil = 1.4, seed = 7;
+  let lastInput = 0, restartAt = 0, restartTimer = 0;
   const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
   const pellets = [];
   holes.forEach((h) => { h.rel = wrap(h.a - phase) % Math.PI; });
@@ -104,7 +107,10 @@ export function mount(stage, { text: T, data: F }) {
   const target = () => (running ? levels[level] : 0);
   const number = (v) => String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, T.thousands || " ");
 
-  function say(textValue) { if (readout && shown !== textValue) { shown = textValue; readout.textContent = textValue; } }
+  function say(textValue) {
+    if (restartAt) textValue += " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000)));
+    if (readout && shown !== textValue) { shown = textValue; readout.textContent = textValue; }
+  }
   function announce(textValue) { if (live && phrase !== textValue) { phrase = textValue; live.textContent = textValue; } }
 
   function emit(h) {
@@ -114,6 +120,9 @@ export function mount(stage, { text: T, data: F }) {
 
   function step(dt) {
     clock += dt;
+    if (!touring && !still.matches && lastInput && performance.now() - lastInput >= RESUME_MS) {
+      touring = true; tourAt = 0; quietUntil = clock; lastInput = 0; disarmRestart();
+    }
     if (touring && clock > quietUntil) {
       tourAt += dt;
       const plan = [3, 1, 0, 1];
@@ -223,23 +232,39 @@ export function mount(stage, { text: T, data: F }) {
     draw();
   }
 
-  function takeOver() { touring = false; quietUntil = Infinity; }
+  // Any input hands the figure to the reader; the tour comes back RESUME_MS after the last one.
+  function takeOver() { touring = false; lastInput = performance.now(); }
+  // A stop made by the reader comes back on by itself RESTART_MS later; any further input restarts the wait.
+  function armRestart() { restartAt = performance.now() + RESTART_MS; clearTimeout(restartTimer); restartTimer = setTimeout(restartTick, 1005); }
+  function disarmRestart() { restartAt = 0; clearTimeout(restartTimer); restartTimer = 0; }
+  function restartTick() {
+    const left = restartAt - performance.now();
+    if (left > 20) { if (still.matches) draw(); restartTimer = setTimeout(restartTick, (left % 1000 || 1000) + 5); return; }
+    disarmRestart();
+    running = true;
+    announce(T.start);
+    run();
+  }
+  const afterInput = () => (running ? disarmRestart() : armRestart());
   function setLevel(next) {
     takeOver();
     level = clamp(next, 0, levels.length - 1);
     running = true;
     announce(T.set.replace("{rpm}", number(levels[level])));
+    afterInput();
     run();
   }
   function toggle() {
     takeOver();
     running = !running;
     announce(running ? T.start : T.stop);
+    afterInput();
     run();
   }
   const partOf = (event) => { const n = event.target.closest && event.target.closest("[data-part]"); return n ? n.dataset.part : ""; };
-  svg.addEventListener("pointermove", (event) => { hover = partOf(event); if (still.matches) draw(); });
-  svg.addEventListener("pointerleave", () => { hover = ""; if (still.matches) draw(); });
+  // Only a real mouse counts as hover; a tap on a phone fires pointer events too.
+  svg.addEventListener("pointermove", (event) => { if (event.pointerType !== "mouse") return; hover = partOf(event); if (still.matches) draw(); });
+  svg.addEventListener("pointerleave", () => { if (!hover) return; hover = ""; if (still.matches) draw(); });
   svg.addEventListener("click", (event) => {
     const part = partOf(event);
     if (part === "cutter" || part === "motor") setLevel(running ? (level + levels.length - 1) % levels.length : level);

@@ -6,7 +6,7 @@
 // The idle tour lights the stages in turn; keys 1–5, the arrows or a click pick one.
 const NS = "http://www.w3.org/2000/svg";
 const STAGE_FOR = 3.4;     // s per stage in the tour
-const RESUME = 8;          // s of quiet before the tour resumes
+const RESUME = 8000;       // ms of quiet after the reader's last input before the tour resumes (wall clock)
 const DASH = 26;           // flow dash speed, px/s
 const BUBBLES = 46;
 const FROTH = 34;
@@ -76,12 +76,12 @@ export function mount(stage, { text: T, data: F }) {
   function select(n, byUser) {
     selected = n;
     groups.forEach((list, i) => list.forEach((g) => g.toggleAttribute("data-on", i + 1 === n)));
-    if (byUser) { touring = false; quietSince = clock; announce(n ? T.stages[n - 1] : T.summary); }
+    if (byUser) { touring = false; quietSince = performance.now(); announce(n ? T.stages[n - 1] : T.summary); }
   }
 
   function step(dt) {
     clock += dt;
-    if (!touring && quietSince >= 0 && clock - quietSince > RESUME && !still.matches) { touring = true; tourAt = clock; }
+    if (!touring && quietSince >= 0 && performance.now() - quietSince > RESUME && !still.matches) { touring = true; tourAt = clock; }
     if (touring) {
       const n = Math.floor((clock - tourAt) / STAGE_FOR) % 6;
       const want = n === 5 ? 0 : n + 1;

@@ -206,7 +206,7 @@ export function mount(stage, { text: T, data: F }) {
   // ---------- state
   const FULL = F.shownRps * TAU;          // shown angular speed at 1 500 rpm (slowed down)
   let theta = 0, omega = FULL, running = true, phase = "run", phaseAt = 0, clock = 0;
-  let material = 0, touring = !still.matches, quietUntil = 0, screwTurn = 0;
+  let material = 0, touring = !still.matches, lastInput = 0, screwTurn = 0;
   let last = 0, frame = 0, visible = false, lastText = "", spoken = "";
 
   const materialName = () => T.materials[material];
@@ -225,11 +225,31 @@ export function mount(stage, { text: T, data: F }) {
     else { phase = "start1"; phaseAt = clock; running = true; announce(T.started); }
     if (still.matches) { phase = running ? "run" : "stop"; omega = running ? FULL : 0; }
   }
-  const takeOver = () => { touring = false; quietUntil = clock + 12; };
+  // The idle tour resumes 8 s after the reader's last input (wall clock).
+  const RESUME = 8000;
+  const takeOver = () => { touring = false; lastInput = performance.now(); };
+  // A stop by the reader starts again by itself 6 s after the reader's last input (wall clock, so it also works with
+  // reduced motion, where there is no animation loop and the readout is redrawn by a timer instead).
+  const RESTART = 6000;
+  let restartAt = 0, restartTimer = 0, countTimer = 0;
+  function dropRestart() { clearTimeout(restartTimer); clearInterval(countTimer); restartAt = 0; }
+  function holdOff() {
+    dropRestart();
+    if (running) return;
+    restartAt = performance.now() + RESTART;
+    restartTimer = setTimeout(restart, RESTART);
+    if (still.matches) countTimer = setInterval(() => draw(), 500);
+  }
+  function restart() {
+    dropRestart();
+    if (!running) toggle();
+    run(); draw();
+  }
+  const countdown = () => (restartAt ? " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000))) : "");
 
   function step(dt) {
     clock += dt;
-    if (!touring && !still.matches && clock > quietUntil && phase === "run") touring = true;
+    if (!touring && !still.matches && performance.now() - lastInput > RESUME) touring = true;
     if (touring) {
       const want = Math.floor(clock / 7) % 3;
       if (want !== material) choose(want, false);
@@ -355,8 +375,8 @@ export function mount(stage, { text: T, data: F }) {
     const m = F.materials[material];
     if (phase === "start1") say(T.start1);
     else if (phase === "start2") say(T.start2);
-    else if (phase === "coast") say(T.coast);
-    else if (phase === "stop") say(T.stopped.replace("{m}", materialName()));
+    else if (phase === "coast") say(T.coast + countdown());
+    else if (phase === "stop") say(T.stopped.replace("{m}", materialName()) + countdown());
     else say(T.run.replace("{m}", materialName()).replace("{i}", m.inlet).replace("{o}", `${F.outlet[0]}–${F.outlet[1]}`).replace("{q}", F.capacity));
   }
 
@@ -376,6 +396,7 @@ export function mount(stage, { text: T, data: F }) {
     if (!event.target.closest || !event.target.closest("[data-hit]")) return;
     takeOver();
     choose(material + 1, true);
+    holdOff();
     run(); draw();
   });
   stage.addEventListener("keydown", (event) => {
@@ -383,6 +404,7 @@ export function mount(stage, { text: T, data: F }) {
     else if (event.key === " " || event.key === "Enter") { takeOver(); toggle(); }
     else return;
     event.preventDefault();
+    holdOff();
     run(); draw();
   });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));

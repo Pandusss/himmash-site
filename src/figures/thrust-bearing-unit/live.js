@@ -5,6 +5,8 @@
 const PARTS = ["sleeve", "thrust", "housing", "radial", "cover"];
 const SPIN = 1.3;          // sleeve, rad/s of figure time (slowed down)
 const CAGE = 0.44;         // roller crown of a thrust bearing turns at a little under half the shaft speed
+const RESUME_MS = 8000;    // the tour resumes this long after the last input (wall clock)
+const RESTART_MS = 6000;   // a unit the reader took apart goes back together by itself this long after the last input
 const TOUR = [
   { run: true, part: null, dur: 3 },
   { part: "sleeve", dur: 2.2 },
@@ -53,9 +55,13 @@ export function mount(stage, { text: T, data: F }) {
   let wantApart = false, apart = false;
   let touring = !still.matches, tourStep = 0, tourClock = 0, quiet = 0;
   let frame = 0, last = 0, visible = false, phrase = "";
+  let restartAt = 0, restartTimer = 0, startPending = false;
 
   const number = (v) => String(Math.round(v * 100));
-  function say(text) { if (readout && readout.textContent !== text) readout.textContent = text; }
+  function say(text) {
+    if (restartAt) text += " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000)));
+    if (readout && readout.textContent !== text) readout.textContent = text;
+  }
   function announce(text) { if (live && phrase !== text) { phrase = text; live.textContent = text; } }
 
   // Critically damped follow of one assembly toward its goal.
@@ -74,7 +80,7 @@ export function mount(stage, { text: T, data: F }) {
   // Opening: the cover leaves first, the sleeve after it. Closing: the sleeve goes home first.
   function setApart(on) {
     wantApart = on;
-    if (on) running = false;
+    if (on) { running = false; startPending = false; }
   }
   function schedule(on) {
     const first = on ? pieces.cover : pieces.cartridge;
@@ -97,9 +103,8 @@ export function mount(stage, { text: T, data: F }) {
         tourClock = 0;
         enter(TOUR[tourStep]);
       }
-    } else if (!touring && !calm) {
-      quiet += dt;
-      if (quiet > (apart || wantApart ? 9 : 3.6)) resumeTour();
+    } else if (!touring && !calm && !hovered && quiet && performance.now() - quiet >= RESUME_MS) {
+      resumeTour();
     }
     // Arming: stop before taking apart; take apart only once the sleeve has stopped.
     if (wantApart && !apart && speed < 0.03 && load < 0.03) schedule(true);
@@ -108,6 +113,7 @@ export function mount(stage, { text: T, data: F }) {
     const moving = settle(pieces.cover, dt, calm) | settle(pieces.cartridge, dt, calm);
     const home = pieces.cover.x === 0 && pieces.cartridge.x === 0 && pieces.cover.goal === 0 && pieces.cartridge.goal === 0;
     if (!wantApart && home && !apart && !running && touring) running = true;
+    if (startPending && home && !apart && running) { startPending = false; announce(T.started); }
     // Drive and load: the motor brings the sleeve up to speed, melt pressure builds behind it.
     const on = running && home;
     const k1 = calm ? 1 : 1 - Math.exp(-dt / (on ? 0.5 : 0.25));
@@ -128,9 +134,11 @@ export function mount(stage, { text: T, data: F }) {
     if (s.apart === true) setApart(true);
     if (s.apart === false) setApart(false);
   }
-  function takeOver() { touring = false; quiet = 0; }
+  // Any input hands the figure to the reader; the tour comes back RESUME_MS after the last one.
+  function takeOver() { touring = false; quiet = performance.now(); }
   function resumeTour() {
     touring = true; tourClock = 0; quiet = 0;
+    disarmRestart();
     tourStep = apart || wantApart ? TOUR.length - 1 : 0;
     enter(TOUR[tourStep]);
   }
@@ -219,19 +227,37 @@ export function mount(stage, { text: T, data: F }) {
   };
   const refresh = () => { if (still.matches) { step(0); draw(); } else run(); };
 
+  // Taking the unit apart stops it; when the reader did that, it goes back together and starts by itself
+  // RESTART_MS later. Any further input while it waits restarts the wait.
+  function armRestart() { restartAt = performance.now() + RESTART_MS; clearTimeout(restartTimer); restartTimer = setTimeout(restartTick, 1005); }
+  function disarmRestart() { restartAt = 0; clearTimeout(restartTimer); restartTimer = 0; }
+  function restartTick() {
+    const left = restartAt - performance.now();
+    if (left > 20) { if (still.matches) draw(); restartTimer = setTimeout(restartTick, (left % 1000 || 1000) + 5); return; }
+    disarmRestart();
+    setApart(false);
+    running = true;
+    if (still.matches) { step(0); announce(T.started); draw(); }
+    else { startPending = true; run(); }
+  }
+  const afterInput = () => { if (!wantApart) disarmRestart(); else if (restartAt) armRestart(); };
+
   const partOf = (event) => {
     const node = event.target.closest && event.target.closest("[data-part]");
     return node ? node.dataset.part : null;
   };
+  // Only a real mouse counts as hover; a tap on a phone fires pointer events too.
   svg.addEventListener("pointermove", (event) => {
+    if (event.pointerType !== "mouse") return;
     const name = partOf(event);
-    if (name !== hovered) { hovered = name; if (name) takeOver(); refresh(); }
+    if (name !== hovered) { hovered = name; takeOver(); refresh(); }
   });
-  svg.addEventListener("pointerleave", () => { hovered = null; refresh(); });
+  svg.addEventListener("pointerleave", () => { if (!hovered) return; hovered = null; takeOver(); refresh(); });
   svg.addEventListener("click", (event) => {
     const name = partOf(event);
     takeOver();
     selected = name && name !== selected ? name : null;
+    afterInput();
     refresh();
   });
   stage.addEventListener("keydown", (event) => {
@@ -240,12 +266,13 @@ export function mount(stage, { text: T, data: F }) {
     if (/^[1-5]$/.test(key)) selected = PARTS[Number(key) - 1];
     else if (key === "ArrowRight" || key === "ArrowDown") selected = PARTS[(PARTS.indexOf(selected) + 1) % PARTS.length];
     else if (key === "ArrowLeft" || key === "ArrowUp") selected = PARTS[(PARTS.indexOf(selected) + PARTS.length - 1) % PARTS.length];
-    else if (key === " " || key === "Enter") { setApart(!wantApart); if (!wantApart) running = true; }
+    else if (key === " " || key === "Enter") { setApart(!wantApart); if (!wantApart) running = true; if (wantApart) armRestart(); }
     else if (key === "Escape") selected = null;
     else handled = false;
     if (!handled) return;
     event.preventDefault();
     takeOver();
+    afterInput();
     if (still.matches && (key === " " || key === "Enter")) {
       if (wantApart) { running = false; load = 0; speed = 0; schedule(true); } else { schedule(false); running = true; }
     }

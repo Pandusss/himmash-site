@@ -14,6 +14,8 @@ const KINDS = [
 ];
 const TOUR = [[0, 1, 1], [8, 1, 2], [16, 1, 0], [24, 0, 0], [31, 1, 1]];
 const TOUR_LEN = 33;
+const RESTART_MS = 6000;     // a stop made by the reader switches itself back on after this (wall clock)
+const RESUME_MS = 8000;      // the tour resumes this long after the last input (wall clock)
 
 export function mount(stage, { text: T, data: F }) {
   const svg = stage.querySelector("svg");
@@ -50,8 +52,12 @@ export function mount(stage, { text: T, data: F }) {
   let kind = 1, on = true, w = 1, beta = 0, gamma = 0, sock = 1;
   let clock = 0, last = 0, frame = 0, visible = false, phrase = "", spawnDebt = 0;
   let touring = !still.matches, tourAt = 0, quiet = 0, hovering = false;
+  let restartAt = 0, restartTimer = 0;
 
-  function say(text) { if (readout && readout.textContent !== text) readout.textContent = text; }
+  function say(text) {
+    if (restartAt) text += " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000)));
+    if (readout && readout.textContent !== text) readout.textContent = text;
+  }
   function announce(text) { if (live && phrase !== text) { phrase = text; live.textContent = text; } }
 
   const H = F.funnel;
@@ -182,7 +188,7 @@ export function mount(stage, { text: T, data: F }) {
       for (const entry of TOUR) if (t >= entry[0]) s = entry;
       if (s[2] !== kind) setKind(s[2], false);
       if (!!s[1] !== on) setOn(!!s[1]);
-    } else if (!still.matches && !hovering && quiet > 0 && clock - quiet > 10) touring = true;
+    } else if (!still.matches && !hovering && quiet > 0 && performance.now() - quiet >= RESUME_MS) { touring = true; tourAt = 0; disarmRestart(); }
     if (still.matches) { w = on ? 1 : 0; sock = on ? 1.02 : 0.9; return; }
     simulate(dt);
   }
@@ -211,7 +217,18 @@ export function mount(stage, { text: T, data: F }) {
     kind = v;
     if (user) announce(T.material.replace("{m}", NAMES()[kind]));
   }
-  function takeOver() { touring = false; quiet = clock || 1e-3; }
+  function takeOver() { touring = false; quiet = performance.now(); }
+  // A stop made by the reader comes back on by itself RESTART_MS later; any further input restarts the wait.
+  function armRestart() { restartAt = performance.now() + RESTART_MS; clearTimeout(restartTimer); restartTimer = setTimeout(restartTick, 1005); }
+  function disarmRestart() { restartAt = 0; clearTimeout(restartTimer); restartTimer = 0; }
+  function restartTick() {
+    const left = restartAt - performance.now();
+    if (left > 20) { if (still.matches) draw(); restartTimer = setTimeout(restartTick, (left % 1000 || 1000) + 5); return; }
+    disarmRestart();
+    setOn(true);
+    run(); if (still.matches) draw();
+  }
+  const afterInput = () => (on ? disarmRestart() : armRestart());
   function tick(now) {
     const dt = last ? Math.min((now - last) / 1000, 1 / 30) : 1 / 60;
     last = now;
@@ -228,7 +245,7 @@ export function mount(stage, { text: T, data: F }) {
     if (!hit) return;
     takeOver();
     if (hit.dataset.hit === "hopper") setKind((kind + 1) % 3, true); else setOn(!on);
-    run(); if (still.matches) draw();
+    afterInput(); run(); if (still.matches) draw();
   });
   stage.addEventListener("keydown", (event) => {
     let handled = true;
@@ -237,10 +254,15 @@ export function mount(stage, { text: T, data: F }) {
     else handled = false;
     if (!handled) return;
     event.preventDefault();
-    takeOver(); run(); if (still.matches) draw();
+    takeOver(); afterInput(); run(); if (still.matches) draw();
   });
-  stage.addEventListener("pointerenter", () => { hovering = true; if (touring) takeOver(); });
-  stage.addEventListener("pointerleave", () => { hovering = false; quiet = clock || 1e-3; });
+  // Only a real mouse pauses the tour on hover; a tap on a phone fires pointerenter too.
+  stage.addEventListener("pointerenter", (event) => {
+    if (event.pointerType !== "mouse") return;
+    hovering = true;
+    if (touring) { takeOver(); if (!on && !restartAt) armRestart(); }
+  });
+  stage.addEventListener("pointerleave", () => { if (!hovering) return; hovering = false; quiet = performance.now(); });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));
   new IntersectionObserver((entries) => { visible = entries[entries.length - 1].isIntersecting; if (visible) run(); }, { rootMargin: "120px 0px" }).observe(stage);
   // Start with the line already running, so the first frame shows material on its way.

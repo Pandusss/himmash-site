@@ -7,6 +7,8 @@ const FLIGHT_SPEED = 30;    // mm/s the flights appear to travel at (slowed down
 const SPAWN = 16;           // bubbles per second
 const ON_FOR = 10, OFF_FOR = 6;
 const TAU = Math.PI * 2;
+const RESTART_MS = 6000;    // a pump stop made by the reader switches itself back on after this (wall clock)
+const RESUME_MS = 8000;     // the tour resumes this long after the last input (wall clock)
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const smooth = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
@@ -34,11 +36,15 @@ export function mount(stage, { text: T, data: F }) {
   const sc = F.screw, poolLen = F.pool.share * (sc.pitch - sc.t), zRoot = F.axis + sc.root, zPool = zRoot + F.pool.h;
   let pumpOn = true, vac = 1, shift = 0, tank = 0.35, draining = false;
   let clock = 0, last = 0, frame = 0, visible = false, shown = "", phrase = "", hover = "", spawnDebt = 0, seed = 5;
-  let touring = !still.matches, tourAt = 0;
+  let touring = !still.matches, tourAt = 0, quiet = 0;
+  let restartAt = 0, restartTimer = 0;
   const bubbles = [], wisps = [];
   const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
 
-  function say(value) { if (readout && shown !== value) { shown = value; readout.textContent = value; } }
+  function say(value) {
+    if (restartAt) value += " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000)));
+    if (readout && shown !== value) { shown = value; readout.textContent = value; }
+  }
   function announce(value) { if (live && phrase !== value) { phrase = value; live.textContent = value; } }
   function setPump(on) {
     if (on === pumpOn) return;
@@ -62,7 +68,7 @@ export function mount(stage, { text: T, data: F }) {
       tourAt += dt;
       const phaseT = tourAt % (ON_FOR + OFF_FOR);
       setPump(phaseT < ON_FOR);
-    }
+    } else if (!still.matches && quiet > 0 && performance.now() - quiet >= RESUME_MS) { touring = true; tourAt = 0; disarmRestart(); }
     const goal = pumpOn ? 1 : 0;
     vac = still.matches ? goal : vac + (goal - vac) * (1 - Math.exp(-dt / (pumpOn ? 1.1 : 2.2)));
     if (Math.abs(vac - goal) < 0.002) vac = goal;
@@ -162,17 +168,28 @@ export function mount(stage, { text: T, data: F }) {
     for (let i = 0; i < 150; i++) step(1 / 30);
     draw();
   }
-  function takeOver() { touring = false; }
+  function takeOver() { touring = false; quiet = performance.now(); }
+  // A pump stop made by the reader comes back on by itself RESTART_MS later; any further input restarts the wait.
+  function armRestart() { restartAt = performance.now() + RESTART_MS; clearTimeout(restartTimer); restartTimer = setTimeout(restartTick, 1005); }
+  function disarmRestart() { restartAt = 0; clearTimeout(restartTimer); restartTimer = 0; }
+  function restartTick() {
+    const left = restartAt - performance.now();
+    if (left > 20) { if (still.matches) draw(); restartTimer = setTimeout(restartTick, (left % 1000 || 1000) + 5); return; }
+    disarmRestart();
+    setPump(true);
+    run();
+  }
+  const afterInput = () => (pumpOn ? disarmRestart() : armRestart());
   const partOf = (event) => { const n = event.target.closest && event.target.closest("[data-part]"); return n ? n.dataset.part : ""; };
   svg.addEventListener("pointermove", (event) => { hover = partOf(event); if (still.matches) draw(); });
   svg.addEventListener("pointerleave", () => { hover = ""; if (still.matches) draw(); });
-  svg.addEventListener("click", (event) => { if (partOf(event)) { takeOver(); setPump(!pumpOn); run(); } });
+  svg.addEventListener("click", (event) => { if (partOf(event)) { takeOver(); setPump(!pumpOn); afterInput(); run(); } });
   stage.addEventListener("keydown", (event) => {
     if (event.key === " " || event.key === "Enter") setPump(!pumpOn);
     else if (event.key === "1") setPump(true);
     else if (event.key === "0") setPump(false);
     else return;
-    takeOver();
+    takeOver(); afterInput();
     event.preventDefault();
     run();
   });

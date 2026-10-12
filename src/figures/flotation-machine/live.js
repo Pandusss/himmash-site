@@ -327,6 +327,24 @@ export function mount(stage, { text: T, data: F }) {
     running = !running;
     announce(running ? T.started : T.stopped);
   }
+  // Shafts stopped by the reader start again by themselves 6 s after the reader's last input (wall clock, so it also
+  // works with reduced motion, where there is no animation loop and the readout is redrawn by a timer instead).
+  const RESTART = 6000;
+  let restartAt = 0, restartTimer = 0, countTimer = 0;
+  function dropRestart() { clearTimeout(restartTimer); clearInterval(countTimer); restartAt = 0; }
+  function holdOff() {
+    dropRestart();
+    if (running) return;
+    restartAt = performance.now() + RESTART;
+    restartTimer = setTimeout(restart, RESTART);
+    if (still.matches) countTimer = setInterval(() => draw(), 500);
+  }
+  function restart() {
+    dropRestart();
+    if (!running) { running = true; announce(T.started); }
+    run(); draw();
+  }
+  const countdown = () => (restartAt ? " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000))) : "");
   function drop() {
     for (let i = 0; i < 18; i++) spawnFlake();
     for (let i = 0; i < 8; i++) spawnGrit();
@@ -382,8 +400,8 @@ export function mount(stage, { text: T, data: F }) {
     shaftGroups.forEach((group) => group.toggleAttribute("data-on", lit === "paddles"));
     if (valve) valve.toggleAttribute("data-on", lit === "valve");
     const pct = number((100 * Math.max(0, bed - 2)) / (BED_MAX - 2));
-    if (draining) say(T.drain.replace("{p}", pct));
-    else if (!running) say(T.idleStop.replace("{p}", pct));
+    if (draining) say(T.drain.replace("{p}", pct) + countdown());
+    else if (!running) say(T.idleStop.replace("{p}", pct) + countdown());
     else say(T.run.replace("{q}", number(F.rate)).replace("{p}", pct));
   }
 
@@ -402,8 +420,8 @@ export function mount(stage, { text: T, data: F }) {
   svg.addEventListener("click", (event) => {
     const target = event.target.closest ? event.target : null;
     if (!target) return;
-    if (target.closest("[data-valve]")) { openValve(); run(); draw(); }
-    else if (target.closest("[data-shaft]") || target.closest('[data-layer="over"],[data-layer="mid"],[data-layer="front1"],[data-layer="back0"]')) { toggleShafts(); run(); draw(); }
+    if (target.closest("[data-valve]")) { openValve(); holdOff(); run(); draw(); }
+    else if (target.closest("[data-shaft]") || target.closest('[data-layer="over"],[data-layer="mid"],[data-layer="front1"],[data-layer="back0"]')) { toggleShafts(); holdOff(); run(); draw(); }
   });
   stage.addEventListener("keydown", (event) => {
     let act = null;
@@ -412,7 +430,7 @@ export function mount(stage, { text: T, data: F }) {
     if (event.key === " " || event.key === "Enter") act = openValve;
     if (!act) return;
     event.preventDefault();
-    act(); run(); draw();
+    act(); holdOff(); run(); draw();
   });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));
   new IntersectionObserver((entries) => { visible = entries[entries.length - 1].isIntersecting; if (visible) run(); }, { rootMargin: "120px 0px" }).observe(stage);

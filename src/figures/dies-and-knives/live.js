@@ -7,6 +7,8 @@ const PELLET = 3.5;         // mm, pellet length the strand speed is set for
 const WEAR_FOR = 7;         // seconds from new to worn knives (sped up)
 const TAU = Math.PI * 2;
 const BANDS = [0, 0.2, 0.42, 0.62];
+const RESUME_MS = 8000;     // the tour resumes this long after the last input (wall clock)
+const RESTART_MS = 6000;    // a stop made by the reader comes back on by itself this long after the last input
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const wrap = (a) => ((a % TAU) + TAU) % TAU;
@@ -99,11 +101,15 @@ export function mount(stage, { text: T, data: F }) {
   let phase = 0.5, clock = 0, last = 0, frame = 0, visible = false, shown = "", phrase = "";
   let running = true, mode = "run", wear = 0, hold = 0, seed = 11;
   let touring = !still.matches, tourWait = 2.5;
+  let lastInput = 0, restartAt = 0, restartTimer = 0;
   const pellets = [];
   const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
   holes.forEach((h) => { h.rel = wrap(h.a - phase) % Math.PI; });
 
-  function say(value) { if (readout && shown !== value) { shown = value; readout.textContent = value; } }
+  function say(value) {
+    if (restartAt) value += " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000)));
+    if (readout && shown !== value) { shown = value; readout.textContent = value; }
+  }
   function announce(value) { if (live && phrase !== value) { phrase = value; live.textContent = value; } }
 
   function startWear() { if (wear >= F.wear.max - 1e-3) return replace(); mode = "wearing"; announce(T.wear); if (still.matches) { wear = F.wear.max; mode = "worn"; } }
@@ -111,6 +117,12 @@ export function mount(stage, { text: T, data: F }) {
 
   function step(dt) {
     clock += dt;
+    if (!touring && !still.matches && lastInput && performance.now() - lastInput >= RESUME_MS) {
+      // Back to the tour: it carries on from the current state (worn knives get replaced, new ones wear).
+      touring = true; tourWait = 0; lastInput = 0;
+      if (!running) { running = true; announce(T.start); }
+      disarmRestart();
+    }
     if (touring) {
       tourWait -= dt;
       if (tourWait <= 0) {
@@ -224,15 +236,29 @@ export function mount(stage, { text: T, data: F }) {
     mode = keep;
     draw();
   }
-  function takeOver() { touring = false; }
+  // Any input hands the figure to the reader; the tour comes back RESUME_MS after the last one.
+  function takeOver() { touring = false; lastInput = performance.now(); }
+  // A stop made by the reader comes back on by itself RESTART_MS later; any further input restarts the wait.
+  function armRestart() { restartAt = performance.now() + RESTART_MS; clearTimeout(restartTimer); restartTimer = setTimeout(restartTick, 1005); }
+  function disarmRestart() { restartAt = 0; clearTimeout(restartTimer); restartTimer = 0; }
+  function restartTick() {
+    const left = restartAt - performance.now();
+    if (left > 20) { if (still.matches) draw(); restartTimer = setTimeout(restartTick, (left % 1000 || 1000) + 5); return; }
+    disarmRestart();
+    running = true;
+    announce(T.start);
+    run();
+  }
+  const afterInput = () => (running ? disarmRestart() : armRestart());
   const partOf = (event) => { const n = event.target.closest && event.target.closest("[data-part]"); return n ? n.dataset.part : ""; };
-  svg.addEventListener("click", (event) => { if (partOf(event)) { takeOver(); startWear(); run(); } });
+  svg.addEventListener("click", (event) => { if (partOf(event)) { takeOver(); startWear(); afterInput(); run(); } });
   stage.addEventListener("keydown", (event) => {
     if (event.key === "2") { takeOver(); startWear(); }
     else if (event.key === "1") { takeOver(); replace(); }
     else if (event.key === " " || event.key === "Enter") { takeOver(); running = !running; announce(running ? T.start : T.stop); }
     else return;
     event.preventDefault();
+    afterInput();
     run();
   });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));

@@ -5,6 +5,8 @@
 const STEP = 2.1;          // seconds per unit on the tour
 const REST = 2.6;          // pause on the whole line at the end of a lap
 const G = 9810;            // mm/s², pellets fall freely from the spout
+const RESUME_MS = 8000;    // the tour resumes this long after the last input (wall clock)
+const RESTART_MS = 6000;   // a stop made by the reader comes back on by itself this long after the last input
 
 export function mount(stage, { text: T, data: F }) {
   const svg = stage.querySelector("svg");
@@ -43,8 +45,12 @@ export function mount(stage, { text: T, data: F }) {
   let running = true, flow = 1;
   let selected = null, hovered = null;
   let touring = !still.matches, tourClock = 0, quiet = 0;
+  let restartAt = 0, restartTimer = 0;
 
-  function say(text) { if (readout && readout.textContent !== text) readout.textContent = text; }
+  function say(text) {
+    if (restartAt) text += " · " + T.restart.replace("{s}", Math.max(1, Math.ceil((restartAt - performance.now()) / 1000)));
+    if (readout && readout.textContent !== text) readout.textContent = text;
+  }
   function announce(text) { if (live && phrase !== text) { phrase = text; live.textContent = text; } }
 
   function tourAt(t) {
@@ -56,7 +62,11 @@ export function mount(stage, { text: T, data: F }) {
   function step(dt) {
     clock += dt;
     if (touring) tourClock += dt;
-    else { quiet += dt; if (quiet > 3.6 && !still.matches) { touring = true; tourClock = 0; } }
+    else if (!still.matches && hovered === null && quiet && performance.now() - quiet >= RESUME_MS) {
+      touring = true; tourClock = 0; quiet = 0; selected = null;
+      if (!running) { running = true; announce(T.started); }
+      disarmRestart();
+    }
     flow += ((running ? 1 : 0) - flow) * (still.matches ? 1 : 1 - Math.exp(-dt / 0.6));
     if (!running && flow < 1e-3) flow = 0;
     const d = dt * flow;
@@ -115,21 +125,37 @@ export function mount(stage, { text: T, data: F }) {
     if (!frame && visible) { last = 0; frame = requestAnimationFrame(tick); }
   };
   const refresh = () => { if (still.matches) { step(0); draw(); } else run(); };
-  function takeOver() { touring = false; quiet = 0; }
+  // Any input hands the figure to the reader; the tour comes back RESUME_MS after the last one.
+  function takeOver() { touring = false; quiet = performance.now(); }
+  // A stop made by the reader comes back on by itself RESTART_MS later; any further input restarts the wait.
+  function armRestart() { restartAt = performance.now() + RESTART_MS; clearTimeout(restartTimer); restartTimer = setTimeout(restartTick, 1005); }
+  function disarmRestart() { restartAt = 0; clearTimeout(restartTimer); restartTimer = 0; }
+  function restartTick() {
+    const left = restartAt - performance.now();
+    if (left > 20) { if (still.matches) draw(); restartTimer = setTimeout(restartTick, (left % 1000 || 1000) + 5); return; }
+    disarmRestart();
+    running = true;
+    announce(T.started);
+    refresh();
+  }
+  const afterInput = () => (running ? disarmRestart() : armRestart());
 
   const unitOf = (event) => {
     const node = event.target.closest && event.target.closest("[data-unit]");
     return node ? Number(node.dataset.unit) : null;
   };
+  // Only a real mouse counts as hover; a tap on a phone fires pointer events too.
   svg.addEventListener("pointermove", (event) => {
+    if (event.pointerType !== "mouse") return;
     const i = unitOf(event);
-    if (i !== hovered) { hovered = i; if (i !== null) takeOver(); refresh(); }
+    if (i !== hovered) { hovered = i; takeOver(); refresh(); }
   });
-  svg.addEventListener("pointerleave", () => { hovered = null; refresh(); });
+  svg.addEventListener("pointerleave", () => { if (hovered === null) return; hovered = null; takeOver(); refresh(); });
   svg.addEventListener("click", (event) => {
     const i = unitOf(event);
     takeOver();
     selected = i !== null && i !== selected ? i : null;
+    afterInput();
     refresh();
   });
   stage.addEventListener("keydown", (event) => {
@@ -146,6 +172,7 @@ export function mount(stage, { text: T, data: F }) {
     if (!handled) return;
     event.preventDefault();
     takeOver();
+    afterInput();
     refresh();
   });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));

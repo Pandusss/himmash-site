@@ -189,7 +189,7 @@ export function mount(stage, { text: T, data: F }) {
   const FULL = F.rps * TAU;
   let U = START.map((p) => ({ ...p }));
   let theta = 0, omega = FULL, phase = "settle", phaseAt = 0, clock = 0, target = -1, targetAngle = 0, measured = 0;
-  let touring = !still.matches, quietUntil = 0, last = 0, frame = 0, visible = false, lastText = "", spoken = "";
+  let touring = !still.matches, lastInput = 0, last = 0, frame = 0, visible = false, lastText = "", spoken = "";
   const amps = [0, 0];
   const rand = (() => { let seed = 5; return () => ((seed = (seed * 16807) % 2147483647) / 2147483647); })();
   const residual = () => Math.max(U[0].m, U[1].m);
@@ -220,11 +220,14 @@ export function mount(stage, { text: T, data: F }) {
     U = START.map((p) => ({ ...p }));
     phase = "settle"; phaseAt = clock; measured = 0;
   }
-  const takeOver = () => { touring = false; quietUntil = clock + 12; };
+  // The idle tour resumes 8 s after the reader's last input (wall clock), in whatever phase the shaft is, so a balanced
+  // shaft ("done") is followed by the next one again.
+  const RESUME = 8000;
+  const takeOver = () => { touring = false; lastInput = performance.now(); };
 
   function step(dt) {
     clock += dt;
-    if (!touring && !still.matches && clock > quietUntil && (phase === "measure" || phase === "settle")) touring = true;
+    if (!touring && !still.matches && performance.now() - lastInput > RESUME) touring = true;
     const age = clock - phaseAt;
     if (phase === "stop") { omega = FULL * Math.max(0, 1 - age / STOP_T) ** 2; if (age > STOP_T) { omega = 0; phase = "fit"; phaseAt = clock; fit(); } }
     else if (phase === "fit") { if (age > FIT_T) { phase = "spin"; phaseAt = clock; } }
