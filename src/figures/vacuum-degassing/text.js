@@ -8,6 +8,10 @@ export const TEXT = {
     loading: "Загружаем схему…",
     title: "Вакуумная дегазация",
     hint: "Нажмите на насос",
+    controls: [
+      { key: "1", label: "Включить насос", flash: "[data-part=\"pump\"]" },
+      { key: "0", label: "Выключить насос", flash: "[data-part=\"pump\"]" },
+    ],
     idle: "разрежение 100 % · пары уходят в бак",
     aria: "Вакуумная дегазация. Пробел или Enter включает и выключает вакуумный насос, клавиша 1 включает его, клавиша 0 выключает.",
     label: "Участок цилиндра экструдера с зоной дегазации и вакуумной камерой над ней, разрезанные вдоль оси: шнек с витками, расплав в канале, пузырьки пара. От камеры через шаровой кран и тройник с вакуумметром шланг идёт в бак-конденсатор, а от бака труба — к вакуумному насосу с электродвигателем на общей раме. Пока насос работает, пары влаги уходят из расплава в камеру и в бак; когда насос выключен, пузырьки остаются в расплаве.",
@@ -37,6 +41,10 @@ export const TEXT = {
     loading: "Loading the drawing…",
     title: "Vacuum degassing",
     hint: "Click the pump",
+    controls: [
+      { key: "1", label: "Pump on", flash: "[data-part=\"pump\"]" },
+      { key: "0", label: "Pump off", flash: "[data-part=\"pump\"]" },
+    ],
     idle: "vacuum 100 % · vapour going to the tank",
     aria: "Vacuum degassing. Space or Enter switches the vacuum pump on and off; key 1 switches it on, key 0 switches it off.",
     label: "A section of the extruder barrel with the degassing zone and the vacuum chamber above it, cut along the axis: the screw with its flights, the melt in the channel and the vapour bubbles. From the chamber a hose runs through a ball valve and a tee with the vacuum gauge to the condensate tank, and a pipe from the tank to the vacuum pump with its motor on a common base. While the pump runs, moisture vapour leaves the melt for the chamber and the tank; with the pump off, the bubbles stay in the melt.",
@@ -66,6 +74,10 @@ export const TEXT = {
     loading: "正在加载示意图…",
     title: "真空排气",
     hint: "点击真空泵",
+    controls: [
+      { key: "1", label: "开启真空泵", flash: "[data-part=\"pump\"]" },
+      { key: "0", label: "关闭真空泵", flash: "[data-part=\"pump\"]" },
+    ],
     idle: "真空度 100% · 蒸汽流向罐内",
     aria: "真空排气。按空格键或回车键开启或关闭真空泵，按 1 键开启，按 0 键关闭。",
     label: "挤出机机筒的排气区及其上方的真空室，沿轴线剖开：可见带螺棱的螺杆、螺槽中的熔体和蒸汽气泡。软管从真空室经球阀和装有真空表的三通接到冷凝罐，再由管道从罐接到共用底座上带电机的真空泵。真空泵运转时，水蒸气从熔体逸出，进入真空室和罐内；真空泵关闭时，气泡留在熔体中。",

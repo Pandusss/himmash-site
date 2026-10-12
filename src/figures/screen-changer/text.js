@@ -8,6 +8,10 @@ export const TEXT = {
     loading: "Загружаем схему…",
     title: "Шиберный фильтр · смена сетки",
     hint: "Нажмите на плиту",
+    controls: [
+      { key: "1", label: "Сменить сетку: плита 1", flash: "[data-plate=\"0\"]" },
+      { key: "2", label: "Сменить сетку: плита 2", flash: "[data-plate=\"1\"]" },
+    ],
     idle: "давление 32 % уставки",
     aria: "Шиберный фильтр. Клавиши 1 и 2 меняют сетку на первой или второй плите, пробел — на той, что загрязнена сильнее.",
     label: "Шиберный фильтр на передвижной платформе: корпус с входным фланцем, две шиберные плиты с окнами по 250 мм, рама на колоннах и два гидроцилиндра. Когда давление расплава доходит до уставки, цилиндр за 2,5 с сдвигает плиту: чистая сетка входит в поток, загрязнённая выходит наружу, а расплав идёт через вторую плиту.",
@@ -33,6 +37,10 @@ export const TEXT = {
     loading: "Loading the drawing…",
     title: "Screen changer · screen change",
     hint: "Click a plate",
+    controls: [
+      { key: "1", label: "Change screen: plate 1", flash: "[data-plate=\"0\"]" },
+      { key: "2", label: "Change screen: plate 2", flash: "[data-plate=\"1\"]" },
+    ],
     idle: "pressure 32 % of set point",
     aria: "Screen changer. Keys 1 and 2 change the screen on the first or second plate, Space on the dirtier one.",
     label: "A screen changer on its mobile platform: a body with the inlet flange, two slide plates with 250 mm windows, a frame on columns and two hydraulic cylinders. When the melt pressure reaches the set point, a cylinder moves a plate in 2.5 s: a clean screen enters the flow, the used one comes out, and the melt keeps flowing through the other plate.",
@@ -58,6 +66,10 @@ export const TEXT = {
     loading: "正在加载示意图…",
     title: "滑板换网器 · 换网过程",
     hint: "点击滑板",
+    controls: [
+      { key: "1", label: "更换滤网：滑板 1", flash: "[data-plate=\"0\"]" },
+      { key: "2", label: "更换滤网：滑板 2", flash: "[data-plate=\"1\"]" },
+    ],
     idle: "压力为设定值的 32%",
     aria: "滑板换网器。按 1 或 2 更换第一或第二块滑板的滤网，按空格键更换较脏的一块。",
     label: "移动平台上的滑板换网器：带进料法兰的机体、两块带 250 毫米网孔的滑板、立柱支撑的顶板和两个液压缸。熔体压力达到设定值时，液压缸在 2.5 秒内推动滑板：干净滤网进入流道，用过的滤网移出，熔体经另一块滑板继续流动。",

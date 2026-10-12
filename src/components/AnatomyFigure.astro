@@ -10,6 +10,7 @@ const { text, data } = figureById(id)!;
 const t = text[lang];
 const payload = JSON.stringify({ ...t.live, label: t.label });
 const { width, height, ...rest } = data;
+const controlsLabel = { ru: 'Управление схемой', en: 'Figure controls', zh: '示意图操作' }[lang];
 ---
 <section id="how-it-works" class="section details-layout anatomy-section" aria-labelledby="how-title">
   <div class="anatomy-intro">
@@ -23,11 +24,16 @@ const { width, height, ...rest } = data;
   <figure class="anatomy">
     <div class="anatomy-plate">
       <div class="anatomy-head" aria-hidden="true">{t.title}</div>
-      <div class="anatomy-stage" tabindex="0" role="group" aria-label={t.aria} aria-busy="true" data-hint data-figure-id={id} data-src={asset(`figures/${id}.svg`)} data-text={payload} data-figure={JSON.stringify(rest)} style={`aspect-ratio:${width}/${height}`}>
+      <div class="anatomy-stage" tabindex="0" role="group" aria-label={t.aria} aria-busy="true" data-hint={t.controls ? undefined : ''} data-figure-id={id} data-src={asset(`figures/${id}.svg`)} data-text={payload} data-figure={JSON.stringify(rest)} style={`aspect-ratio:${width}/${height}`}>
         <span class="anatomy-live" aria-live="polite"></span>
         <span class="anatomy-loading">{t.loading}</span>
       </div>
-      <div class="anatomy-foot"><button type="button" class="anatomy-hint" data-key={t.hintKey ?? ' '}>{t.hint}</button><span data-readout aria-hidden="true">{t.idle}</span></div>
+      {t.controls && (
+        <div class="anatomy-controls" role="group" aria-label={controlsLabel}>
+          {t.controls.map((c: { key: string; label: string; flash?: string }) => <button type="button" class="anatomy-control" data-key={c.key} data-flash={c.flash}>{c.label}</button>)}
+        </div>
+      )}
+      <div class="anatomy-foot">{!t.controls && <button type="button" class="anatomy-hint" data-key={t.hintKey ?? ' '}>{t.hint}</button>}<span data-readout aria-hidden="true">{t.idle}</span></div>
     </div>
     <figcaption class="anatomy-caption">{t.caption}</figcaption>
   </figure>
@@ -70,18 +76,16 @@ const { width, height, ...rest } = data;
   .anatomy-stage[data-flash] :global([data-hit] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
   .anatomy-stage :global([data-hl] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 2.2px; }
   .anatomy-stage :global([data-hl] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
-  /* Hotspots on the clickable parts: a dot and a ripple that settles after the first tap. */
-  .anatomy-stage :global(.fig-spot) { cursor: pointer; }
-  .anatomy-stage :global(.fig-spot-pad) { fill: transparent; }
-  .anatomy-stage :global(.fig-spot-halo) { fill: var(--anatomy-lit); opacity: .18; }
-  .anatomy-stage :global(.fig-spot-dot) { fill: var(--anatomy-lit); stroke: var(--white); stroke-width: 2.5; }
-  .anatomy-stage :global(.fig-spot-ring) { fill: color-mix(in srgb, var(--anatomy-lit) 18%, transparent); stroke: var(--anatomy-lit); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: anatomy-spot 1.8s ease-out infinite; }
-  .anatomy-stage :global(.fig-spot:hover .fig-spot-dot) { stroke-width: 3; }
-  .anatomy-stage:not([data-hint]) :global(.fig-spot-ring) { animation: none; opacity: 0; }
-  @keyframes anatomy-spot { 0% { transform: scale(.7); opacity: .95; } 100% { transform: scale(2.4); opacity: 0; } }
+  /* Control buttons under the drawing: each presses one of the figure's keys and flashes its part. */
+  .anatomy-controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+  .anatomy-control { min-height: 38px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink); font: 500 13px/1.2 var(--font-body); cursor: pointer; transition: background-color .15s, border-color .15s, color .15s, transform .1s; }
+  .anatomy-control:hover { border-color: var(--green); color: var(--green); }
+  .anatomy-control:active { transform: scale(.97); }
+  .anatomy-control:focus { outline: none; }
+  .anatomy-control:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .anatomy-control[data-fired] { background: var(--green); border-color: var(--green); color: var(--white); }
   @media (prefers-reduced-motion: reduce) {
     .anatomy-hint::before { animation: none; }
-    .anatomy-stage :global(.fig-spot-ring) { animation: none; transform: scale(1.5); opacity: .6; }
     .anatomy-stage[data-hint] :global([data-hit] .iso-solid > .iso-edge) { animation: none; stroke: var(--anatomy-lit); stroke-width: 1.6px; }
     .anatomy-stage[data-hint] :global([data-hit] .iso-solid > :is(.iso-fill, .iso-top, .iso-shade)) { animation: none; fill: var(--fig-hl); }
   }

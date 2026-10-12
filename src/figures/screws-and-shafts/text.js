@@ -8,6 +8,10 @@ export const TEXT = {
     loading: "Загружаем схему…",
     title: "Вал мойки · балансировка",
     hint: "Нажмите на вал",
+    controls: [
+      { key: "1", label: "Груз в плоскость 1", flash: "[data-hit]" },
+      { key: "2", label: "Груз в плоскость 2", flash: "[data-hit]" },
+    ],
     idle: "замер · пл. 1 100 % · пл. 2 70 %",
     aria: "Вал на балансировочном станке. Клавиши 1 и 2 ставят корректирующий груз в первую или вторую плоскость, пробел или Enter — в ту, где дисбаланс больше.",
     label: "Вал фрикционной мойки на балансировочном станке: станина с направляющими, две стойки с роликовыми опорами, ремённый привод вала, датчики вибрации и индикаторы на стойках. Вал — труба с двумя рядами наклонных лопаток, к лопаткам болтами прикручены накладки из термообработанной стали, на концах торцевые диски и закалённые посадочные места под сальники. Ремень вращает вал, стрелки индикаторов качаются от дисбаланса, после установки грузов на торцевые диски качание затухает.",
@@ -35,6 +39,10 @@ export const TEXT = {
     loading: "Loading the drawing…",
     title: "Washer shaft · balancing",
     hint: "Click the shaft",
+    controls: [
+      { key: "1", label: "Weight in plane 1", flash: "[data-hit]" },
+      { key: "2", label: "Weight in plane 2", flash: "[data-hit]" },
+    ],
     idle: "measuring · pl. 1 100 % · pl. 2 70 %",
     aria: "Shaft on a balancing machine. Keys 1 and 2 add a correction weight in the first or second plane, Space or Enter in the plane with more unbalance.",
     label: "A friction-washer shaft on a dynamic balancing machine: a bed with slideways, two supports with rollers, a belt drive to the shaft, vibration pick-ups and dial gauges on the supports. The shaft is a tube with two rows of inclined blades, each with a heat-treated overlay bolted to it, end discs and hardened seal seats at both ends. The belt turns the shaft, the gauge needles swing with the unbalance, and as weights are fixed to the end discs the swing dies away.",
@@ -62,6 +70,10 @@ export const TEXT = {
     loading: "正在加载示意图…",
     title: "清洗机主轴 · 动平衡",
     hint: "点击主轴",
+    controls: [
+      { key: "1", label: "平面1加配重", flash: "[data-hit]" },
+      { key: "2", label: "平面2加配重", flash: "[data-hit]" },
+    ],
     idle: "测量 · 平面1 100% · 平面2 70%",
     aria: "动平衡机上的主轴。按 1 或 2 在第一或第二校正平面加配重，按空格键或回车键在不平衡量较大的平面加配重。",
     label: "动平衡机上的摩擦清洗机主轴：带导轨的床身、两个滚轮支承座、主轴皮带驱动、支承座上的振动传感器和百分表。主轴为钢管，焊有两排斜桨叶，每片桨叶用螺栓固定一块经热处理的钢护板，两端为端盘和淬硬的油封轴颈。皮带带动主轴旋转，百分表指针随不平衡摆动，在端盘上加装配重后摆动逐渐消失。",
