@@ -16,7 +16,7 @@ export const SVG_CLASS = "fig-svg";
 export const LIGHT = "--anatomy-paper:var(--white,#fff);--anatomy-face:var(--white,#fff);--anatomy-top:var(--white,#fff);--anatomy-shade-0:#dfe4dc;--anatomy-shade-1:#e7ebe4;--anatomy-shade-2:#eef1ec;--anatomy-shade-3:#f5f7f3;--anatomy-lit-top:#fff;--anatomy-lit-shade:#ecf2ee;--anatomy-hi:#202d28;--anatomy-mid:#86918a;--anatomy-lo:#b3bdb5;--anatomy-faint:#d5dcd4;--anatomy-lit:var(--green,#145445);--anatomy-halo:#7f8a7c;--anatomy-halo-opacity:.3;--anatomy-dot:#2c3a33;--anatomy-weight:.6px;--anatomy-red:#c8463b;--anatomy-green:#2f8a5b;--anatomy-blue:#3e6fb5";
 export const DARK = "--anatomy-paper:var(--white,#182019);--anatomy-shade-0:#121914;--anatomy-shade-1:#151d17;--anatomy-shade-2:#18211b;--anatomy-shade-3:#1c251f;--anatomy-face:#1e2822;--anatomy-top:#1f2a23;--anatomy-lit-top:#25332b;--anatomy-lit-shade:#203028;--anatomy-hi:#d6e0d9;--anatomy-mid:#6e7c73;--anatomy-lo:#3e4a43;--anatomy-faint:#2a3530;--anatomy-lit:var(--green,#7fcfa9);--anatomy-halo:#040605;--anatomy-halo-opacity:.85;--anatomy-dot:#dfe8e2;--anatomy-red:#ff8f85;--anatomy-green:#7fcfa9;--anatomy-blue:#8fb4ff";
 
-const DRAW_CSS = k.ISO_CSS.split("\n").filter((line) => /^\.(iso-(fill|solid|shade|top|line|halo|dots|face-text|wire|crease|edge|bevel)|tb-)/.test(line.trim())).join("\n");
+const DRAW_CSS = k.ISO_CSS.split("\n").filter((line) => /^(\.(iso-(fill|solid|shade|top|line|halo|dots|face-text|wire|crease|edge|bevel)|tb-)|@keyframes iso-|@media \(prefers-reduced-motion)/.test(line.trim())).join("\n");
 
 // Anything inside an element with data-on becomes the lit accent; data-hit marks parts the reader can click.
 const LIT_CSS = `
