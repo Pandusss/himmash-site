@@ -5,3 +5,7 @@ dist/
 .env.*
 !.env.example
 .claude/
+
+# Figure build previews and screenshots
+figures/*/out/
+figures/*/shots/
