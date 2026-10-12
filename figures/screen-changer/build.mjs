@@ -1,16 +1,9 @@
 // Шиберный фильтр безостановочного действия: an interactive isometric figure built with the anatomy kit.
 // World units are millimetres; x across the filter, y along the melt flow (inlet faces +y, the viewer), z up.
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import * as k from "../kit/iso-kit.mjs";
 import * as G from "../kit/lathe.mjs";
-import { kitScript } from "../kit/inline-kit.mjs";
+import { SVG_CLASS, figureCss, writeFigure, writePreview } from "../shared.mjs";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const OUT = join(HERE, "out");
-const SITE = join(HERE, "..", "..");
-const SRC = join(SITE, "src", "figures", "screen-changer");
 const theme = process.argv.includes("--light") ? "light" : "dark";
 
 const WIDTH = 520;
@@ -291,7 +284,7 @@ function cylinderUnit(cx) {
 }
 
 // ---------- assemble
-const plateGroup = (index, part, content) => `<g data-plate="${index}" data-part="${part}">${content}</g>`;
+const plateGroup = (index, part, content) => `<g data-plate="${index}" data-part="${part}" data-hit>${content}</g>`;
 const lower = PLATES.map((cx, i) => {
   const [low] = windowsOf(cx);
   return `<g clip-path="url(#sc-down-${i})">${plateGroup(i, "low", plateBody(cx) + windowSvg(low[0], low[1], i * 2))}</g>`;
@@ -304,7 +297,7 @@ const upper = PLATES.map((cx, i) => {
 const svg = k.figureSvg({
   width: WIDTH,
   height: HEIGHT,
-  className: "sc-svg",
+  className: SVG_CLASS,
   label: "",
   body: [
     `<defs>${PLATES.map((cx, i) => slotClips(cx, i)).join("")}</defs>`,
@@ -329,43 +322,12 @@ const svg = k.figureSvg({
 const DOWN = k.axisVector(P, [0, 0, -STROKE]);
 const DATA = { down: DOWN, stroke: STROKE, change: 2.5 };
 
-const LIGHT = "--anatomy-paper:var(--white,#fff);--anatomy-face:var(--white,#fff);--anatomy-top:var(--white,#fff);--anatomy-shade-0:#dfe4dc;--anatomy-shade-1:#e7ebe4;--anatomy-shade-2:#eef1ec;--anatomy-shade-3:#f5f7f3;--anatomy-lit-top:#fff;--anatomy-lit-shade:#ecf2ee;--anatomy-hi:#202d28;--anatomy-mid:#86918a;--anatomy-lo:#b3bdb5;--anatomy-faint:#d5dcd4;--anatomy-lit:var(--green,#145445);--anatomy-halo:#7f8a7c;--anatomy-halo-opacity:.3;--anatomy-dot:#2c3a33;--anatomy-weight:.6px;--sc-dirt:#5c5448;--sc-hole:#2a3530";
-const DARK = "--anatomy-shade-0:#121914;--anatomy-shade-1:#151d17;--anatomy-shade-2:#18211b;--anatomy-shade-3:#1c251f;--anatomy-face:#1e2822;--anatomy-top:#1f2a23;--anatomy-lit-top:#25332b;--anatomy-lit-shade:#203028;--anatomy-hi:#d6e0d9;--anatomy-mid:#6e7c73;--anatomy-lo:#3e4a43;--anatomy-faint:#2a3530;--anatomy-lit:var(--green,#7fcfa9);--anatomy-halo:#040605;--anatomy-halo-opacity:.85;--anatomy-dot:#dfe8e2;--sc-dirt:#5a4a35;--sc-hole:#050706";
-const DRAW_CSS = k.ISO_CSS.split("\n").filter((line) => /^\.(iso-(fill|solid|shade|top|line|halo|dots|face-text|wire|crease|edge|bevel)|tb-)/.test(line.trim())).join("\n");
-const CSS = `
-.sc-svg{${LIGHT}}
-:root[data-theme=dark] .sc-svg{${DARK}}
-@media (prefers-color-scheme:dark){:root:not([data-theme]) .sc-svg{${DARK}}}
-${DRAW_CSS}
+const CSS = figureCss(`
 .sc-dirt{fill:var(--sc-dirt);stroke:none}
 .sc-recess{fill:var(--anatomy-shade-1)}
 .sc-bore{fill:var(--anatomy-shade-0);stroke:none}
-.sc-hole{fill:var(--sc-hole);stroke:none}
-[data-plate]{cursor:pointer}
-.sc-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-[data-plate][data-on] .iso-solid>.iso-edge{stroke:var(--anatomy-lit)}
-[data-plate][data-on] .iso-solid>.iso-top{fill:var(--anatomy-lit-top)}
-[data-plate][data-on] .iso-solid>.iso-shade{fill:var(--anatomy-lit-shade)}
-`;
+.sc-hole{fill:var(--sc-hole);stroke:none}`, { light: "--sc-dirt:#5c5448;--sc-hole:#2a3530", dark: "--sc-dirt:#5a4a35;--sc-hole:#050706" });
 
-// The site fetches the drawing as one file with its own styles; the page carries only the card.
-const fileSvg = svg.replace(/^<svg([^>]*)>/, `<svg$1><style>${CSS.replace(/\s*\n\s*/g, "")}</style>`);
-mkdirSync(OUT, { recursive: true });
-writeFileSync(join(SITE, "public", "figures", "screen-changer.svg"), fileSvg);
-writeFileSync(join(SRC, "figure.json"), JSON.stringify({ ...DATA, width: WIDTH, height: HEIGHT }));
-
-// Standalone preview page for the checks.
-const live = readFileSync(join(SRC, "live.js"), "utf8");
-const TEXT = (await import(join(SRC, "text.js"))).TEXT.ru;
-const card = k.plateHtml({
-  fig: TEXT.fig,
-  title: TEXT.title,
-  hint: TEXT.hint,
-  readout: TEXT.idle,
-  keys: TEXT.keys,
-  caption: TEXT.caption,
-  body: `<div class="iso-stage sc-stage" tabindex="0" role="group" aria-label="${TEXT.aria}" data-text='${JSON.stringify({ ...TEXT.live, label: TEXT.label }).replace(/'/g, "&#39;")}' data-figure='${JSON.stringify(DATA)}'>${fileSvg}<span class="sc-live" aria-live="polite"></span></div>`,
-});
-const name = theme === "light" ? "preview-light.html" : "preview.html";
-writeFileSync(join(OUT, name), k.pageHtml({ title: TEXT.title, theme, body: `<style>.sc-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}</style>${card}`, script: live, width: 560 }));
-console.log("wrote", name, "·", (fileSvg.length / 1024).toFixed(0), "KB svg");
+const file = writeFigure({ id: "screen-changer", svg, css: CSS, data: DATA, width: WIDTH, height: HEIGHT });
+const page = await writePreview({ id: "screen-changer", file, data: DATA, theme });
+console.log("wrote", page, "·", (file.length / 1024).toFixed(0), "KB svg");

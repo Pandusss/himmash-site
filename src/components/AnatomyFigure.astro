@@ -1,15 +1,15 @@
 ---
-// Interactive isometric drawing of the slide-plate screen changer (built with the anatomy kit, see figures/).
-// The page carries only the card; the drawing is fetched when the section comes near the viewport.
+// Interactive isometric drawing of a machine, built with the anatomy kit (see figures/README.md).
+// The page carries only the card; the drawing and its script are fetched when the section nears the viewport.
 import { type Lang, asset } from '../i18n';
-import { TEXT } from '../figures/screen-changer/text.js';
-import figure from '../figures/screen-changer/figure.json';
+import { figureById } from '../figures';
 
-interface Props { lang: Lang; num: string }
-const { lang, num } = Astro.props;
-const t = TEXT[lang];
+interface Props { lang: Lang; id: string; num: string }
+const { lang, id, num } = Astro.props;
+const { text, data } = figureById(id)!;
+const t = text[lang];
 const payload = JSON.stringify({ ...t.live, label: t.label });
-const data = JSON.stringify({ down: figure.down, stroke: figure.stroke, change: figure.change });
+const { width, height, ...rest } = data;
 ---
 <section id="how-it-works" class="section details-layout anatomy-section" aria-labelledby="how-title">
   <div class="anatomy-intro">
@@ -23,8 +23,8 @@ const data = JSON.stringify({ down: figure.down, stroke: figure.stroke, change: 
   <figure class="anatomy">
     <div class="anatomy-plate">
       <div class="anatomy-head" aria-hidden="true"><span>{t.fig}</span><span>{t.title}</span></div>
-      <div class="anatomy-stage sc-stage" tabindex="0" role="group" aria-label={t.aria} aria-busy="true" data-src={asset('figures/screen-changer.svg')} data-text={payload} data-figure={data} style={`aspect-ratio:${figure.width}/${figure.height}`}>
-        <span class="sc-live" aria-live="polite"></span>
+      <div class="anatomy-stage" tabindex="0" role="group" aria-label={t.aria} aria-busy="true" data-figure-id={id} data-src={asset(`figures/${id}.svg`)} data-text={payload} data-figure={JSON.stringify(rest)} style={`aspect-ratio:${width}/${height}`}>
+        <span class="anatomy-live" aria-live="polite"></span>
         <span class="anatomy-loading">{t.loading}</span>
       </div>
       <div class="anatomy-foot" aria-hidden="true"><span>{t.hint}</span><span data-readout>{t.idle}</span></div>
@@ -34,7 +34,7 @@ const data = JSON.stringify({ down: figure.down, stroke: figure.stroke, change: 
 </section>
 
 <script>
-  import '../figures/screen-changer/live.js';
+  import '../figures/loader.js';
 </script>
 
 <style>
@@ -58,7 +58,7 @@ const data = JSON.stringify({ down: figure.down, stroke: figure.stroke, change: 
   .anatomy-stage :global(svg) ~ .anatomy-loading { display: none; }
   .anatomy-stage[data-failed] .anatomy-loading { display: none; }
   .anatomy-caption { margin-top: 14px; font-size: 13px; line-height: 1.6; color: var(--muted); max-width: 62ch; }
-  .sc-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .anatomy-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (max-width: 700px) {
     .anatomy-plate { padding: 14px 14px 12px; }
     .anatomy-stage { margin: 6px -6px; }

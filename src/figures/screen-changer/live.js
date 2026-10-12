@@ -12,14 +12,12 @@ const REPLACE_FOR = 1.6;
 const smooth = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
-function mount(stage) {
-  const T = JSON.parse(stage.dataset.text);
-  const F = JSON.parse(stage.dataset.figure);
+export function mount(stage, { text: T, data: F }) {
   const svg = stage.querySelector("svg");
   if (T.label) svg.setAttribute("aria-label", T.label);
-  const plate = stage.closest(".iso-plate") || stage.parentElement;
+  const plate = stage.closest(".iso-plate, .anatomy-plate") || stage.parentElement;
   const readout = plate.querySelector("[data-readout]");
-  const live = stage.querySelector(".sc-live");
+  const live = stage.querySelector(".anatomy-live");
   const still = matchMedia("(prefers-reduced-motion: reduce)");
   const parts = [0, 1].map((i) => [...svg.querySelectorAll(`[data-plate="${i}"]`)]);
   const dirt = [...svg.querySelectorAll(".sc-dirt")].sort((a, b) => a.dataset.window - b.dataset.window);
@@ -142,22 +140,3 @@ function mount(stage) {
   step(0);
   draw();
 }
-
-// The drawing is a separate file, fetched when the figure comes near the viewport.
-function load(stage) {
-  if (stage.querySelector("svg")) return mount(stage);
-  const go = () => fetch(stage.dataset.src)
-    .then((response) => (response.ok ? response.text() : Promise.reject(response.status)))
-    .then((markup) => {
-      stage.insertAdjacentHTML("afterbegin", markup);
-      stage.removeAttribute("aria-busy");
-      mount(stage);
-    })
-    .catch(() => stage.setAttribute("data-failed", ""));
-  const io = new IntersectionObserver((entries) => {
-    if (entries.some((entry) => entry.isIntersecting)) { io.disconnect(); go(); }
-  }, { rootMargin: "600px 0px" });
-  io.observe(stage);
-}
-
-document.querySelectorAll(".sc-stage").forEach(load);

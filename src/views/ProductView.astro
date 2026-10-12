@@ -4,8 +4,8 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import SectionHead from '../components/SectionHead.astro';
 import ProductCard from '../components/ProductCard.astro';
 import ContactCta from '../components/ContactCta.astro';
-import ScreenChangerFigure from '../components/ScreenChangerFigure.astro';
-import { TEXT as SCREEN_CHANGER } from '../figures/screen-changer/text.js';
+import AnatomyFigure from '../components/AnatomyFigure.astro';
+import { figureById } from '../figures';
 import { type Lang, localePath, asset, useTranslations } from '../i18n';
 import { type ProductMeta, productText, productBySlug } from '../data/products';
 import { breadcrumbJsonLd, company } from '../data/company';
@@ -46,10 +46,10 @@ const productJsonLd = {
   }),
 };
 const hasSpecs = Boolean(text.specs?.length);
-const hasFigure = product.slug === 'screen-changer';
+const figure = figureById(product.slug);
 const jumps = [
   hasSpecs ? { href: '#specs', label: p.jumpSpecs } : { href: '#about-product', label: p.jumpAbout },
-  hasFigure && { href: '#how-it-works', label: SCREEN_CHANGER[lang].eyebrow },
+  figure && { href: '#how-it-works', label: figure.text[lang].eyebrow },
   text.materials && { href: '#materials', label: p.jumpMaterials },
   text.terms && { href: '#terms', label: p.jumpTerms },
   { href: '#contacts', label: p.jumpContact },
@@ -137,7 +137,7 @@ const num = () => String(++n).padStart(2, '0');
       </section>
     )}
 
-    {hasFigure && <ScreenChangerFigure lang={lang} num={num()} />}
+    {figure && <AnatomyFigure lang={lang} id={product.slug} num={num()} />}
 
     {text.materials && (
       <section id="materials" class="section section-flush" aria-labelledby="materials-title">
