@@ -27,8 +27,20 @@ function hints(stage) {
   stage.addEventListener('click', acted, { once: true });
   stage.addEventListener('keydown', acted, { once: true });
   feedback(stage);
-  // Control buttons: each presses one of the figure's keys and flashes the part it acts on.
+  const zoom = camera(stage);
+  // Control buttons: each presses one of the figure's keys and flashes the part it acts on; a zoom button
+  // moves the camera onto a part and back (its label switches between the two).
   for (const control of stage.closest('.anatomy-plate')?.querySelectorAll('.anatomy-control') || []) {
+    if (control.dataset.zoom) {
+      const there = control.textContent, back = control.dataset.labelBack || there;
+      zoom.onChange((selector) => { control.textContent = selector === control.dataset.zoom ? back : there; control.toggleAttribute('aria-pressed', selector === control.dataset.zoom); });
+      control.addEventListener('click', () => {
+        acted();
+        zoom.to(zoom.current() === control.dataset.zoom ? null : control.dataset.zoom);
+        stage.dispatchEvent(new CustomEvent('anatomy-zoomed', { detail: { by: 'reader' } }));
+      });
+      continue;
+    }
     control.addEventListener('click', () => {
       acted();
       control.removeAttribute('data-fired'); void control.offsetWidth; control.setAttribute('data-fired', '');
@@ -132,6 +144,56 @@ function feedback(stage) {
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => toast.removeAttribute('data-show'), TOAST_MS);
   });
+}
+
+// Camera: eases the drawing's viewBox onto the box of a part (with some air, at the card's proportions)
+// and back to the whole drawing. Figures can drive it too: dispatch "anatomy-zoom" with { selector }.
+function camera(stage) {
+  const svg = stage.querySelector('svg');
+  const base = svg.viewBox.baseVal;
+  const full = { x: base.x, y: base.y, w: base.width, h: base.height };
+  let now = { ...full }, from = now, to = now, start = 0, frame = 0, current = null;
+  const listeners = [];
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  const set = (r) => svg.setAttribute('viewBox', `${r.x.toFixed(2)} ${r.y.toFixed(2)} ${r.w.toFixed(2)} ${r.h.toFixed(2)}`);
+  function boxOf(selector) {
+    const back = svg.getScreenCTM().inverse();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const el of svg.querySelectorAll(selector)) {
+      const r = el.getBoundingClientRect();
+      if (!r.width && !r.height) continue;
+      for (const [cx, cy] of [[r.left, r.top], [r.right, r.bottom]]) {
+        const p = new DOMPoint(cx, cy).matrixTransform(back);
+        x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+      }
+    }
+    if (!isFinite(x0)) return null;
+    let w = (x1 - x0) * 1.3, h = (y1 - y0) * 1.3;
+    const ratio = full.w / full.h;
+    if (w / h > ratio) h = w / ratio; else w = h * ratio;
+    w = Math.min(w, full.w); h = Math.min(h, full.h);
+    const x = Math.min(Math.max((x0 + x1) / 2 - w / 2, full.x), full.x + full.w - w);
+    const y = Math.min(Math.max((y0 + y1) / 2 - h / 2, full.y), full.y + full.h - h);
+    return { x, y, w, h };
+  }
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+  function tick(t) {
+    const k = still.matches ? 1 : Math.min(1, (t - start) / 900);
+    const e = ease(k);
+    now = { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, w: from.w + (to.w - from.w) * e, h: from.h + (to.h - from.h) * e };
+    set(now);
+    frame = k < 1 ? requestAnimationFrame(tick) : 0;
+  }
+  function go(selector) {
+    const box = selector ? boxOf(selector) : null;
+    if (selector && !box) return;
+    current = box ? selector : null;
+    from = now; to = box || full; start = performance.now();
+    cancelAnimationFrame(frame); frame = requestAnimationFrame(tick);
+    listeners.forEach((fn) => fn(current));
+  }
+  stage.addEventListener('anatomy-zoom', (event) => go(event.detail?.selector || null));
+  return { to: go, current: () => current, onChange: (fn) => listeners.push(fn) };
 }
 
 document.querySelectorAll('.anatomy-stage[data-figure-id]').forEach(load);

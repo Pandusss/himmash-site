@@ -9,6 +9,7 @@ export const TEXT = {
     title: "Голова грануляции · рез",
     hint: "Нажмите на ножи",
     controls: [
+      { zoom: "[data-part=\"cutter\"], .gh-pellets", label: "Зона реза крупно", labelBack: "Вся голова" },
       { key: "ArrowDown", label: "Медленнее", flash: "[data-part=\"cutter\"]" },
       { key: "ArrowUp", label: "Быстрее", flash: "[data-part=\"cutter\"]" },
       { key: " ", label: "Стоп / пуск", flash: "[data-part=\"motor\"]" },
@@ -41,6 +42,7 @@ export const TEXT = {
     title: "Pelletizing head · cutting",
     hint: "Click the knives",
     controls: [
+      { zoom: "[data-part=\"cutter\"], .gh-pellets", label: "Cutting zone close-up", labelBack: "Whole head" },
       { key: "ArrowDown", label: "Slower", flash: "[data-part=\"cutter\"]" },
       { key: "ArrowUp", label: "Faster", flash: "[data-part=\"cutter\"]" },
       { key: " ", label: "Stop / start", flash: "[data-part=\"motor\"]" },
@@ -73,6 +75,7 @@ export const TEXT = {
     title: "造粒机头 · 切粒",
     hint: "点击切刀",
     controls: [
+      { zoom: "[data-part=\"cutter\"], .gh-pellets", label: "放大切粒区", labelBack: "整个机头" },
       { key: "ArrowDown", label: "减速", flash: "[data-part=\"cutter\"]" },
       { key: "ArrowUp", label: "加速", flash: "[data-part=\"cutter\"]" },
       { key: " ", label: "停止 / 启动", flash: "[data-part=\"motor\"]" },

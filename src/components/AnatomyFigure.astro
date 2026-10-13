@@ -30,7 +30,7 @@ const controlsLabel = { ru: 'Управление схемой', en: 'Figure con
       </div>
       {t.controls && (
         <div class="anatomy-controls" role="group" aria-label={controlsLabel}>
-          {t.controls.map((c: { key: string; label: string; flash?: string }) => <button type="button" class="anatomy-control" data-key={c.key} data-flash={c.flash}>{c.label}</button>)}
+          {t.controls.map((c: { key?: string; label: string; flash?: string; zoom?: string; labelBack?: string }) => <button type="button" class="anatomy-control" data-key={c.key} data-flash={c.flash} data-zoom={c.zoom} data-label-back={c.labelBack}>{c.label}</button>)}
         </div>
       )}
       <div class="anatomy-foot">{!t.controls && <button type="button" class="anatomy-hint" data-key={t.hintKey ?? ' '}>{t.hint}</button>}<span data-readout aria-hidden="true">{t.idle}</span></div>
@@ -95,6 +95,7 @@ const controlsLabel = { ru: 'Управление схемой', en: 'Figure con
   .anatomy-control:active { transform: scale(.97); }
   .anatomy-control:focus { outline: none; }
   .anatomy-control:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .anatomy-control[aria-pressed] { border-color: var(--green); color: var(--green); }
   .anatomy-control[data-fired] { background: var(--green); border-color: var(--green); color: var(--white); }
   @media (prefers-reduced-motion: reduce) {
     .anatomy-hint::before { animation: none; }

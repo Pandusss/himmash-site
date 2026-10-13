@@ -7,6 +7,9 @@ const PELLET_AT_MAX = 3.5;   // mm, pellet length assumed at the top shaft speed
 const FLIGHT = 0.45, FALL = 1.3, OUT = 0.7;
 const TAU = Math.PI * 2;
 const RESUME_MS = 8000;    // the tour resumes this long after the last input (wall clock)
+const TOUR_WHOLE = 4;      // each tour lap opens on the whole head, then the camera moves into the cutting zone
+const TOUR_STEP = 5.5;     // seconds per speed step inside the cutting zone
+const ZONE = '[data-part="cutter"], .gh-pellets';
 const RESTART_MS = 6000;   // a stop made by the reader comes back on by itself this long after the last input
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -98,7 +101,7 @@ export function mount(stage, { text: T, data: F }) {
   for (const a of [a1 + 0.004, a2 - 0.004]) holes.push({ a, len: 0, face: true });
   let level = levels.length - 1, rpm = maxRpm, running = true;
   let phase = 0.3, clock = 0, last = 0, frame = 0, visible = false, hover = "", phrase = "", shown = "";
-  let touring = !still.matches, tourAt = 0, quietUntil = 1.4, seed = 7;
+  let touring = !still.matches, tourAt = 0, quietUntil = 1.4, seed = 7, zoomed = null;
   let lastInput = 0, restartAt = 0, restartTimer = 0;
   const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
   const pellets = [];
@@ -121,13 +124,16 @@ export function mount(stage, { text: T, data: F }) {
   function step(dt) {
     clock += dt;
     if (!touring && !still.matches && lastInput && performance.now() - lastInput >= RESUME_MS) {
-      touring = true; tourAt = 0; quietUntil = clock; lastInput = 0; disarmRestart();
+      touring = true; tourAt = 0; quietUntil = clock; lastInput = 0; zoomed = null; disarmRestart();
     }
     if (touring && clock > quietUntil) {
       tourAt += dt;
       const plan = [3, 1, 0, 1];
-      const want = plan[Math.floor(tourAt / 5.5) % plan.length];
+      const u = tourAt % (TOUR_WHOLE + plan.length * TOUR_STEP);
+      const inZone = u >= TOUR_WHOLE;
+      const want = inZone ? plan[Math.floor((u - TOUR_WHOLE) / TOUR_STEP)] : plan[0];
       if (want !== level) level = want;
+      if (inZone !== zoomed) { zoomed = inZone; stage.dispatchEvent(new CustomEvent("anatomy-zoom", { detail: { selector: inZone ? ZONE : null } })); }
       running = true;
     }
     const goal = target();
