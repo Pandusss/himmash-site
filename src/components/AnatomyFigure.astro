@@ -79,9 +79,9 @@ const controlsLabel = { ru: 'Управление схемой', en: 'Figure con
   /* Focus: a figure that marks a picked part (data-on) and sets data-focus on its drawing fades every
      other part and the frame, and lights the picked one: a glow (which also reaches parts drawn through
      <use>, where fills can't be restyled) plus an accent fill on parts drawn directly. */
-  .anatomy-stage :global(.fig-svg :is([data-part], path, circle)) { transition: opacity .35s ease; }
-  .anatomy-stage :global(.fig-svg[data-focus] [data-part]:not([data-on])) { opacity: .14; }
-  .anatomy-stage :global(.fig-svg[data-focus] :is(path, circle, ellipse, polygon, line):not([data-part], [data-part] *, defs *, .fig-ripple)) { opacity: .14; }
+  .anatomy-stage :global(.fig-svg :is(use, path, circle)) { transition: opacity .35s ease; }
+  .anatomy-stage :global(.fig-svg[data-focus] use:not([data-on])) { opacity: .14; }
+  .anatomy-stage :global(.fig-svg[data-focus] :is(path, circle, ellipse, polygon, line):not([data-on], [data-on] *, defs *, .fig-ripple)) { opacity: .14; }
   .anatomy-stage :global(.fig-svg[data-focus] [data-on]) { filter: drop-shadow(0 0 1.2px var(--anatomy-lit)) drop-shadow(0 0 6px color-mix(in srgb, var(--anatomy-lit) 70%, transparent)); }
   .anatomy-stage :global(.fig-svg[data-focus] [data-on] path:not(.iso-line, .iso-halo)) { fill: color-mix(in srgb, var(--anatomy-lit) var(--fig-focus-mix, 30%), var(--anatomy-paper)); stroke: none; }
   .anatomy-stage :global(.fig-svg[data-focus] [data-on] .iso-line) { stroke: var(--anatomy-lit); }

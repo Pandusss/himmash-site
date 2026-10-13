@@ -108,6 +108,7 @@ export function mount(stage, { text: T, data: F }) {
     if (on !== lastOn) {
       lastOn = on;
       units.forEach((node, i) => node.toggleAttribute("data-on", i === on));
+      svg.toggleAttribute("data-focus", on !== null && on !== undefined);   // isolate the unit: the rest of the line fades
     }
     if (on !== null && on !== undefined) say(T.step.replace("{n}", on + 1).replace("{text}", T.units[on]));
     else say(running ? T.run : T.stopped);

@@ -76,6 +76,7 @@ export function mount(stage, { text: T, data: F }) {
   function select(n, byUser) {
     selected = n;
     groups.forEach((list, i) => list.forEach((g) => g.toggleAttribute("data-on", i + 1 === n)));
+    svg.toggleAttribute("data-focus", !!n);   // isolate the stage; 0 is the whole system
     if (byUser) { touring = false; quietSince = performance.now(); announce(n ? T.stages[n - 1] : T.summary); }
   }
 
