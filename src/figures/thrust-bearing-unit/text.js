@@ -11,6 +11,7 @@ export const TEXT = {
     controls: [
       { key: "p", label: "Путь усилия" },
       { key: " ", label: "Разобрать / собрать" },
+      { key: "Escape", label: "Весь узел" },
       { key: "1", label: "Гильза", flash: "[data-part=\"sleeve\"]" },
       { key: "2", label: "Упорный подшипник", flash: "[data-part=\"thrust\"]" },
       { key: "3", label: "Корпус", flash: "[data-part=\"housing\"]" },
@@ -26,6 +27,7 @@ export const TEXT = {
     ],
     caption: "Давление расплава отталкивает шнек к редуктору. Хвостовик сидит в шлицах вал-гильзы, и всё осевое усилие гильза передаёт буртом на упорный подшипник, а он — на заплечик корпуса; дальше усилие уходит через лапу в раму. Радиальные подшипники только держат гильзу соосно, масляная ванна смазывает подшипники, водяная рубашка отводит тепло. Нагрузка показана в процентах от рабочей, вращение замедлено.",
     live: {
+      whole: "Весь узел целиком",
       path1: "1 из 4 · Давление расплава толкает шнек назад, хвостовик давит на вал-гильзу",
       path2: "2 из 4 · Бурт гильзы передаёт всё осевое усилие на упорный подшипник",
       path3: "3 из 4 · Упорный подшипник упирается в заплечик корпуса",
@@ -61,6 +63,7 @@ export const TEXT = {
     controls: [
       { key: "p", label: "Load path" },
       { key: " ", label: "Take apart / assemble" },
+      { key: "Escape", label: "Whole unit" },
       { key: "1", label: "Sleeve", flash: "[data-part=\"sleeve\"]" },
       { key: "2", label: "Thrust bearing", flash: "[data-part=\"thrust\"]" },
       { key: "3", label: "Housing", flash: "[data-part=\"housing\"]" },
@@ -76,6 +79,7 @@ export const TEXT = {
     ],
     caption: "Melt pressure pushes the screw back toward the gearbox. The screw shank sits in the splines of the drive sleeve, and the sleeve passes the whole axial force through its collar to the thrust bearing, which bears on the housing shoulder; from there the force goes through the foot into the frame. The radial bearings only keep the sleeve centred, the oil bath lubricates the bearings and the water jacket carries the heat away. The load is shown as a percentage of the working load; rotation is slowed down.",
     live: {
+      whole: "The whole unit",
       path1: "1 of 4 · Melt pressure pushes the screw back; its shank presses on the sleeve",
       path2: "2 of 4 · The sleeve collar passes the whole axial load to the thrust bearing",
       path3: "3 of 4 · The thrust bearing bears against the housing shoulder",
@@ -111,6 +115,7 @@ export const TEXT = {
     controls: [
       { key: "p", label: "受力路径" },
       { key: " ", label: "拆开 / 装配" },
+      { key: "Escape", label: "整个部件" },
       { key: "1", label: "轴套", flash: "[data-part=\"sleeve\"]" },
       { key: "2", label: "推力轴承", flash: "[data-part=\"thrust\"]" },
       { key: "3", label: "壳体", flash: "[data-part=\"housing\"]" },
@@ -126,6 +131,7 @@ export const TEXT = {
     ],
     caption: "熔体压力把螺杆推向减速机。螺杆尾柄插在驱动轴套的花键中，轴套通过凸肩把全部轴向力传给推力轴承，推力轴承再压在壳体台肩上；轴向力随后经支座传入机架。径向轴承只负责使轴套保持同心，油池润滑轴承，水冷夹套带走热量。载荷以额定值的百分比表示，旋转为慢速演示。",
     live: {
+      whole: "部件全貌",
       path1: "第 1 步，共 4 步 · 熔体压力把螺杆向后推，尾柄压在轴套上",
       path2: "第 2 步，共 4 步 · 轴套凸肩把全部轴向力传给推力轴承",
       path3: "第 3 步，共 4 步 · 推力轴承顶在壳体台肩上",

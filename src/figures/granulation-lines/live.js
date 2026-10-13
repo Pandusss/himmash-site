@@ -43,7 +43,7 @@ export function mount(stage, { text: T, data: F }) {
 
   let clock = 0, last = 0, frame = 0, visible = false, phrase = "";
   let running = true, flow = 1;
-  let selected = null, hovered = null;
+  let selected = null, hovered = null, overview = false;   // overview: the reader asked for the whole line, no unit lit
   let touring = !still.matches, tourClock = 0, quiet = 0;
   let restartAt = 0, restartTimer = 0;
 
@@ -103,7 +103,7 @@ export function mount(stage, { text: T, data: F }) {
       p.node.setAttribute("cy", sy.toFixed(1));
       p.node.style.opacity = flow > 0.05 ? "" : "0";
     });
-    const toured = touring ? tourAt(tourClock) : null;
+    const toured = touring && !overview ? tourAt(tourClock) : null;
     const on = hovered !== null ? hovered : selected !== null ? selected : toured;
     if (on !== lastOn) {
       lastOn = on;
@@ -156,21 +156,23 @@ export function mount(stage, { text: T, data: F }) {
     const i = unitOf(event);
     takeOver();
     selected = i !== null && i !== selected ? i : null;
+    if (i !== null) overview = false;
     afterInput();
     refresh();
   });
   stage.addEventListener("keydown", (event) => {
     const key = event.key;
-    const from = selected !== null ? selected : touring && tourAt(tourClock) !== null ? tourAt(tourClock) : null;
+    const from = selected !== null ? selected : touring && !overview && tourAt(tourClock) !== null ? tourAt(tourClock) : null;
     let handled = true;
     if (key === "ArrowRight" || key === "ArrowDown") selected = from === null ? 0 : Math.min(count - 1, from + 1);
     else if (key === "ArrowLeft" || key === "ArrowUp") selected = from === null ? count - 1 : Math.max(0, from - 1);
     else if (key === "Home") selected = 0;
     else if (key === "End") selected = count - 1;
-    else if (key === "Escape") selected = null;
+    else if (key === "Escape") { selected = null; overview = true; announce(T.whole); }
     else if (key === " " || key === "Enter") { running = !running; announce(running ? T.started : T.halted); }
     else handled = false;
     if (!handled) return;
+    if (key.startsWith("Arrow") || key === "Home" || key === "End") overview = false;
     event.preventDefault();
     takeOver();
     afterInput();

@@ -58,7 +58,7 @@ export function mount(stage, { text: T, data: F }) {
 
   // State.
   let running = true, load = 0, speed = 0, angle = 0, flow = 0, clock = 0;
-  let selected = null, hovered = null;
+  let selected = null, hovered = null, overview = false;   // overview: the reader asked for the whole unit
   const pieces = { cover: { x: 0, v: 0, goal: 0, at: 0 }, cartridge: { x: 0, v: 0, goal: 0, at: 0 } };
   let wantApart = false, apart = false;
   let touring = !still.matches, tourStep = 0, tourClock = 0, quiet = 0;
@@ -164,7 +164,7 @@ export function mount(stage, { text: T, data: F }) {
   }
   function enter(s) {
     if (s.run) { running = true; announce(T.started); }
-    if ("part" in s) selected = s.part;
+    if ("part" in s) selected = overview ? null : s.part;
     if (s.apart === true) setApart(true);
     if (s.apart === false) setApart(false);
   }
@@ -296,6 +296,7 @@ export function mount(stage, { text: T, data: F }) {
     const name = partOf(event);
     takeOver();
     pathStep = -1; pathWait = false;
+    if (name) overview = false;
     if (name && !wantApart) { setApart(true); armRestart(); selected = name; }
     else if (name && name !== selected) selected = name;
     else if (wantApart) { setApart(false); running = true; selected = null; }
@@ -309,13 +310,13 @@ export function mount(stage, { text: T, data: F }) {
   stage.addEventListener("keydown", (event) => {
     const key = event.key;
     let handled = true;
-    const pick = (name) => { pathStep = -1; pathWait = false; selected = name; if (!wantApart) { setApart(true); armRestart(); } };
-    if (key === "p" || key === "P" || key === "з" || key === "З") startPath();
+    const pick = (name) => { overview = false; pathStep = -1; pathWait = false; selected = name; if (!wantApart) { setApart(true); armRestart(); } };
+    if (key === "p" || key === "P" || key === "з" || key === "З") { overview = false; startPath(); }
     else if (/^[1-5]$/.test(key)) pick(PARTS[Number(key) - 1]);
     else if (key === "ArrowRight" || key === "ArrowDown") pick(PARTS[(PARTS.indexOf(selected) + 1) % PARTS.length]);
     else if (key === "ArrowLeft" || key === "ArrowUp") pick(PARTS[(PARTS.indexOf(selected) + PARTS.length - 1) % PARTS.length]);
     else if (key === " " || key === "Enter") { pathStep = -1; pathWait = false; setApart(!wantApart); if (!wantApart) running = true; if (wantApart) armRestart(); }
-    else if (key === "Escape") { pathStep = -1; pathWait = false; selected = null; }
+    else if (key === "Escape") { pathStep = -1; pathWait = false; selected = null; overview = true; announce(T.whole); }
     else handled = false;
     if (!handled) return;
     event.preventDefault();

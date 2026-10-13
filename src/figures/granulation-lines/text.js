@@ -11,6 +11,7 @@ export const TEXT = {
     controls: [
       { key: "ArrowLeft", label: "← Предыдущая" },
       { key: "ArrowRight", label: "Следующая →" },
+      { key: "Escape", label: "Вся линия" },
       { key: " ", label: "Стоп / пуск линии" },
     ],
     hintKey: "ArrowRight",
@@ -23,6 +24,7 @@ export const TEXT = {
     ],
     caption: "Сырьё с загрязнённостью до 50 % и выше измельчают, во флотационной машине песок и камни тонут, фрикционная мойка отмывает дроблёнку горячей водой, центрифуга отжимает её до влажности 3–5 %. Пневмотранспорт подаёт чистую дроблёнку в бункер, питатель задавливает её в экструдер без агломерации; расплав дегазируется, проходит фильтр и режется в гранулы на фильере. Цифры — из характеристик установок; расстояния между ними сокращены, водоочистка не показана.",
     live: {
+      whole: "Вся линия целиком",
       units: [
         "дробилка · плёнка до 50 мм, нить до 100 мм",
         "флотация · песок и камни тонут · 500 кг/ч",
@@ -56,6 +58,7 @@ export const TEXT = {
     controls: [
       { key: "ArrowLeft", label: "← Previous" },
       { key: "ArrowRight", label: "Next →" },
+      { key: "Escape", label: "Whole line" },
       { key: " ", label: "Stop / start the line" },
     ],
     hintKey: "ArrowRight",
@@ -68,6 +71,7 @@ export const TEXT = {
     ],
     caption: "Feedstock with contamination of up to 50% and more is shredded; in the flotation machine sand and stones sink, the friction washer scrubs the flakes with hot water and the centrifuge spins them down to 3–5% moisture. Pneumatic conveying lifts the clean flakes into the hopper, and the crammer forces them into the extruder with no agglomeration step; the melt is degassed, filtered and cut into pellets at the die. Figures come from the units' specifications; the distances between units are shortened and the water treatment is not shown.",
     live: {
+      whole: "The whole line",
       units: [
         "shredder · film up to 50 mm, yarn up to 100 mm",
         "flotation · sand and stones sink · 500 kg/h",
@@ -101,6 +105,7 @@ export const TEXT = {
     controls: [
       { key: "ArrowLeft", label: "← 上一台" },
       { key: "ArrowRight", label: "下一台 →" },
+      { key: "Escape", label: "整条生产线" },
       { key: " ", label: "停止 / 启动生产线" },
     ],
     hintKey: "ArrowRight",
@@ -113,6 +118,7 @@ export const TEXT = {
     ],
     caption: "污染率达 50% 及以上的原料先被破碎；在浮选机中泥沙和石块下沉，摩擦清洗机用热水搓洗碎片，离心机将其脱水至含水率 3–5%。气力输送把干净的碎片送入料仓，强制喂料机无需团粒工序即可把物料压入挤出机；熔体经排气、过滤后在模板上切成颗粒。数据取自各设备的技术参数；设备间距已缩短，水处理系统未画出。",
     live: {
+      whole: "整条生产线全貌",
       units: [
         "破碎机 · 薄膜至 50 毫米，纤维至 100 毫米",
         "浮选机 · 泥沙石块下沉 · 500 公斤/时",

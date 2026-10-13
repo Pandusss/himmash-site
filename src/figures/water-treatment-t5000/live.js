@@ -67,7 +67,7 @@ export function mount(stage, { text: T, data: F }) {
   const froth = Array.from({ length: FROTH }, () => ({ x: rand(T2.plates[0] - 100, T2.x1 - 40), y: rand(T2.y0 + 40, T2.y1 - 40), s: rand(40, 90), a: rand(0, 6.28) }));
   const debris = [];
   let clock = 0, last = 0, frame = 0, visible = false, phrase = "";
-  let selected = 0, touring = !still.matches, quietSince = -1, tourAt = 0;
+  let selected = 0, touring = !still.matches, quietSince = -1, tourAt = 0, overview = false;
   let tote = 0.35, binLevel = 0.3, dropTimer = 0, offset = 0;
 
   function say(text) { if (readout && readout.textContent !== text) readout.textContent = text; }
@@ -77,13 +77,13 @@ export function mount(stage, { text: T, data: F }) {
     selected = n;
     groups.forEach((list, i) => list.forEach((g) => g.toggleAttribute("data-on", i + 1 === n)));
     svg.toggleAttribute("data-focus", !!n);   // isolate the stage; 0 is the whole system
-    if (byUser) { touring = false; quietSince = performance.now(); announce(n ? T.stages[n - 1] : T.summary); }
+    if (byUser) { overview = !n; touring = false; quietSince = performance.now(); announce(n ? T.stages[n - 1] : T.summary); }
   }
 
   function step(dt) {
     clock += dt;
     if (!touring && quietSince >= 0 && performance.now() - quietSince > RESUME && !still.matches) { touring = true; tourAt = clock; }
-    if (touring) {
+    if (touring && !overview) {
       const n = Math.floor((clock - tourAt) / STAGE_FOR) % 6;
       const want = n === 5 ? 0 : n + 1;
       if (want !== selected) select(want, false);
