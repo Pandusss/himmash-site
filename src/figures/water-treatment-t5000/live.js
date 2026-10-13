@@ -85,7 +85,7 @@ export function mount(stage, { text: T, data: F }) {
     if (!touring && quietSince >= 0 && performance.now() - quietSince > RESUME && !still.matches) { touring = true; tourAt = clock; }
     if (touring && !overview) {
       const n = Math.floor((clock - tourAt) / STAGE_FOR) % 6;
-      const want = n === 5 ? 0 : n + 1;
+      const want = n;   // the whole system first, then stages 1–5
       if (want !== selected) select(want, false);
     }
     offset = (offset + DASH * dt) % 1000;
@@ -200,7 +200,7 @@ export function mount(stage, { text: T, data: F }) {
   });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));
   new IntersectionObserver((entries) => { visible = entries[entries.length - 1].isIntersecting; if (visible) run(); }, { rootMargin: "120px 0px" }).observe(stage);
-  select(still.matches ? 0 : 1, false);
+  select(0, false);
   step(0);
   draw();
 }

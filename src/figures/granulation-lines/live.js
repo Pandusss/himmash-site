@@ -3,7 +3,7 @@
 // auger spout into the big bag. The idle tour walks along the line unit by unit (lighting it and naming
 // its role in the readout); the reader picks a unit by pointing at it or with the arrow keys.
 const STEP = 2.1;          // seconds per unit on the tour
-const REST = 2.6;          // pause on the whole line at the end of a lap
+const REST = 4;            // each lap opens on the whole line before walking it unit by unit
 const G = 9810;            // mm/s², pellets fall freely from the spout
 const RESUME_MS = 8000;    // the tour resumes this long after the last input (wall clock)
 const RESTART_MS = 6000;   // a stop made by the reader comes back on by itself this long after the last input
@@ -56,7 +56,7 @@ export function mount(stage, { text: T, data: F }) {
   function tourAt(t) {
     const lap = count * STEP + REST;
     const u = t % lap;
-    return u < count * STEP ? Math.floor(u / STEP) : null;
+    return u < REST ? null : Math.min(count - 1, Math.floor((u - REST) / STEP));
   }
 
   function step(dt) {
