@@ -1,4 +1,4 @@
-// Texts of the dewatering centrifuge figure and its section, in the three site languages.
+// Texts of the dewatering centrifuge figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -69,42 +69,6 @@ export const TEXT = {
       started: "Centrifuge started",
       halted: "Centrifuge stopped",
       restart: "back on in {s} s",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "用离心力<br>甩干水分",
-    intro: "根据设备照片、技术参数和公开资料绘制的交互示意图。机壳为剖视：转子桨叶把湿料甩向筛网并沿筛网向前推送，水穿过筛网流入底槽。",
-    loading: "正在加载示意图…",
-    title: "离心脱水机 · 脱水过程",
-    hint: "点击转子",
-    controls: [
-      { key: "1", label: "薄膜", flash: "[data-hit]" },
-      { key: "2", label: "聚丙烯丝", flash: "[data-hit]" },
-      { key: "3", label: "厚壁料", flash: "[data-hit]" },
-      { key: " ", label: "停止 / 启动", flash: "[data-hit]" },
-    ],
-    idle: "薄膜 · ≤17 → 3–5% · ≤500 千克/时",
-    aria: "离心脱水机剖视图。按 1、2、3 选择物料：薄膜、PP 编织丝或厚壁硬料；按空格键或回车键启动或停止转子。",
-    label: "机架上的卧式离心脱水机剖视图：两块端板、围绕带斜桨叶转子的八角形筛篮、带污泥螺旋的底槽、顶部出料管、轴承座以及电机驱动的三角带传动。湿料从端板上的进料口进入，桨叶把它甩向筛网并推向出料端，水穿过筛网流向螺旋。",
-    keys: [
-      { mark: "lit", label: "带斜桨叶的转子，1500 转/分" },
-      { mark: "raised", label: "筛网、底槽和污泥螺旋" },
-    ],
-    caption: "湿料从端板上的进料口进入。转子桨叶把物料甩向筛网，并借助倾斜角度沿主轴推向出料端；水和细小污物穿过筛网流入底槽，由螺旋排出污泥。干燥后的物料由桨叶直接从顶部出料管抛出，设备可自动卸料。图中转子转速已放慢；进料含水率按物料表，出料含水率为 3–5%。",
-    live: {
-      run: "{m} · ≤{i} → {o}% · ≤{q} 千克/时",
-      start1: "启动 · 第一级",
-      start2: "启动 · 第二级",
-      coast: "停机 · 惯性运转",
-      stopped: "已停机 · {m}",
-      materials: ["薄膜", "PP 编织丝", "厚壁硬料"],
-      picked: "物料：{m}，进料含水率不超过 {i}%",
-      started: "离心机已启动",
-      halted: "离心机已停止",
-      restart: "{s} 秒后恢复运行",
       decimal: ".",
     },
   },

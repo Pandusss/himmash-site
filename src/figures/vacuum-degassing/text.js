@@ -1,4 +1,4 @@
-// Texts of the vacuum degassing figure and its section, in the three site languages.
+// Texts of the vacuum degassing figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -63,39 +63,6 @@ export const TEXT = {
       stopped: "Vacuum pump off",
       drained: "Condensate drained from the tank",
       restart: "back on in {s} s",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "真空抽走<br>熔体水分",
-    intro: "根据照片、技术参数和公开资料绘制的交互示意图。螺杆排气区上方设有真空室：真空泵对其抽真空，水蒸气从熔体中逸出并进入罐内。",
-    loading: "正在加载示意图…",
-    title: "真空排气",
-    hint: "点击真空泵",
-    controls: [
-      { key: "1", label: "开启真空泵", flash: "[data-part=\"pump\"]" },
-      { key: "0", label: "关闭真空泵", flash: "[data-part=\"pump\"]" },
-    ],
-    idle: "真空度 100% · 蒸汽流向罐内",
-    aria: "真空排气。按空格键或回车键开启或关闭真空泵，按 1 键开启，按 0 键关闭。",
-    label: "挤出机机筒的排气区及其上方的真空室，沿轴线剖开：可见带螺棱的螺杆、螺槽中的熔体和蒸汽气泡。软管从真空室经球阀和装有真空表的三通接到冷凝罐，再由管道从罐接到共用底座上带电机的真空泵。真空泵运转时，水蒸气从熔体逸出，进入真空室和罐内；真空泵关闭时，气泡留在熔体中。",
-    keys: [
-      { mark: "lit", label: "排气区上方的真空室：熔体中的蒸汽从这里排出" },
-      { mark: "raised", label: "冷凝罐和真空泵：水蒸气抽除量最高 5%，真空泵功率 0.75–4 kW" },
-    ],
-    caption: "螺杆把熔体送入机筒排气口下方的排气区。真空泵对排气口上方的真空室抽真空，气泡上升破裂，水蒸气、气体和着色剂分解产物经球阀和装有真空表的三通进入罐内，冷凝液在罐中积聚。没有真空时，气泡随熔体继续前行，颗粒中会留下水珠和分层。机筒和真空室以剖面显示；运动已放慢，冷凝液积聚为加速演示。",
-    live: {
-      on: "真空度 {v}% · 蒸汽流向罐内",
-      pumping: "正在抽真空 · 真空度 {v}%",
-      off: "真空泵已关闭 · 蒸汽留在熔体中",
-      venting: "真空泵已关闭 · 真空度 {v}%",
-      drain: "正在排放罐内冷凝液",
-      started: "真空泵已开启",
-      stopped: "真空泵已关闭",
-      drained: "罐内冷凝液已排放",
-      restart: "{s} 秒后恢复运行",
       decimal: ".",
     },
   },

@@ -1,4 +1,4 @@
-// Texts of the screw feeder figure and its section, in the three site languages.
+// Texts of the screw feeder figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -59,37 +59,6 @@ export const TEXT = {
       stopped: "Feeder stopped, the extruder runs out of material",
       speed: "Drive frequency {n} %",
       restart: "back on in {s} s",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "薄膜直接喂料<br>无需团粒",
-    intro: "根据设备照片、技术参数和公开资料绘制的交互示意图。锥形螺杆压缩轻质薄膜和破碎料，并将其强制喂入挤出机的加料段。",
-    loading: "正在加载示意图…",
-    title: "螺杆喂料机 · 喂料",
-    hint: "点击传动装置",
-    controls: [
-      { key: " ", label: "停止 / 启动", flash: "[data-sf=\"drive\"]" },
-      { key: "ArrowDown", label: "减速", flash: "[data-sf=\"drive\"]" },
-      { key: "ArrowUp", label: "加速", flash: "[data-sf=\"drive\"]" },
-    ],
-    idle: "喂料 500 kg/h · 充满度 100%",
-    aria: "螺杆喂料机。按空格键或回车键启动和停止，按上下方向键以 10% 为一档调节驱动频率。",
-    label: "安装在带可调支脚机架上的螺杆喂料机：料斗、带进料口的机筒、锥形机筒和出料短管，出料短管用螺栓连接在挤出机侧面的加料口上。后部是轴承座、联轴器、减速机，以及由机架下部电机驱动的三角带传动。机筒上的剖切窗口露出锥形螺杆：它从进料口取料、压缩，并推入挤出机螺杆，左侧可见挤出机的剖面。",
-    keys: [
-      { mark: "lit", label: "锥形螺杆：越靠近出口，螺距和螺槽深度越小，物料被压缩" },
-      { mark: "raised", label: "50 毫米以下的薄膜和破碎料；挤出机剖面显示螺槽的充满程度" },
-    ],
-    caption: "轻质薄膜和纤维很难自行进入挤出机螺杆：它们在料斗中架桥，挤出机处于饥饿喂料状态。喂料机的锥形螺杆从进料口取料，反复压缩，并强制送入加料段。变频器设定螺杆转速，从而设定喂料量，最高 500 kg/h；示意图中喂料量与频率成正比（简化模型）。三角带轮的转动已放慢显示。",
-    live: {
-      feed: "喂料 {q} kg/h · 充满度 {f}%",
-      stop: "喂料机停止 · 充满度 {f}%",
-      started: "喂料机已启动",
-      stopped: "喂料机已停止，挤出机断料",
-      speed: "驱动频率 {n}%",
-      restart: "{s} 秒后恢复运行",
       decimal: ".",
     },
   },

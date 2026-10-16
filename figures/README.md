@@ -7,7 +7,7 @@ Isometric drawings of the machines, built with the [anatomy](https://github.com/
 | `figures/<id>/build.mjs` | Geometry and drawing (Node, imports `../kit/*.mjs` and `../shared.mjs`). |
 | `public/figures/<id>.svg` | Written by the build: the drawing with its styles. The page fetches it when the section nears the viewport. |
 | `src/figures/<id>/figure.json` | Written by the build: data for the live script, plus `width` and `height`. |
-| `src/figures/<id>/text.js` | Texts of the card and the section in RU, EN and ZH. |
+| `src/figures/<id>/text.js` | Texts of the card and the section in RU and EN. |
 | `src/figures/<id>/live.js` | Behaviour: `export function mount(stage, { text, data })`. Loaded on demand. |
 | `figures/<id>/out/preview*.html` | Standalone pages for the browser checks (not committed). |
 

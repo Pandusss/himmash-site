@@ -1,4 +1,4 @@
-// Texts of the pelletizing head figure and its section, in the three site languages.
+// Texts of the pelletizing head figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -62,39 +62,6 @@ export const TEXT = {
       stop: "Cutting stopped",
       start: "Cutting started",
       restart: "back on in {s} s",
-      thousands: ",",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "模面<br>热切造粒",
-    intro: "根据照片、技术参数和公开资料绘制的交互示意图。熔体从模板孔中挤出成条，切刀紧贴模面将其切断，水环冷却颗粒并将其带走。",
-    loading: "正在加载示意图…",
-    title: "造粒机头 · 切粒",
-    hint: "点击切刀",
-    controls: [
-      { zoom: "[data-part=\"cutter\"], .gh-pellets", label: "放大切粒区", labelBack: "整个机头" },
-      { key: "ArrowDown", label: "减速", flash: "[data-part=\"cutter\"]" },
-      { key: "ArrowUp", label: "加速", flash: "[data-part=\"cutter\"]" },
-      { key: " ", label: "停止 / 启动", flash: "[data-part=\"motor\"]" },
-    ],
-    idle: "切刀轴 2,800 rpm · 每秒 93 刀",
-    aria: "造粒机头。按 1 至 4 键将切刀轴转速设为 700 至 2,800 rpm，方向键逐级调节，空格键停止或重新开始切粒。",
-    label: "立式模面热切造粒机头：顶部为电机，下面依次是装联轴器的连接架、带切刀调节环的套筒、模头和带水环的护罩。护罩和模头的前部被剖开：熔体从侧面进入，流经环形流道和模孔，轴上的两把切刀切断挤出的料条，颗粒飞入罩壁上的水膜并流向出口。",
-    keys: [
-      { mark: "lit", label: "切刀轴上的切刀在模面处切断熔体料条" },
-      { mark: "raised", label: "带水环的护罩冷却颗粒并将其送往出口" },
-    ],
-    caption: "熔体从侧面进入模头，料条从朝下的模板孔中挤出。轴上的两把切刀贴着模面滑过，把料条切成颗粒：转速越高，颗粒越短。颗粒飞入沿护罩内壁流下的水膜，冷却后随水流入冷却器。旋转速度放慢 100 倍显示，颗粒飞行为示意。",
-    live: {
-      speed: "切刀轴 {rpm} rpm · 每秒 {cuts} 刀",
-      stopped: "切粒已停止",
-      set: "切刀轴：{rpm} rpm",
-      stop: "切粒已停止",
-      start: "切粒已开始",
-      restart: "{s} 秒后恢复运行",
       thousands: ",",
       decimal: ".",
     },

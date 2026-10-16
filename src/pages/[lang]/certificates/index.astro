@@ -2,7 +2,7 @@
 import DocumentsView from '../../../views/DocumentsView.astro';
 import type { Lang } from '../../../i18n';
 export function getStaticPaths() {
-  return [{ params: { lang: "en" } }, { params: { lang: "zh" } }];
+  return [{ params: { lang: "en" } }];
 }
 const lang = Astro.params.lang as Lang;
 ---

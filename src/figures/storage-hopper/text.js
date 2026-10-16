@@ -1,4 +1,4 @@
-// Texts of the storage hopper figure and its section, in the three site languages.
+// Texts of the storage hopper figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -65,40 +65,6 @@ export const TEXT = {
       restart: "back on in {s} s",
       lowSwitch: "Low level switch: pneumatic refilling started",
       highSwitch: "High level switch: refilling stopped",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "储存原料<br>均匀供料",
-    intro: "根据设备照片、技术参数和公开资料绘制的交互示意图。料仓储存气力输送送来的原料，底部的螺旋计量给料器将其均匀送往挤出或团粒工序。",
-    loading: "正在加载示意图…",
-    title: "储料仓 · 计量给料",
-    hint: "点击传动装置",
-    controls: [
-      { key: " ", label: "停止 / 启动", flash: "[data-sh=\"drive\"]" },
-      { key: "ArrowDown", label: "减速", flash: "[data-sh=\"drive\"]" },
-      { key: "ArrowUp", label: "加速", flash: "[data-sh=\"drive\"]" },
-    ],
-    idle: "料位 70% · 螺杆 60%",
-    aria: "带螺旋计量给料器的储料仓。按空格键或回车键启动和停止螺杆，按上下方向键以 10% 为一档调节转速。",
-    label: "焊接机架上的储料仓：带面板和观察窗的箱体、V 形底部以及装有计量螺杆的料槽。右侧是螺杆的减速电机、高低料位开关、气力输送进料口和带变频器的控制箱；左侧是位于接料斗上方的出料口。拆下两块前面板以显示料位，料槽开有剖切窗口以显示螺杆。",
-    keys: [
-      { mark: "lit", label: "200–300 毫米计量螺杆：操作员在控制箱上设定转速" },
-      { mark: "raised", label: "仓内原料：料位开关维持储量，气力输送补料" },
-    ],
-    caption: "原料经气力输送管道进入料仓，废气排入车间。V 形底部下方料槽中的计量螺杆将原料送到出料口；操作员通过变频器设定出料速度。料位降到低料位开关时开始补料，到达高料位开关时停止。时间已加速：实际 5–10 立方米的料仓可用数小时。",
-    live: {
-      dosing: "料位 {l}% · 螺杆 {n}%",
-      filling: "补料中 · 料位 {l}%",
-      stopped: "螺杆停止 · 料位 {l}%",
-      start: "螺杆已启动，{n}%",
-      stop: "螺杆已停止",
-      speed: "螺杆转速 {n}%",
-      restart: "{s} 秒后恢复运行",
-      lowSwitch: "低料位开关：气力输送开始补料",
-      highSwitch: "高料位开关：补料停止",
       decimal: ".",
     },
   },

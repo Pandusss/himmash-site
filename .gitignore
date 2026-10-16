@@ -10,5 +10,3 @@ dist/
 figures/*/out/
 figures/*/shots/
 
-# Chinese fallback font, copied from node_modules at build time
-public/fonts/noto-sans-sc/

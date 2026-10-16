@@ -1,4 +1,4 @@
-// Texts of the T-5000 water treatment figure and its section, in the three site languages.
+// Texts of the T-5000 water treatment figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -69,42 +69,6 @@ export const TEXT = {
         "5/5 clean water · to the loop or sewer",
       ],
       summary: "3–10 m³/h · water reused up to 20 times",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "闭路循环的<br>五级处理",
-    intro: "根据照片、技术参数和公开资料绘制的交互示意图。清洗线废水在集装箱单元中经过五级处理，净化后的水回到循环中。",
-    loading: "正在加载示意图…",
-    title: "T-5000 · 污水处理",
-    hint: "点击处理单元",
-    controls: [
-      { key: "1", label: "1 进水", flash: "[data-stage=\"1\"]" },
-      { key: "2", label: "2 电气浮", flash: "[data-stage=\"2\"]" },
-      { key: "3", label: "3 过滤器", flash: "[data-stage=\"3\"]" },
-      { key: "4", label: "4 杀菌", flash: "[data-stage=\"4\"]" },
-      { key: "5", label: "5 清水", flash: "[data-stage=\"5\"]" },
-      { key: "Escape", label: "整个系统" },
-    ],
-    idle: "1/5 进水 · 除杂、调节",
-    aria: "T-5000 污水处理系统。按 1–5 选择处理级，方向键和空格键切换到下一级，Esc 显示整个系统。",
-    label: "拆去顶板和侧壁的集装箱式污水处理单元。从左到右依次为：带阶梯格栅和杂物箱的进水调节池，带电极组、刮渣机和浮渣槽的电气浮和电絮凝池，机械过滤器和吸附过滤器组，杀菌处理单元，以及设有两个出口（回清洗线和排入下水道）的清水箱。各级之间由水泵和管道连接，浮渣进入储泥桶。",
-    keys: [
-      { mark: "lit", label: "当前选中的处理级" },
-      { mark: "raised", label: "管道中的短线随水流移动，逐级变清" },
-    ],
-    caption: "废水先经过格栅，粗大杂物被提升到杂物箱中，然后在进水池中均质调节。在电气浮池中，电极产生的气体把油类和絮体带到水面形成浮渣，刮渣机把浮渣推入集渣槽，浮渣汇集到单独的储泥桶中。过滤器截留金属、有机物、纳米塑料和表面活性剂，随后水经过杀菌处理，从清水箱回到清洗线或排入下水道。本图为示意：水流和污泥积累均为加速演示。",
-    live: {
-      stages: [
-        "1/5 进水 · 除杂、调节",
-        "2/5 电气浮 · 油类、悬浮物",
-        "3/5 过滤器 · 金属、有机物、表面活性剂",
-        "4/5 杀菌处理",
-        "5/5 清水 · 回用或排放",
-      ],
-      summary: "3–10 m³/h · 水可循环回用 20 次",
       decimal: ".",
     },
   },

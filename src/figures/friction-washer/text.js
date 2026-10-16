@@ -1,4 +1,4 @@
-// Texts of the friction washer figure and its section, in the three site languages.
+// Texts of the friction washer figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -65,40 +65,6 @@ export const TEXT = {
       waterOn: "Water on, dirt drains through the screen",
       waterOff: "Water off, the material is not washed",
       restart: "back on in {s} s",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "靠转子桨叶<br>摩擦清洗",
-    intro: "根据设备照片、技术参数和公开资料绘制的交互示意图。机壳侧板已拆下，可以看到转子把物料沿倾斜机壳向上输送，热水把污物从底部筛网冲走。",
-    loading: "正在加载示意图…",
-    title: "摩擦清洗机 · 清洗过程",
-    hint: "点击转子",
-    controls: [
-      { key: "1", label: "薄膜", flash: "[data-hit]" },
-      { key: "2", label: "聚丙烯丝", flash: "[data-hit]" },
-      { key: "3", label: "块料", flash: "[data-hit]" },
-      { key: "4", label: "PET 片", flash: "[data-hit]" },
-      { key: " ", label: "供水：开 / 关", flash: "[data-hit]" },
-    ],
-    idle: "薄膜 · ≤500 千克/时 · 供水中",
-    aria: "拆下侧板的摩擦清洗机。按 1–4 选择物料：薄膜、PP 编织丝、硬质块料或 PET 瓶片；按空格键或回车键开关供水。",
-    label: "机架上的倾斜式摩擦清洗机：八角形机壳拆下侧板，内有带斜桨叶的转子，下方是筛网和排水槽，上方是进料斗和带喷嘴的热水总管，低端为重型下轴承座，高端为电机、带护罩的皮带传动和出料口。转子把物料沿机壳向上输送，使其与桨叶和壳壁摩擦，污水经筛网流入排水槽并排入水箱。",
-    keys: [
-      { mark: "lit", label: "带斜桨叶的高速转子" },
-      { mark: "raised", label: "八角形机壳、底部筛网和热水总管" },
-    ],
-    caption: "脏料从低端的进料斗落入。高速转子的桨叶使物料与桨叶及八角形机壳内壁相互摩擦，并借助倾斜角度把物料向上推送；喷嘴向物料喷洒加有清洗剂的热水。污水靠重力经底部筛网流入排水槽并排入水箱，洁净物料从高端出料口排出。图中转子转速已放慢；产量按所选物料的技术参数。",
-    live: {
-      run: "{m} · ≤{q} 千克/时 · 供水中",
-      dry: "{m} · ≤{q} 千克/时 · 已停水",
-      materials: ["薄膜", "PP 编织丝", "硬质块料", "PET 瓶片"],
-      picked: "物料：{m}，最高 {q} 千克/时",
-      waterOn: "供水中，污物经筛网排出",
-      waterOff: "已停水，物料得不到清洗",
-      restart: "{s} 秒后恢复运行",
       decimal: ".",
     },
   },

@@ -1,7 +1,6 @@
 import type { Lang } from '../i18n';
 import ru from './products.ru';
 import en from './products.en';
-import zh from './products.zh';
 
 export type Category = 'line' | 'washing' | 'granulation' | 'systems';
 export const categoryOrder: Category[] = ['line', 'washing', 'granulation', 'systems'];
@@ -69,7 +68,7 @@ export const processSteps: string[][] = [
 ];
 export const processLoop: string[] = ['water-treatment-t5000'];
 
-const texts: Record<Lang, Record<string, ProductText>> = { ru, en, zh };
+const texts: Record<Lang, Record<string, ProductText>> = { ru, en };
 
 /** One-line label of a quick spec for cards and the table: "Производительность<br>до 500 кг/час" → "Производительность". */
 export function quickLabel(label: string): string {

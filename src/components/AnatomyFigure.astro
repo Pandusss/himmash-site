@@ -10,7 +10,7 @@ const { text, data } = figureById(id)!;
 const t = text[lang];
 const payload = JSON.stringify({ ...t.live, label: t.label });
 const { width, height, ...rest } = data;
-const controlsLabel = { ru: 'Управление схемой', en: 'Figure controls', zh: '示意图操作' }[lang];
+const controlsLabel = { ru: 'Управление схемой', en: 'Figure controls' }[lang];
 ---
 <section id="how-it-works" class="section details-layout anatomy-section" aria-labelledby="how-title">
   <div class="anatomy-intro">

@@ -1,19 +1,17 @@
 import ru from './ru';
 import en from './en';
-import zh from './zh';
 
-export const locales = ['ru', 'en', 'zh'] as const;
+export const locales = ['ru', 'en'] as const;
 export type Lang = (typeof locales)[number];
 export const defaultLang: Lang = 'ru';
 
 export const langMeta: Record<Lang, { label: string; name: string; htmlLang: string; hreflang: string; ogLocale: string; dateLocale: string }> = {
   ru: { label: 'RU', name: 'Русский', htmlLang: 'ru', hreflang: 'ru', ogLocale: 'ru_RU', dateLocale: 'ru-RU' },
   en: { label: 'EN', name: 'English', htmlLang: 'en', hreflang: 'en', ogLocale: 'en_US', dateLocale: 'en-GB' },
-  zh: { label: '中文', name: '简体中文', htmlLang: 'zh-CN', hreflang: 'zh-Hans', ogLocale: 'zh_CN', dateLocale: 'zh-CN' },
 };
 
 export type UI = typeof ru;
-const dictionaries: Record<Lang, UI> = { ru, en, zh };
+const dictionaries: Record<Lang, UI> = { ru, en };
 
 export function useTranslations(lang: Lang): UI {
   return dictionaries[lang];

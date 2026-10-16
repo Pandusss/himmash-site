@@ -1,4 +1,4 @@
-// Russian is the source language. en.ts and zh.ts must keep the same shape.
+// Russian is the source language. en.ts must keep the same shape.
 // Strings rendered with set:html may contain <br> and <span>.
 const ru = {
   meta: {

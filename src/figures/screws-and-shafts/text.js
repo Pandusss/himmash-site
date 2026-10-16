@@ -1,4 +1,4 @@
-// Texts of the shafts-and-screws figure (a washer shaft on a dynamic balancing machine), in the three site languages.
+// Texts of the shafts-and-screws figure (a washer shaft on a dynamic balancing machine), in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -59,37 +59,6 @@ export const TEXT = {
       next: "next shaft",
       started: "Correction weight in plane {n}",
       balanced: "Shaft balanced, residual {r} %",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "每根轴<br>都做动平衡",
-    intro: "根据设备照片、技术参数和公开资料绘制的交互示意图。带螺栓固定桨叶护板的摩擦清洗机主轴放在动平衡机的滚轮支承上：支承中的传感器显示不平衡量，校正配重将其消除。",
-    loading: "正在加载示意图…",
-    title: "清洗机主轴 · 动平衡",
-    hint: "点击主轴",
-    controls: [
-      { key: "1", label: "平面1加配重", flash: "[data-hit]" },
-      { key: "2", label: "平面2加配重", flash: "[data-hit]" },
-    ],
-    idle: "测量 · 平面1 100% · 平面2 70%",
-    aria: "动平衡机上的主轴。按 1 或 2 在第一或第二校正平面加配重，按空格键或回车键在不平衡量较大的平面加配重。",
-    label: "动平衡机上的摩擦清洗机主轴：带导轨的床身、两个滚轮支承座、主轴皮带驱动、支承座上的振动传感器和百分表。主轴为钢管，焊有两排斜桨叶，每片桨叶用螺栓固定一块经热处理的钢护板，两端为端盘和淬硬的油封轴颈。皮带带动主轴旋转，百分表指针随不平衡摆动，在端盘上加装配重后摆动逐渐消失。",
-    keys: [
-      { mark: "lit", label: "下一块配重所在的校正平面" },
-      { mark: "raised", label: "带桨叶护板的主轴，油封轴颈硬度 45–50 HRC" },
-    ],
-    caption: "清洗机主轴在平衡机的滚轮支承上旋转，每个支承中的传感器测量两个平面（两端端盘处）上由不平衡引起的振动。在不平衡量较大的平面、重点的对侧加装校正配重，然后重复测量，直到剩余不平衡量进入允差。所有部件都要经过动平衡；油封轴颈淬硬至 45–50 HRC，桨叶护板采用热处理钢并以不锈钢紧固件固定。图中转速已放慢，不平衡量以初始值的百分比表示。",
-    live: {
-      measure: "测量 · 平面1 {a}% · 平面2 {b}%",
-      settle: "加速 · 测量中",
-      fit: "平面{n}加配重 · {d}°",
-      done: "剩余 {r}% · 合格",
-      next: "下一根轴",
-      started: "在平面 {n} 加校正配重",
-      balanced: "主轴已平衡，剩余 {r}%",
       decimal: ".",
     },
   },

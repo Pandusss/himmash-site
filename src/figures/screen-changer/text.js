@@ -1,4 +1,4 @@
-// Texts of the screen changer figure and its section, in the three site languages.
+// Texts of the screen changer figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -55,35 +55,6 @@ export const TEXT = {
       replace: "plate {n} · new screen going in",
       started: "Plate {n}: changing the screen",
       done: "Plate {n}: clean screen in the flow",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "不停机<br>换网",
-    intro: "根据设备照片和技术参数绘制的交互示意图。两块滑板轮流换网：一块移动时，熔体经另一块继续流动。",
-    loading: "正在加载示意图…",
-    title: "滑板换网器 · 换网过程",
-    hint: "点击滑板",
-    controls: [
-      { key: "1", label: "更换滤网：滑板 1", flash: "[data-plate=\"0\"]" },
-      { key: "2", label: "更换滤网：滑板 2", flash: "[data-plate=\"1\"]" },
-    ],
-    idle: "压力为设定值的 32%",
-    aria: "滑板换网器。按 1 或 2 更换第一或第二块滑板的滤网，按空格键更换较脏的一块。",
-    label: "移动平台上的滑板换网器：带进料法兰的机体、两块带 250 毫米网孔的滑板、立柱支撑的顶板和两个液压缸。熔体压力达到设定值时，液压缸在 2.5 秒内推动滑板：干净滤网进入流道，用过的滤网移出，熔体经另一块滑板继续流动。",
-    keys: [
-      { mark: "lit", label: "正在换网或下一个换网的滑板" },
-      { mark: "raised", label: "四个 250 毫米网孔：两个在流道中，两个装好干净滤网待用" },
-    ],
-    caption: "熔体分成两个流道，每个流道各有一块装滤网的滑板。滤网逐渐堵塞，压力随之升高；达到设定值时，液压缸在 2–3 秒内将滑板移动一个网孔。一块滑板移动时，熔体经另一块继续流动，因此挤出机无需停机。堵塞过程为加速演示，换网为实际速度。",
-    live: {
-      pressure: "压力为设定值的 {p}%",
-      change: "滑板 {n} · 换网 {t} 秒 · 熔体不断流",
-      replace: "滑板 {n} · 更换滤网",
-      started: "滑板 {n}：正在换网",
-      done: "滑板 {n}：干净滤网已进入流道",
       decimal: ".",
     },
   },

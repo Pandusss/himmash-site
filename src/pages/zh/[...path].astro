@@ -1,0 +1,27 @@
+---
+// The Chinese version was removed: old /zh/… links lead to the same page in English.
+import { localePath } from '../../i18n';
+import { products } from '../../data/products';
+import { getArticles, articleSlug } from '../../data/articles';
+
+export async function getStaticPaths() {
+  const pages = [
+    '', 'equipment', 'certificates', 'articles', 'privacy', 'consent',
+    ...products.map((product) => `equipment/${product.slug}`),
+    ...(await getArticles('en')).map((article) => `articles/${articleSlug(article)}`),
+  ];
+  return pages.map((page) => ({ params: { path: page || undefined } }));
+}
+const target = localePath('en', Astro.params.path ? `/${Astro.params.path}/` : '/');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Himmash</title>
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href={target}>
+    <meta http-equiv="refresh" content={`0; url=${target}`}>
+  </head>
+  <body><a href={target}>Himmash — English version</a></body>
+</html>

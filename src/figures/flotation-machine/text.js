@@ -1,4 +1,4 @@
-// Texts of the flotation machine figure and its section, in the three site languages.
+// Texts of the flotation machine figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -65,40 +65,6 @@ export const TEXT = {
       stopped: "Shafts stopped",
       portion: "A batch of feedstock dropped in",
       restart: "back on in {s} s",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "轻料上浮，<br>重物下沉",
-    intro: "根据照片、技术参数和公开资料绘制的交互示意图。两根带叶片的纵向轴在水槽中搅拌破碎料：聚乙烯和聚丙烯比水轻，沿水面漂向出口，泥沙和石块则沉到槽底。",
-    loading: "正在加载示意图…",
-    title: "浮选清洗机 · 清洗过程",
-    hint: "点击搅拌轴或排污阀",
-    controls: [
-      { key: "1", label: "加入一批物料" },
-      { key: "2", label: "转轴：停止 / 启动", flash: "[data-shaft]" },
-      { key: " ", label: "排放沉积物", flash: "[data-valve]" },
-    ],
-    idle: "进料 500 kg/h · 沉积 40%",
-    aria: "浮选清洗机。按 1 投入一批原料，按 2 停止或启动搅拌轴，按空格键打开排污阀。",
-    label: "机架上长约 5 米的浮选水槽，近侧槽壁已剖开。槽内有两根装有倾斜叶片的纵向轴；漂浮的塑料碎片沿水面移向溢流堰和出料槽，重颗粒沉入 V 形槽底。出料端外侧是两台搅拌轴减速电机、带气动执行器的排污阀和接污小车。",
-    keys: [
-      { mark: "lit", label: "带叶片的搅拌轴；排污时为排污阀" },
-      { mark: "raised", label: "PE、PP 碎片漂向溢流堰，泥沙和石块沉入 V 形槽底" },
-    ],
-    caption: "带污物的破碎料从进料槽落入水槽。两根纵向轴上的倾斜叶片对其搅拌，击落污物，并把漂浮的碎片推向出口溢流堰，再送往摩擦清洗机。比水重的颗粒下沉并聚集在 V 形槽底；沉积层增厚后，排污阀打开，污泥排入小车。沉积过程为加速演示。",
-    live: {
-      run: "进料 {q} kg/h · 沉积 {p}%",
-      drain: "正在排污 · {p}%",
-      idleStop: "搅拌轴已停 · 沉积 {p}%",
-      opened: "排污阀已打开",
-      closed: "排污阀已关闭",
-      started: "搅拌轴已启动",
-      stopped: "搅拌轴已停止",
-      portion: "已投入一批原料",
-      restart: "{s} 秒后恢复运行",
       decimal: ".",
     },
   },

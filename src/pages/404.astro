@@ -5,7 +5,6 @@ import { localePath, useTranslations } from '../i18n';
 // GitHub Pages serves this file for every missing URL, so it links to all languages.
 const t = useTranslations('ru');
 const en = useTranslations('en');
-const zh = useTranslations('zh');
 ---
 <Base lang="ru" path="/" title={t.notFound.metaTitle} description={t.notFound.text} alternates={['ru']} noindex>
   <section class="wrap not-found">
@@ -18,7 +17,6 @@ const zh = useTranslations('zh');
     </div>
     <p class="not-found-langs">
       <a href={localePath('en', '/')} lang="en">{en.notFound.home} — English</a>
-      <a href={localePath('zh', '/')} lang="zh-CN">{zh.notFound.home} — 中文</a>
     </p>
   </section>
 </Base>

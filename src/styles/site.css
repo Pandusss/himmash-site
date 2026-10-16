@@ -1,7 +1,4 @@
 /* Additions to the approved variant-1 styles (global.css): languages, new home sections, inner pages. */
-:lang(zh){--font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Segoe UI",sans-serif;--font-display:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",Arial,sans-serif}
-:lang(zh) h1,:lang(zh) h2,:lang(zh) h3{letter-spacing:0;line-height:1.22;font-weight:600}
-:lang(zh) .eyebrow{letter-spacing:.06em}
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .section-flush{padding-top:0}
 .steps-section{padding-top:0}

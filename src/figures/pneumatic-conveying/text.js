@@ -1,4 +1,4 @@
-// Texts of the pneumatic conveying figure and its section, in the three site languages.
+// Texts of the pneumatic conveying figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -71,43 +71,6 @@ export const TEXT = {
       pellets: "pellets",
       regrind: "regrind 5–30 mm",
       film: "film 50–100 mm",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "气流输送物料<br>无需人工转运",
-    intro: "根据设备照片、技术参数和公开资料绘制的交互示意图。接触式风机经叶轮从料斗吸取物料，再沿管道吹送到接料仓。",
-    loading: "正在加载示意图…",
-    title: "气力输送 · 输送过程",
-    hint: "点击风机",
-    controls: [
-      { key: "1", label: "颗粒" },
-      { key: "2", label: "破碎料" },
-      { key: "3", label: "薄膜" },
-      { key: " ", label: "风机：停止 / 启动", flash: "[data-pc=\"wheel\"]" },
-    ],
-    idle: "破碎料 5–30 毫米 · 输送距离最远 50 米",
-    aria: "气力输送。按空格键或回车键启动和停止风机；按 1、2、3 选择颗粒、破碎料或薄膜。点击料斗也可切换物料。",
-    label: "气力输送系统：安装在带可调支脚机架上的接触式风机，电机法兰安装，蜗壳开有剖切窗口以显示桨叶式叶轮，进料管上装有加料斗。管道从蜗壳向上引出，通往接料仓；接料仓带观察窗，顶部装布袋过滤器，底部装旋转阀，旋转阀将物料卸入料箱。管道上装有视镜。",
-    keys: [
-      { mark: "lit", label: "接触式风机叶轮：物料直接从叶轮中通过" },
-      { mark: "raised", label: "颗粒、5–30 毫米破碎料或 50–100 毫米薄膜；管径 110–160 毫米" },
-    ],
-    caption: "接触式风机从加料斗吸取物料，使其直接穿过带加强叶片的叶轮，再沿 5–50 米的管道吹送。在接料仓中气流减速：物料落下并经旋转阀排出，空气则通过布袋过滤器排出。示意图中管道已缩短，物料运动放慢约 20 倍；接料仓和旋转阀为示意画法。",
-    live: {
-      run: "{m} · 输送距离最远 50 米",
-      start: "{m} · 风机加速中",
-      stopping: "风机正在停止",
-      off: "风机停止 · {m}",
-      started: "风机已启动",
-      stopped: "风机已停止",
-      material: "物料：{m}",
-      restart: "{s} 秒后恢复运行",
-      pellets: "颗粒",
-      regrind: "破碎料 5–30 毫米",
-      film: "薄膜 50–100 毫米",
       decimal: ".",
     },
   },

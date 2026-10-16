@@ -1,4 +1,4 @@
-// Texts of the die plate and floating knives figure and its section, in the three site languages.
+// Texts of the die plate and floating knives figure and its section, in the site languages.
 export const TEXT = {
   ru: {
     fig: "Рис. 1",
@@ -65,40 +65,6 @@ export const TEXT = {
       stop: "Cutting stopped",
       start: "Cutting started",
       restart: "back on in {s} s",
-      decimal: ".",
-    },
-  },
-  zh: {
-    fig: "图 1",
-    eyebrow: "工作原理",
-    heading: "始终贴紧的<br>浮动切刀",
-    intro: "根据照片、技术参数和公开资料绘制的交互示意图。弹簧把浮动切刀压在模板上，即使刀刃磨损，切刀也始终贴紧模面。",
-    loading: "正在加载示意图…",
-    title: "模板与浮动切刀",
-    hint: "点击切刀",
-    controls: [
-      { key: "2", label: "演示磨损", flash: "[data-part=\"knives\"]" },
-      { key: "1", label: "换新刀", flash: "[data-part=\"knives\"]" },
-      { key: " ", label: "停止 / 启动", flash: "[data-part=\"hub\"]" },
-    ],
-    idle: "40 个 Ø3 mm 模孔 · 磨损 0%",
-    aria: "模板与浮动切刀。按 2 键或点击切刀可加速演示磨损，按 1 键换上新刀，空格键停止或重新开始切粒。",
-    label: "切粒组件特写：模板模面朝上，用螺钉固定在带加热圈的模头上，带硬化切削环和 40 个 3 毫米模孔；轴上装有双刀浮动切刀组件，包括刀座臂上的切刀、弹簧和滚花螺母。切刀旋转，在模孔处切断熔体料条；刀刃磨损时，弹簧推动刀座下移，切刀始终压在模板上。",
-    keys: [
-      { mark: "lit", label: "浮动切刀：弹簧使其始终贴在模面上，磨损后也是如此" },
-      { mark: "raised", label: "模板：硬度 48–54 HRC 的硬化环上有 40 个 3 毫米模孔" },
-    ],
-    caption: "熔体料条从模孔中挤出，以 15° 工作角安装的切刀贴着硬化模面滑过，把料条切成颗粒。刀座可沿轴自由移动：由滚花螺母预紧的弹簧把切刀压向模板，因此刀刃磨损后刀座随之下移，接触始终保持。模板以模面朝上的方式显示，磨损为加速并放大 2 倍显示，旋转已放慢。",
-    live: {
-      run: "40 个 Ø3 mm 模孔 · 磨损 {w}%",
-      wearing: "磨损 {w}% · 弹簧持续压紧切刀",
-      worn: "磨损 {w}% · 切刀需要更换",
-      stopped: "切粒已停止 · 磨损 {w}%",
-      wear: "切刀磨损（加速演示）",
-      replaced: "已换上新刀",
-      stop: "切粒已停止",
-      start: "切粒已开始",
-      restart: "{s} 秒后恢复运行",
       decimal: ".",
     },
   },

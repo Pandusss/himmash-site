@@ -39,7 +39,7 @@ for (const file of pages) {
     if (/^(https?:|mailto:|tel:|data:|#)/.test(url)) continue;
     if (!exists(url, file)) broken.set(`${rel} → ${url}`, true);
   }
-  if (/^\/(en|zh)\//.test(rel)) {
+  if (/^\/en\//.test(rel)) {
     const text = html
       .replace(/<script[\s\S]*?<\/script>/g, '')
       .replace(/<style[\s\S]*?<\/style>/g, '')
@@ -57,5 +57,5 @@ console.log(`pages: ${pages.length}`);
 console.log(`broken internal links: ${broken.size}`);
 for (const k of [...broken.keys()].slice(0, 30)) console.log('  ' + k);
 console.log(`pages without hreflang: ${missingHreflang}`);
-console.log(`Cyrillic snippets in /en/ and /zh/: ${cyrillic.size}`);
+console.log(`Cyrillic snippets in /en/: ${cyrillic.size}`);
 for (const [k, v] of [...cyrillic].sort((a, b) => b[1] - a[1]).slice(0, 40)) console.log(`  ${v}× ${k}`);
