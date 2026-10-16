@@ -299,82 +299,172 @@ document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((catalog) => {
 
 // Inquiry form
 const form = $<HTMLFormElement>('inquiry-form');
-const contactField = $<HTMLInputElement>('contact-value');
-const contactError = $('contact-error');
 const sendError = $('send-error');
-const consentCheck = $<HTMLInputElement>('consent-check');
-const consentError = $('consent-error');
-consentCheck?.addEventListener('change', () => {
-  consentError!.textContent = '';
-  consentCheck.removeAttribute('aria-invalid');
-});
+const fileInput = $<HTMLInputElement>('inquiry-files');
+const fileList = $('inquiry-file-list');
 const views = { form: $('form-view'), success: $('success-view'), mailto: $('mailto-view') };
+const MAX_FILES = 3;
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 function showView(name: keyof typeof views) {
   for (const [key, el] of Object.entries(views)) if (el) el.hidden = key !== name;
 }
-function openInquiry(subject: string) {
+/** Each checked field names its error box first in aria-describedby. */
+function errorBox(field: Element) {
+  const id = field.getAttribute('aria-describedby')?.split(' ')[0];
+  return id ? $(id) : null;
+}
+function clearError(field: Element) {
+  const box = errorBox(field);
+  if (!box) return;
+  box.textContent = '';
+  form?.querySelectorAll(`[aria-describedby^="${box.id}"]`).forEach((el) => el.removeAttribute('aria-invalid'));
+}
+function clearErrors() {
+  form?.querySelectorAll('.field-error:not(.send-error)').forEach((box) => { box.textContent = ''; });
+  form?.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+}
+form?.addEventListener('input', (event) => clearError(event.target as Element));
+form?.addEventListener('change', (event) => { if (event.target !== fileInput) clearError(event.target as Element); });
+// Choosing email as the way to be contacted makes the email field the one to fill.
+$('inquiry-channel')?.addEventListener('change', () => clearError($('inquiry-email')!));
+
+const formatSize = (bytes: number) => bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+const chosenFiles = () => [...(fileInput?.files ?? [])];
+const filesOk = () => chosenFiles().length <= MAX_FILES && chosenFiles().every((file) => file.size <= MAX_FILE_BYTES);
+function renderFiles() {
+  if (!fileInput || !fileList) return;
+  const files = chosenFiles();
+  fileList.hidden = !files.length;
+  fileList.querySelector('ul')!.replaceChildren(...files.map((file) => {
+    const li = document.createElement('li');
+    li.textContent = `${file.name} · ${formatSize(file.size)}`;
+    if (file.size > MAX_FILE_BYTES) li.dataset.tooBig = '';
+    return li;
+  }));
+  clearError(fileInput);
+  if (!filesOk()) {
+    errorBox(fileInput)!.textContent = JSON.parse(form!.dataset.errors!).files;
+    fileInput.setAttribute('aria-invalid', 'true');
+  }
+}
+fileInput?.addEventListener('change', renderFiles);
+$('inquiry-files-clear')?.addEventListener('click', () => { fileInput!.value = ''; renderFiles(); fileInput!.focus(); });
+
+function openInquiry(subject: string, need?: string) {
   if (!inquiry || !form) return;
   form.reset();
   $('inquiry-subject')!.textContent = subject;
   $<HTMLInputElement>('inquiry-subject-field')!.value = subject;
   $<HTMLInputElement>('inquiry-page-field')!.value = location.href;
-  contactError!.textContent = '';
-  contactField!.removeAttribute('aria-invalid');
-  consentError!.textContent = '';
-  consentCheck!.removeAttribute('aria-invalid');
+  // Product pages and section buttons suggest what the visitor most likely needs.
+  const suggested = need ? form.querySelector<HTMLInputElement>(`input[name=need][data-key="${need}"]`) : null;
+  if (suggested) suggested.checked = true;
+  clearErrors();
+  renderFiles();
   sendError!.hidden = true;
   showView('form');
   openDialog(inquiry);
+  inquiry.querySelector('.inquiry-main')?.scrollTo(0, 0);
+  inquiry.scrollTo(0, 0);
 }
 document.querySelectorAll<HTMLElement>('[data-inquiry]').forEach((b) =>
-  b.addEventListener('click', () => openInquiry(b.dataset.inquiry!)),
+  b.addEventListener('click', () => openInquiry(b.dataset.inquiry!, b.dataset.need)),
 );
-contactField?.addEventListener('input', () => {
-  contactError!.textContent = '';
-  contactField.removeAttribute('aria-invalid');
-});
 
-function isValidContact(value: string) {
-  const digits = value.replace(/\D/g, '');
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || (/^[+\d\s()\-]+$/.test(value) && digits.length >= 10 && digits.length <= 15);
+const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+function isPhone(value: string) {
+  const digits = value.replace(/\D/g, '').length;
+  return /^[+\d\s()\-.]+$/.test(value) && digits >= 10 && digits <= 15;
+}
+
+/** Marks every problem at once and returns the first field to fix. */
+function validate(): HTMLElement | null {
+  const errors = JSON.parse(form!.dataset.errors!);
+  let first: HTMLElement | null = null;
+  const fail = (field: HTMLElement, message: string) => {
+    errorBox(field)!.textContent = message;
+    field.setAttribute('aria-invalid', 'true');
+    first ??= field;
+  };
+  clearErrors();
+  const name = $<HTMLInputElement>('inquiry-name')!;
+  const phone = $<HTMLInputElement>('inquiry-phone')!;
+  const email = $<HTMLInputElement>('inquiry-email')!;
+  const channel = $<HTMLSelectElement>('inquiry-channel')!;
+  for (const input of [name, phone, email]) input.value = input.value.trim();
+  if (!name.value) fail(name, errors.name);
+  if (!phone.value) fail(phone, errors.phone);
+  else if (!isPhone(phone.value)) fail(phone, errors.phoneInvalid);
+  if (email.value && !isEmail(email.value)) fail(email, errors.email);
+  else if (!email.value && channel.selectedOptions[0]?.dataset.key === 'email') fail(email, errors.emailNeeded);
+  const needs = [...form!.querySelectorAll<HTMLInputElement>('input[name=need]')];
+  if (!needs.some((r) => r.checked)) {
+    fail(needs[0], errors.need);
+    needs.forEach((r) => r.setAttribute('aria-invalid', 'true'));
+  }
+  if (!filesOk()) fail(fileInput!, errors.files);
+  // Consent to personal data processing is a separate, unticked checkbox (152-FZ).
+  const consent = $<HTMLInputElement>('consent-check')!;
+  if (!consent.checked) fail(consent, errors.consent);
+  return first;
+}
+
+/** The request as plain text, for the mail app when there is no form endpoint. */
+function mailBody(data: FormData) {
+  const l = JSON.parse(form!.dataset.labels!);
+  const line = (label: string, value: string) => `${label}: ${value || '—'}`;
+  const get = (name: string) => String(data.get(name) ?? '').trim();
+  const files = chosenFiles().map((file) => file.name).join(', ');
+  return [
+    line(l.topic, get('subject')),
+    '',
+    `— ${l.contacts} —`,
+    line(l.name, get('name')),
+    line(l.company, get('company')),
+    line(l.phone, get('phone')),
+    line(l.email, get('email')),
+    line(l.city, get('city')),
+    line(l.channel, get('channel')),
+    '',
+    `— ${l.task} —`,
+    line(l.need, get('need')),
+    line(l.feedstock, data.getAll('feedstock[]').join(', ')),
+    line(l.volume, get('volume')),
+    line(l.timing, get('timing')),
+    line(l.message, get('message')),
+    ...(files ? [line(l.files, `${files} (${l.filesMail})`)] : []),
+    '',
+    `${form!.dataset.consentText}, ${get('consent_at')}`,
+    get('page'),
+  ].join('\n');
 }
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const value = contactField!.value.trim();
-  if (!isValidContact(value)) {
-    contactError!.textContent = value ? form.dataset.errorInvalid! : form.dataset.errorEmpty!;
-    contactField!.setAttribute('aria-invalid', 'true');
-    contactField!.focus();
-    return;
-  }
-  // Consent to personal data processing is a separate, unticked checkbox (152-FZ).
-  if (!consentCheck!.checked) {
-    consentError!.textContent = form.dataset.errorConsent!;
-    consentCheck!.setAttribute('aria-invalid', 'true');
-    consentCheck!.focus();
+  const invalid = validate();
+  if (invalid) {
+    invalid.focus();
+    (invalid.closest('.field') ?? invalid).scrollIntoView({ block: 'center', behavior: motionOK ? 'smooth' : 'auto' });
     return;
   }
   $<HTMLInputElement>('consent-at-field')!.value = new Date().toISOString();
   const data = new FormData(form);
   if (data.get('website')) return; // bot filled the honeypot
   data.delete('website');
+  if (!chosenFiles().length) data.delete('files[]');
   sendError!.hidden = true;
 
   const endpoint = form.dataset.endpoint;
   if (!endpoint) {
-    const labels = JSON.parse(form.dataset.labels!);
-    const subject = String(data.get('subject') ?? '');
-    const body = [
-      `${labels.name}: ${data.get('name') || '—'}`,
-      `${labels.contact}: ${data.get('contact')}`,
-      `${labels.message}: ${data.get('message') || '—'}`,
-      `${form.dataset.consentText}, ${data.get('consent_at')}`,
-      '',
-      String(data.get('page') ?? ''),
-    ].join('\n');
-    location.href = `mailto:${form.dataset.mailto}?subject=${encodeURIComponent(`${form.dataset.mailSubject}: ${subject}`)}&body=${encodeURIComponent(body)}`;
+    const subject = `${form.dataset.mailSubject}: ${data.get('subject') ?? ''}`;
+    location.href = `mailto:${form.dataset.mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody(data))}`;
+    const files = chosenFiles().map((file) => file.name).join(', ');
+    const reminder = $('mailto-files');
+    if (reminder) {
+      reminder.hidden = !files;
+      reminder.querySelector('b')!.textContent = files;
+    }
     showView('mailto');
     return;
   }

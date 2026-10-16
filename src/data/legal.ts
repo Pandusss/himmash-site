@@ -3,8 +3,8 @@ import type { Lang } from '../i18n';
 // DRAFT texts. The company replaces them with documents approved by its lawyer
 // and fills the bracketed fields. Bump CONSENT_VERSION whenever the consent text changes:
 // the version and date are sent with every request.
-export const CONSENT_VERSION = '1.0-draft';
-export const LEGAL_DATE = '2026-10-04';
+export const CONSENT_VERSION = '1.1-draft';
+export const LEGAL_DATE = '2026-10-17';
 
 export interface LegalSection { heading?: string; paragraphs?: string[]; bullets?: string[] }
 export interface LegalTexts { privacy: LegalSection[]; consent: LegalSection[] }
@@ -22,9 +22,10 @@ const ru: LegalTexts = {
       heading: '2. Какие данные мы обрабатываем',
       paragraphs: ['При отправке заявки через форму на сайте:'],
       bullets: [
-        'имя — если посетитель его указал;',
-        'номер телефона и (или) адрес электронной почты;',
-        'текст обращения;',
+        'имя и номер телефона;',
+        'если посетитель их указал: название компании, город или регион, адрес электронной почты, удобный способ связи;',
+        'сведения о задаче: какое оборудование требуется, вид сырья, объём переработки, сроки, текст комментария;',
+        'файлы, приложенные к заявке (фотографии сырья, техническое задание), — если посетитель их приложил;',
         'технические сведения о заявке: страница, с которой она отправлена, язык сайта, дата и время отправки, отметка о согласии на обработку данных и его версия.',
       ],
     },
@@ -99,7 +100,7 @@ const ru: LegalTexts = {
     },
     {
       heading: 'Персональные данные',
-      paragraphs: ['Имя (если указано), номер телефона и (или) адрес электронной почты, текст обращения.'],
+      paragraphs: ['Имя, номер телефона, а также — если указаны — название компании, город или регион, адрес электронной почты, удобный способ связи, сведения о задаче (требуемое оборудование, сырьё, объём переработки, сроки, комментарий) и приложенные файлы.'],
     },
     {
       heading: 'Цели обработки',
@@ -134,9 +135,10 @@ const en: LegalTexts = {
       heading: '2. Data we process',
       paragraphs: ['When a request is sent through the website form:'],
       bullets: [
-        'name, if provided;',
-        'phone number and/or email address;',
-        'the text of the request;',
+        'name and phone number;',
+        'if provided: company name, country or city, email address, preferred contact method;',
+        'details of the project: the equipment needed, feedstock, processing volume, timing, comments;',
+        'files attached to the request (feedstock photos, specifications), if any;',
         'technical details of the request: the page it was sent from, site language, date and time, and the consent mark with its version.',
       ],
     },
@@ -209,7 +211,7 @@ const en: LegalTexts = {
         'By sending a request on the химмаш24.рф website and ticking the consent box, I freely, of my own will and in my own interest, give [full legal name], INN [taxpayer ID], OGRN [registration number], address: [registered address with postcode] (the “Operator”) my consent to the processing of my personal data on the following terms.',
       ],
     },
-    { heading: 'Personal data', paragraphs: ['Name (if provided), phone number and/or email address, the text of the request.'] },
+    { heading: 'Personal data', paragraphs: ['Name, phone number and, if provided, company name, country or city, email address, preferred contact method, details of the project (equipment needed, feedstock, processing volume, timing, comments) and attached files.'] },
     { heading: 'Purposes', paragraphs: ['Replying to the request, equipment consultation, preparing a commercial proposal.'] },
     {
       heading: 'Processing',

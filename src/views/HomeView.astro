@@ -137,7 +137,7 @@ const faqJsonLd = {
         <div class="eyebrow">{h.modernization.eyebrow}</div>
         <h2 id="modernization-title" set:html={h.modernization.title} />
         <p>{h.modernization.text}</p>
-        <button class="btn light" type="button" data-inquiry={t.form.modernizationSubject}>{h.modernization.cta} <span class="arrow" aria-hidden="true">↗</span></button>
+        <button class="btn light" type="button" data-inquiry={t.form.modernizationSubject} data-need="modernization">{h.modernization.cta} <span class="arrow" aria-hidden="true">↗</span></button>
       </div>
       <img src={asset('img/products/02-02-1200x900.webp')} width="1200" height="900" loading="lazy" decoding="async" alt={h.modernization.imageAlt}>
     </div>

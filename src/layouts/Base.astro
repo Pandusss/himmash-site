@@ -5,6 +5,7 @@ import '../styles/refresh.css';
 import '../styles/theme.css';
 import '../styles/motion.css';
 import '../styles/mobile.css';
+import '../styles/inquiry.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import InquiryDialog from '../components/InquiryDialog.astro';
@@ -30,9 +31,11 @@ interface Props {
   noindex?: boolean;
   /** Subject for inquiries started from the mobile bar. */
   inquirySubject?: string;
+  /** Option preselected in the inquiry form's «what you need» (see form.needs). */
+  inquiryNeed?: string;
 }
 
-const { lang, path, title, description, image = 'img/og-cover.jpg', type = 'website', jsonLd = [], alternates = locales, noindex = false, inquirySubject } = Astro.props;
+const { lang, path, title, description, image = 'img/og-cover.jpg', type = 'website', jsonLd = [], alternates = locales, noindex = false, inquirySubject, inquiryNeed } = Astro.props;
 const t = useTranslations(lang);
 const absolute = (href: string) => new URL(href, Astro.site).href;
 const canonical = absolute(localePath(lang, path));
@@ -89,7 +92,7 @@ const previewBuild = import.meta.env.PUBLIC_NOINDEX === 'true';
     <slot />
   </main>
   <Footer lang={lang} path={path} alternates={alternates} />
-  <MobileBar lang={lang} subject={inquirySubject} />
+  <MobileBar lang={lang} subject={inquirySubject} need={inquiryNeed} />
   <InquiryDialog lang={lang} />
   <MediaDialog lang={lang} />
   <script>

@@ -26,6 +26,11 @@ const crumbs = [
   { name: p.equipment, href: localePath(lang, '/equipment/') },
   { name: text.short, href: localePath(lang, path) },
 ];
+// What a visitor on this page most likely needs: preselected in the inquiry form.
+const need = product.slug === 'granulation-lines' ? 'line'
+  : product.slug === 'water-treatment-t5000' ? 'water'
+  : ['screws-and-shafts', 'dies-and-knives', 'thrust-bearing-unit'].includes(product.slug) ? 'parts'
+  : 'unit';
 // Offer data comes from the Russian source text: prices are in roubles in every language.
 const ruPrice = productText(product.slug, 'ru').price ?? '';
 const priceValue = /\d/.test(ruPrice) ? ruPrice.replace(/[^\d]/g, '') : '';
@@ -57,7 +62,7 @@ const jumps = [
 let n = 0;
 const num = () => String(++n).padStart(2, '0');
 ---
-<Base lang={lang} path={path} title={`${text.name} — ${t.meta.brandShort}`} description={text.metaDescription} image={`img/${photos[0]}`} jsonLd={[breadcrumbJsonLd(crumbs, absolute), productJsonLd]} inquirySubject={text.name}>
+<Base lang={lang} path={path} title={`${text.name} — ${t.meta.brandShort}`} description={text.metaDescription} image={`img/${photos[0]}`} jsonLd={[breadcrumbJsonLd(crumbs, absolute), productJsonLd]} inquirySubject={text.name} inquiryNeed={need}>
   <div class="wrap">
     <Breadcrumbs label={t.nav.breadcrumbs} items={[crumbs[0], crumbs[1], { name: text.short }]} />
     <section class="product-hero" aria-labelledby="product-title">
@@ -99,7 +104,7 @@ const num = () => String(++n).padStart(2, '0');
             <p>{p.genericText}</p>
           </div>
         )}
-        <button class="btn full" id="product-inquiry" type="button" data-inquiry={text.name}>{p.inquiry} <span class="arrow" aria-hidden="true">↗</span></button>
+        <button class="btn full" id="product-inquiry" type="button" data-inquiry={text.name} data-need={need}>{p.inquiry} <span class="arrow" aria-hidden="true">↗</span></button>
         <p class="summary-note">{p.inquiryNote}</p>
       </div>
     </section>
@@ -130,7 +135,7 @@ const num = () => String(++n).padStart(2, '0');
           {!hasSpecs && (
             <>
               <p class="muted">{p.selectionText}</p>
-              <button class="btn secondary" type="button" data-inquiry={text.name}>{p.clarify} <span aria-hidden="true">↗</span></button>
+              <button class="btn secondary" type="button" data-inquiry={text.name} data-need={need}>{p.clarify} <span aria-hidden="true">↗</span></button>
             </>
           )}
         </div>
@@ -175,7 +180,7 @@ const num = () => String(++n).padStart(2, '0');
     <div class="wrap product-bar-inner">
       <img src={asset(`img/${product.image}`)} width="96" height="54" alt="" loading="lazy">
       <div class="product-bar-name"><b>{text.short}</b>{text.price && <span>{text.price}{text.priceNote && ` · ${text.priceNote}`}</span>}</div>
-      <button class="btn" type="button" data-inquiry={text.name}>{p.inquiry} <span class="arrow" aria-hidden="true">↗</span></button>
+      <button class="btn" type="button" data-inquiry={text.name} data-need={need}>{p.inquiry} <span class="arrow" aria-hidden="true">↗</span></button>
     </div>
   </div>
 </Base>

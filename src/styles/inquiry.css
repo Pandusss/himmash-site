@@ -1,0 +1,129 @@
+/* Inquiry form: a two-column card on wide screens (about the request on the left, the form on the right),
+   one column on tablets, a bottom sheet on phones. */
+.inquiry-dialog{width:min(1080px,calc(100% - 48px));max-height:calc(100dvh - 48px);border-radius:10px;overflow:hidden;background:var(--paper)}
+.inquiry-layout{display:flex;max-height:calc(100dvh - 48px)}
+.inquiry-aside{flex:0 0 352px;display:flex;flex-direction:column;gap:30px;padding:40px 34px 32px;background:var(--deep);color:var(--on-deep);overflow:auto}
+.inquiry-main{flex:1;min-width:0;overflow:auto;overscroll-behavior:contain;padding:40px 44px 34px}
+.inquiry-dialog .dialog-close{z-index:2;color:var(--ink);border-radius:50%}
+.inquiry-dialog .dialog-close:hover{background:var(--soft)}
+
+/* About the request */
+.inquiry-head .eyebrow{color:var(--lime);margin-bottom:18px}
+.inquiry-head h2{font-size:38px;margin-bottom:14px}
+.inquiry-intro{font-size:14px;line-height:1.55;color:color-mix(in srgb,var(--on-deep) 78%,transparent)}
+.inquiry-dialog .inquiry-subject{display:flex;flex-direction:column;gap:3px;margin:22px 0 0;padding:12px 14px;border:1px solid color-mix(in srgb,var(--on-deep) 22%,transparent);border-radius:6px;background:color-mix(in srgb,var(--on-deep) 6%,transparent);color:inherit;font-size:14px}
+.inquiry-subject span{font:10px/1.4 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+.inquiry-subject strong{font-weight:600;line-height:1.35}
+.inquiry-more{display:flex;flex-direction:column;gap:26px;flex:1}
+.inquiry-more-title{font:10px/1.4 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin-bottom:12px}
+.inquiry-steps{list-style:none;margin:0;padding:0;counter-reset:step}
+.inquiry-steps li{counter-increment:step;display:grid;grid-template-columns:30px 1fr;gap:2px 10px;padding:11px 0;border-top:1px solid color-mix(in srgb,var(--on-deep) 16%,transparent)}
+.inquiry-steps li::before{content:"0" counter(step);grid-row:1/3;font:12px/1.6 var(--font-mono);color:var(--lime)}
+.inquiry-steps b{font-size:14px;font-weight:600}
+.inquiry-steps span{font-size:13px;line-height:1.45;color:color-mix(in srgb,var(--on-deep) 72%,transparent)}
+.inquiry-direct{margin-top:auto;display:flex;flex-direction:column;align-items:flex-start}
+.inquiry-direct a{font-size:17px;font-weight:500;letter-spacing:-.01em;padding:3px 0;border-bottom:1px solid transparent}
+.inquiry-direct a:hover{border-color:currentColor}
+.inquiry-direct small{margin-top:8px;font-size:12px;color:color-mix(in srgb,var(--on-deep) 66%,transparent)}
+
+/* Form sections */
+.form-section{border:0;margin:0 0 8px;padding:0;min-width:0}
+.form-section>legend{display:flex;align-items:baseline;gap:12px;width:100%;padding:0 0 12px;margin-bottom:20px;border-bottom:1px solid var(--line);font:500 22px/1.2 var(--font-display);letter-spacing:-.025em}
+.form-section+.form-section>legend{margin-top:10px}
+.form-section-num{font:12px var(--font-mono);letter-spacing:.06em;color:var(--green)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.inquiry-form .field{margin-bottom:18px}
+.inquiry-form label,.inquiry-form .field-label,.chip-field>legend{display:block;font-size:13px;font-weight:600;margin-bottom:8px;padding:0}
+.inquiry-form .field-label small,.chip-field>legend small{font-weight:400;color:var(--muted);margin-left:5px}
+.req{color:var(--green);margin-left:3px;font-weight:700}
+.inquiry-form input,.inquiry-form textarea,.inquiry-form select{border-radius:6px}
+.inquiry-form textarea{min-height:96px}
+.inquiry-form input::placeholder,.inquiry-form textarea::placeholder{color:color-mix(in srgb,var(--muted) 80%,transparent)}
+
+/* Selects in the look of the text fields */
+.select{position:relative}
+.select select{appearance:none;-webkit-appearance:none;width:100%;min-height:48px;padding:12px 40px 12px 14px;border:1px solid var(--field-border);background:var(--field-bg);color:var(--ink);font-size:16px;cursor:pointer}
+.select select:focus{border-color:var(--green)}
+.select select:has(option[value=""]:checked){color:var(--muted)}
+.select::after{content:"";position:absolute;right:17px;top:50%;width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+
+/* Choice chips: one answer (radio) or several (checkbox) */
+.chip-field{border:0;margin:0;padding:0;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.inquiry-form .chip{position:relative;display:inline-flex;margin:0;font-weight:400}
+.inquiry-form .chip input{position:absolute;inset:0;width:100%;height:100%;min-height:0;margin:0;padding:0;opacity:0;cursor:pointer}
+.chip span{display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:9px 16px;border:1px solid var(--field-border);border-radius:30px;background:var(--field-bg);font-size:14px;line-height:1.3;transition:background-color .15s,border-color .15s,color .15s}
+.chip input:hover+span{border-color:var(--green)}
+.chip input:checked+span{background:var(--green);border-color:var(--green);color:var(--white)}
+.chip.multi span::before{content:"";width:13px;height:13px;flex:0 0 13px;border:1.5px solid var(--field-border);border-radius:3px;background:center/10px 10px no-repeat;transition:inherit}
+.chip.multi input:checked+span::before{border-color:var(--white);background-color:var(--white);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.3 4.8 8.8 9.8 3.4' fill='none' stroke='%23145445' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+:root[data-theme=dark] .chip.multi input:checked+span::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.3 4.8 8.8 9.8 3.4' fill='none' stroke='%237fcfa9' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.chip input:focus-visible+span{outline:3px solid #b27c25;outline-offset:2px}
+.chip input[aria-invalid=true]+span{border-color:var(--error)}
+
+/* Files: the whole area is the file input, so files can also be dropped onto it */
+.inquiry-form .file-drop{position:relative;display:flex;align-items:center;gap:14px;margin:0;padding:14px 16px;border:1.5px dashed var(--field-border);border-radius:8px;background:var(--field-bg);font-weight:400;cursor:pointer;transition:border-color .15s,background-color .15s}
+.file-drop:hover,.file-drop:focus-within{border-color:var(--green)}
+.inquiry-form .file-drop input{position:absolute;inset:0;width:100%;height:100%;min-height:0;padding:0;opacity:0;cursor:pointer}
+.file-drop input:focus-visible~.file-drop-icon{outline:3px solid #b27c25;outline-offset:2px}
+.file-drop-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border-radius:50%;background:var(--soft);color:var(--green);font-size:22px;line-height:1}
+.file-drop-text b{display:block;font-size:14px;font-weight:600;color:var(--green)}
+.inquiry-form .file-drop-text small{display:block;font-size:12px;color:var(--muted);margin:2px 0 0}
+.file-drop:has(input[aria-invalid=true]){border-color:var(--error)}
+.file-list{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;margin-top:10px;font-size:13px}
+.file-list ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;min-width:0}
+.file-list li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-list li::before{content:"📎 ";filter:grayscale(1)}
+.file-list li[data-too-big]{color:var(--error)}
+.file-clear{border:0;background:transparent;padding:6px 0;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.file-clear:hover{color:var(--error)}
+
+/* Consent and the button */
+.inquiry-form .consent-field{margin:6px 0 20px;padding-top:18px;border-top:1px solid var(--line)}
+.form-submit{display:flex;align-items:center;gap:22px}
+.form-submit .btn{flex:0 0 auto;min-width:240px}
+.form-submit .form-note{margin:0;max-width:44ch}
+.inquiry-main:has(>.success-view:not([hidden])){display:flex;align-items:center}
+.inquiry-main .success-view{max-width:520px;padding:30px 0}
+.inquiry-main .success-view h2{font-size:38px;margin-bottom:14px}
+.mailto-files{font-size:14px!important;color:var(--ink)!important;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:var(--soft)}
+
+/* Short laptop screens: the steps without their explanations, so the left column fits */
+@media(min-width:901px) and (max-height:860px){
+  .inquiry-aside{padding-top:32px;gap:24px}
+  .inquiry-head h2{font-size:34px}
+  .inquiry-steps li{padding:8px 0}
+  .inquiry-steps span{display:none}
+}
+/* Tablets: one column, the steps and direct contacts after the form */
+@media(max-width:900px){
+  .inquiry-dialog{width:min(680px,calc(100% - 32px));overflow:auto}
+  .inquiry-layout{display:flex;flex-direction:column;max-height:none}
+  .inquiry-aside{display:contents}
+  .inquiry-head{padding:36px 36px 6px;background:var(--paper);color:var(--ink)}
+  .inquiry-head .eyebrow{color:var(--green)}
+  .inquiry-intro{color:var(--muted)}
+  .inquiry-dialog .inquiry-subject{border-color:var(--line);background:var(--white)}
+  .inquiry-subject span{color:var(--muted);opacity:1}
+  .inquiry-main{overflow:visible;padding:24px 36px 30px}
+  .inquiry-more{order:3;margin:0 16px 16px;padding:24px 22px;border-radius:8px;background:var(--deep);color:var(--on-deep)}
+  .inquiry-direct{margin-top:0}
+}
+/* Phones: a bottom sheet */
+@media(max-width:650px){
+  .inquiry-dialog{width:100%;max-width:100%;margin:auto 0 0;border-radius:18px 18px 0 0;max-height:94dvh}
+  .inquiry-dialog::before{content:"";position:absolute;top:8px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:2px;background:var(--line)}
+  .inquiry-dialog .dialog-close{top:10px;right:8px}
+  .inquiry-head{padding:30px 20px 4px}
+  .inquiry-head h2{font-size:31px;padding-right:30px}
+  .inquiry-intro{font-size:13px}
+  .inquiry-dialog .inquiry-subject{margin-top:16px;padding:10px 12px;font-size:13px}
+  .inquiry-main{padding:22px 20px 24px}
+  .inquiry-more{margin:0 12px calc(16px + env(safe-area-inset-bottom));padding:20px 18px}
+  .field-grid{grid-template-columns:1fr}
+  .form-section>legend{font-size:20px;margin-bottom:16px}
+  .chip span{min-height:44px;padding:9px 14px;font-size:13px}
+  .form-submit{flex-direction:column;align-items:stretch;gap:12px}
+  .form-submit .btn{min-width:0;width:100%}
+  .inquiry-main .success-view h2{font-size:31px}
+}

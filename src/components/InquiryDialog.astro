@@ -1,84 +1,197 @@
 ---
 import { type Lang, localePath, useTranslations } from '../i18n';
-import { company } from '../data/company';
+import { company, hasMax, phoneDisplay } from '../data/company';
 import { CONSENT_VERSION } from '../data/legal';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const f = t.form;
 // Without PUBLIC_FORM_ENDPOINT the form prepares an email in the visitor's mail app.
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
+// MAX is offered on the Russian site only.
+const channels = f.channels.filter((c) => c.key !== 'max' || hasMax(lang));
+const labels = {
+  topic: f.mailTopic, contacts: f.sectionContacts, task: f.sectionTask,
+  name: f.name, company: f.company, phone: f.phone, email: f.email, city: f.city, channel: f.channel,
+  need: f.need, feedstock: f.feedstock, volume: f.volume, timing: f.timing, message: f.message, files: f.files, filesMail: f.filesMail,
+};
+const errors = {
+  name: f.errorName, phone: f.errorPhone, phoneInvalid: f.errorPhoneInvalid, email: f.errorEmail, emailNeeded: f.errorEmailNeeded,
+  need: f.errorNeed, files: f.errorFiles, consent: f.errorConsent,
+};
 ---
-<dialog id="inquiry-dialog" aria-labelledby="inquiry-title">
-  <button class="dialog-close" type="button" data-close="inquiry-dialog" aria-label={t.form.close}>×</button>
-  <div class="dialog-content">
-    <div id="form-view">
-      <div class="eyebrow">{t.form.eyebrow}</div>
-      <h2 id="inquiry-title" set:html={t.form.title} />
-      <p class="dialog-intro">{t.form.intro}</p>
-      <div class="inquiry-subject" id="inquiry-subject"></div>
-      <form
-        class="inquiry-form"
-        id="inquiry-form"
-        novalidate
-        data-endpoint={endpoint}
-        data-mailto={company.email}
-        data-mail-subject={t.form.mailSubject}
-        data-error-empty={t.form.errorEmpty}
-        data-error-invalid={t.form.errorInvalid}
-        data-error-consent={t.form.errorConsent}
-        data-consent-text={`${t.form.consentMail}: ${t.form.consentGiven} (${t.form.consentVersion} ${CONSENT_VERSION})`}
-        data-error-send={t.form.errorSend}
-        data-sending={t.form.sending}
-        data-labels={JSON.stringify({ name: t.form.name, contact: t.form.contact, message: t.form.message })}
-      >
-        {accessKey && <input type="hidden" name="access_key" value={accessKey}>}
-        <input type="hidden" name="subject" id="inquiry-subject-field">
-        <input type="hidden" name="page" id="inquiry-page-field">
-        <input type="hidden" name="lang" value={lang}>
-        <input type="hidden" name="consent_version" value={CONSENT_VERSION}>
-        <input type="hidden" name="consent_at" id="consent-at-field">
-        <div class="hp-field" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
-        <div class="field">
-          <label for="contact-name">{t.form.name} <small>{t.form.optional}</small></label>
-          <input id="contact-name" name="name" autocomplete="name" placeholder={t.form.namePlaceholder}>
+<dialog id="inquiry-dialog" class="inquiry-dialog" aria-labelledby="inquiry-title">
+  <button class="dialog-close" type="button" data-close="inquiry-dialog" aria-label={f.close}>×</button>
+  <div class="inquiry-layout">
+    <div class="inquiry-aside">
+      <div class="inquiry-head">
+        <div class="eyebrow">{f.eyebrow}</div>
+        <h2 id="inquiry-title" set:html={f.title} />
+        <p class="inquiry-intro">{f.intro}</p>
+        <div class="inquiry-subject"><span>{f.subjectLabel}</span><strong id="inquiry-subject"></strong></div>
+      </div>
+      <div class="inquiry-more">
+        <div>
+          <p class="inquiry-more-title">{f.stepsTitle}</p>
+          <ol class="inquiry-steps">
+            {f.steps.map((s) => <li><b>{s.title}</b><span>{s.text}</span></li>)}
+          </ol>
         </div>
-        <div class="field">
-          <label for="contact-value">{t.form.contact}</label>
-          <input id="contact-value" name="contact" autocomplete="off" required placeholder={t.form.contactPlaceholder} aria-describedby="contact-error">
-          <p id="contact-error" class="field-error" role="alert"></p>
+        <div class="inquiry-direct">
+          <p class="inquiry-more-title">{f.directTitle}</p>
+          <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
+          <a href={`mailto:${company.email}`}>{company.email}</a>
+          {hasMax(lang) && <a href={company.max} target="_blank" rel="noopener">MAX</a>}
+          <small>{f.hours}</small>
         </div>
-        <div class="field">
-          <label for="contact-message">{t.form.message} <small>{t.form.optional}</small></label>
-          <textarea id="contact-message" name="message" rows="3" placeholder={t.form.messagePlaceholder}></textarea>
-        </div>
-        <div class="field consent-field">
-          <label class="consent-label">
-            <input type="checkbox" id="consent-check" name="consent" value="yes" required aria-describedby="consent-error">
-            <span>{t.form.consentPrefix}<a href={localePath(lang, '/consent/')} target="_blank" rel="noopener">{t.form.consentLink}</a></span>
-          </label>
-          <p id="consent-error" class="field-error" role="alert"></p>
-        </div>
-        <button class="btn full" type="submit"><span class="btn-label">{t.form.submit}</span> <span class="arrow" aria-hidden="true">↗</span></button>
-        <p class="form-note">{t.form.note} <a href={localePath(lang, '/privacy/')} target="_blank" rel="noopener">{t.form.policyLink}</a></p>
-        <p class="field-error send-error" id="send-error" role="alert" hidden>{t.form.errorSend} <a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a> · <a href={`mailto:${company.email}`}>{company.email}</a></p>
-      </form>
+      </div>
     </div>
-    <div id="success-view" class="success-view" role="status" hidden>
-      <div class="success-symbol" aria-hidden="true">✓</div>
-      <div class="eyebrow">{t.form.successEyebrow}</div>
-      <h2 set:html={t.form.successTitle} />
-      <p>{t.form.successText}</p>
-      <button class="btn full" type="button" data-close="inquiry-dialog">{t.form.back} <span aria-hidden="true">↗</span></button>
-    </div>
-    <div id="mailto-view" class="success-view" role="status" hidden>
-      <div class="success-symbol" aria-hidden="true">✉</div>
-      <div class="eyebrow">{t.form.mailtoEyebrow}</div>
-      <h2 set:html={t.form.mailtoTitle} />
-      <p>{t.form.mailtoText}</p>
-      <p class="mailto-contacts"><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a></p>
-      <button class="btn full" type="button" data-close="inquiry-dialog">{t.form.back} <span aria-hidden="true">↗</span></button>
+
+    <div class="inquiry-main">
+      <div id="form-view">
+        <form
+          class="inquiry-form"
+          id="inquiry-form"
+          novalidate
+          data-endpoint={endpoint}
+          data-mailto={company.email}
+          data-mail-subject={f.mailSubject}
+          data-errors={JSON.stringify(errors)}
+          data-consent-text={`${f.consentMail}: ${f.consentGiven} (${f.consentVersion} ${CONSENT_VERSION})`}
+          data-sending={f.sending}
+          data-labels={JSON.stringify(labels)}
+        >
+          {accessKey && <input type="hidden" name="access_key" value={accessKey}>}
+          <input type="hidden" name="subject" id="inquiry-subject-field">
+          <input type="hidden" name="page" id="inquiry-page-field">
+          <input type="hidden" name="lang" value={lang}>
+          <input type="hidden" name="consent_version" value={CONSENT_VERSION}>
+          <input type="hidden" name="consent_at" id="consent-at-field">
+          <div class="hp-field" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+          <fieldset class="form-section">
+            <legend><span class="form-section-num">01</span>{f.sectionContacts}</legend>
+            <div class="field-grid">
+              <div class="field">
+                <label for="inquiry-name">{f.name}<span class="req" aria-hidden="true">*</span></label>
+                <input id="inquiry-name" name="name" autocomplete="name" required placeholder={f.namePlaceholder} aria-describedby="name-error">
+                <p id="name-error" class="field-error" role="alert"></p>
+              </div>
+              <div class="field">
+                <label for="inquiry-company">{f.company} <small>{f.optional}</small></label>
+                <input id="inquiry-company" name="company" autocomplete="organization" placeholder={f.companyPlaceholder}>
+              </div>
+              <div class="field">
+                <label for="inquiry-phone">{f.phone}<span class="req" aria-hidden="true">*</span></label>
+                <input id="inquiry-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder={f.phonePlaceholder} aria-describedby="phone-error">
+                <p id="phone-error" class="field-error" role="alert"></p>
+              </div>
+              <div class="field">
+                <label for="inquiry-email">{f.email} <small>{f.optional}</small></label>
+                <input id="inquiry-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder={f.emailPlaceholder} aria-describedby="email-error">
+                <p id="email-error" class="field-error" role="alert"></p>
+              </div>
+              <div class="field">
+                <label for="inquiry-city">{f.city} <small>{f.optional}</small></label>
+                <input id="inquiry-city" name="city" autocomplete="address-level2" placeholder={f.cityPlaceholder}>
+              </div>
+              <div class="field">
+                <label for="inquiry-channel">{f.channel}</label>
+                <div class="select">
+                  <select id="inquiry-channel" name="channel">
+                    {channels.map((c) => <option value={c.label} data-key={c.key}>{c.label}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend><span class="form-section-num">02</span>{f.sectionTask}</legend>
+            <fieldset class="field chip-field" id="need-field">
+              <legend>{f.need}<span class="req" aria-hidden="true">*</span></legend>
+              <div class="chips">
+                {f.needs.map((n) => <label class="chip"><input type="radio" name="need" value={n.label} data-key={n.key} required aria-describedby="need-error"><span>{n.label}</span></label>)}
+              </div>
+              <p id="need-error" class="field-error" role="alert"></p>
+            </fieldset>
+            <fieldset class="field chip-field">
+              <legend>{f.feedstock} <small>{f.feedstockHint}</small></legend>
+              <div class="chips">
+                {f.feedstocks.map((s) => <label class="chip multi"><input type="checkbox" name="feedstock[]" value={s}><span>{s}</span></label>)}
+              </div>
+            </fieldset>
+            <div class="field-grid">
+              <div class="field">
+                <label for="inquiry-volume">{f.volume} <small>{f.optional}</small></label>
+                <div class="select">
+                  <select id="inquiry-volume" name="volume">
+                    <option value="">{f.choose}</option>
+                    {f.volumes.map((v) => <option>{v}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="inquiry-timing">{f.timing} <small>{f.optional}</small></label>
+                <div class="select">
+                  <select id="inquiry-timing" name="timing">
+                    <option value="">{f.choose}</option>
+                    {f.timings.map((v) => <option>{v}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="inquiry-message">{f.message} <small>{f.optional}</small></label>
+              <textarea id="inquiry-message" name="message" rows="3" placeholder={f.messagePlaceholder}></textarea>
+            </div>
+            <div class="field">
+              <span class="field-label" id="files-label">{f.files} <small>{f.optional}</small></span>
+              <label class="file-drop">
+                <input type="file" id="inquiry-files" name="files[]" multiple accept=".jpg,.jpeg,.png,.webp,.heic,.pdf,.doc,.docx,.xls,.xlsx" aria-labelledby="files-label" aria-describedby="files-error files-hint">
+                <span class="file-drop-icon" aria-hidden="true">+</span>
+                <span class="file-drop-text"><b>{f.filesButton}</b><small id="files-hint">{f.filesHint}</small></span>
+              </label>
+              <div class="file-list" id="inquiry-file-list" hidden>
+                <ul></ul>
+                <button type="button" class="file-clear" id="inquiry-files-clear">{f.filesClear}</button>
+              </div>
+              <p id="files-error" class="field-error" role="alert"></p>
+            </div>
+          </fieldset>
+
+          <div class="field consent-field">
+            <label class="consent-label">
+              <input type="checkbox" id="consent-check" name="consent" value="yes" required aria-describedby="consent-error">
+              <span>{f.consentPrefix}<a href={localePath(lang, '/consent/')} target="_blank" rel="noopener">{f.consentLink}</a><span class="req" aria-hidden="true">*</span></span>
+            </label>
+            <p id="consent-error" class="field-error" role="alert"></p>
+          </div>
+          <div class="form-submit">
+            <button class="btn" type="submit"><span class="btn-label">{f.submit}</span> <span class="arrow" aria-hidden="true">↗</span></button>
+            <p class="form-note">{f.requiredNote} {f.note} <a href={localePath(lang, '/privacy/')} target="_blank" rel="noopener">{f.policyLink}</a></p>
+          </div>
+          <p class="field-error send-error" id="send-error" role="alert" hidden>{f.errorSend} <a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a> · <a href={`mailto:${company.email}`}>{company.email}</a></p>
+        </form>
+      </div>
+      <div id="success-view" class="success-view" role="status" hidden>
+        <div class="success-symbol" aria-hidden="true">✓</div>
+        <div class="eyebrow">{f.successEyebrow}</div>
+        <h2 set:html={f.successTitle} />
+        <p>{f.successText}</p>
+        <button class="btn" type="button" data-close="inquiry-dialog">{f.back} <span aria-hidden="true">↗</span></button>
+      </div>
+      <div id="mailto-view" class="success-view" role="status" hidden>
+        <div class="success-symbol" aria-hidden="true">✉</div>
+        <div class="eyebrow">{f.mailtoEyebrow}</div>
+        <h2 set:html={f.mailtoTitle} />
+        <p>{f.mailtoText}</p>
+        <p class="mailto-files" id="mailto-files" hidden>{f.mailtoFiles} <b></b></p>
+        <p class="mailto-contacts"><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a></p>
+        <button class="btn" type="button" data-close="inquiry-dialog">{f.back} <span aria-hidden="true">↗</span></button>
+      </div>
     </div>
   </div>
 </dialog>
