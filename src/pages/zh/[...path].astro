@@ -1,6 +1,6 @@
 ---
 // The Chinese version was removed: old /zh/… links lead to the same page in English.
-import { localePath } from '../../i18n';
+import { localePath, asset } from '../../i18n';
 import { products } from '../../data/products';
 import { getArticles, articleSlug } from '../../data/articles';
 
@@ -20,6 +20,7 @@ const target = localePath('en', Astro.params.path ? `/${Astro.params.path}/` : '
     <meta charset="utf-8">
     <title>Himmash</title>
     <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" sizes="32x32" href={asset('favicon-32.png')}>
     <link rel="canonical" href={target}>
     <meta http-equiv="refresh" content={`0; url=${target}`}>
   </head>
