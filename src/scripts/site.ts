@@ -326,8 +326,6 @@ function clearErrors() {
 }
 form?.addEventListener('input', (event) => clearError(event.target as Element));
 form?.addEventListener('change', (event) => { if (event.target !== fileInput) clearError(event.target as Element); });
-// Choosing email as the way to be contacted makes the email field the one to fill.
-$('inquiry-channel')?.addEventListener('change', () => clearError($('inquiry-email')!));
 
 const formatSize = (bytes: number) => bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 const chosenFiles = () => [...(fileInput?.files ?? [])];
@@ -391,13 +389,11 @@ function validate(): HTMLElement | null {
   const name = $<HTMLInputElement>('inquiry-name')!;
   const phone = $<HTMLInputElement>('inquiry-phone')!;
   const email = $<HTMLInputElement>('inquiry-email')!;
-  const channel = $<HTMLSelectElement>('inquiry-channel')!;
   for (const input of [name, phone, email]) input.value = input.value.trim();
   if (!name.value) fail(name, errors.name);
   if (!phone.value) fail(phone, errors.phone);
   else if (!isPhone(phone.value)) fail(phone, errors.phoneInvalid);
   if (email.value && !isEmail(email.value)) fail(email, errors.email);
-  else if (!email.value && channel.selectedOptions[0]?.dataset.key === 'email') fail(email, errors.emailNeeded);
   const needs = [...form!.querySelectorAll<HTMLInputElement>('input[name=need]')];
   if (!needs.some((r) => r.checked)) {
     fail(needs[0], errors.need);
@@ -424,14 +420,11 @@ function mailBody(data: FormData) {
     line(l.company, get('company')),
     line(l.phone, get('phone')),
     line(l.email, get('email')),
-    line(l.city, get('city')),
-    line(l.channel, get('channel')),
     '',
     `— ${l.task} —`,
     line(l.need, get('need')),
-    line(l.feedstock, data.getAll('feedstock[]').join(', ')),
+    line(l.feedstock, get('feedstock')),
     line(l.volume, get('volume')),
-    line(l.timing, get('timing')),
     line(l.message, get('message')),
     ...(files ? [line(l.files, `${files} (${l.filesMail})`)] : []),
     '',
