@@ -32,7 +32,9 @@ jobs:
           # Own domain: SITE_URL=https://xn--24-6kc5aua4d2a.xn--p1ai, BASE_PATH=/
           SITE_URL: ${{ vars.SITE_URL }}
           BASE_PATH: ${{ vars.BASE_PATH }}
-          PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+          # The preview has no PHP: its form posts to the handler on the hosting, e.g.
+          # https://himmash24.com/api/send-form.php (add the preview's origin to FORM_ORIGINS).
+          PUBLIC_FORM_ENDPOINT: ${{ vars.PREVIEW_FORM_ENDPOINT }}
           PUBLIC_FORM_ACCESS_KEY: ${{ vars.PUBLIC_FORM_ACCESS_KEY }}
           # "true" on preview deployments: noindex on every page and Disallow in robots.txt.
           PUBLIC_NOINDEX: ${{ vars.PUBLIC_NOINDEX }}
