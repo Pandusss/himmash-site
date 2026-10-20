@@ -4,7 +4,7 @@ const en: UI = {
   meta: {
     siteName: 'NPO Himmash',
     brandShort: 'Himmash',
-    homeTitle: 'Plastic Recycling Equipment and Pelletizing Lines — Himmash',
+    homeTitle: 'Himmash — plastic recycling equipment and pelletizing lines',
     homeDescription:
       'NPO Himmash, Taganrog: we design and build plastic recycling equipment. Turnkey pelletizing lines, washers, centrifuges, components and upgrades of existing lines.',
   },
