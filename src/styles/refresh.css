@@ -265,3 +265,19 @@ h3{letter-spacing:-.03em}
 
 /* Gallery photos carry width/height for layout stability; let the aspect-ratio set the height, not the attribute. */
 .gallery-main img,.thumb img{height:auto}
+
+/* Cookie notice: a card in the corner; on phones above the bottom bar */
+.cookie-notice{position:fixed;left:24px;bottom:24px;z-index:45;width:min(420px,calc(100% - 48px));padding:18px 20px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);box-shadow:0 14px 50px #10291c26;font-size:13px;line-height:1.5}
+.cookie-notice p{margin-bottom:14px}
+.cookie-notice a{color:var(--green);text-decoration:underline;text-underline-offset:2px}
+.cookie-actions{display:flex;gap:10px}
+.cookie-actions .btn{flex:1;min-height:42px;padding:9px 14px;gap:0;font-size:13px}
+.footer-cookie{border:0;background:transparent;padding:0;color:inherit;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+@media(max-width:650px){
+  .cookie-notice{left:10px;right:10px;width:auto;bottom:calc(72px + env(safe-area-inset-bottom));padding:14px 16px}
+  .footer-cookie{min-height:44px}
+}
+@media(prefers-reduced-motion:no-preference){.cookie-notice:not([hidden]){animation:cookie-in .4s cubic-bezier(.2,.7,.2,1) .8s both}}
+@keyframes cookie-in{from{opacity:0;transform:translateY(12px)}}
+
+html.menu-open .cookie-notice{display:none}

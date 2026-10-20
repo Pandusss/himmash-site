@@ -1,3 +1,5 @@
+import { track } from './analytics';
+
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T | null;
 const motionOK = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 /** Soft fade-in for content that changes in place (filters, galleries). */
@@ -363,6 +365,7 @@ function openInquiry(subject: string, need?: string) {
   sendError!.hidden = true;
   showView('form');
   openDialog(inquiry);
+  track('inquiry_open');
   inquiry.querySelector('.inquiry-main')?.scrollTo(0, 0);
   inquiry.scrollTo(0, 0);
 }
@@ -459,6 +462,7 @@ form?.addEventListener('submit', async (event) => {
       reminder.querySelector('b')!.textContent = files;
     }
     showView('mailto');
+    track('inquiry_sent');
     return;
   }
 
@@ -471,6 +475,7 @@ form?.addEventListener('submit', async (event) => {
     const response = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
     if (!response.ok) throw new Error(String(response.status));
     showView('success');
+    track('inquiry_sent');
     views.success?.querySelector('button')?.focus();
   } catch {
     sendError!.hidden = false;

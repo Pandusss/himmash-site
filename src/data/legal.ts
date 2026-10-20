@@ -6,7 +6,9 @@ import type { Lang } from '../i18n';
 export const CONSENT_VERSION = '1.2-draft';
 export const LEGAL_DATE = '2026-10-17';
 
-export interface LegalSection { heading?: string; paragraphs?: string[]; bullets?: string[] }
+// `analytics: true` sections appear only on a site with a web analytics counter (see src/data/analytics.ts),
+// `analytics: false` ones only on a site without it.
+export interface LegalSection { heading?: string; paragraphs?: string[]; bullets?: string[]; analytics?: boolean }
 export interface LegalTexts { privacy: LegalSection[]; consent: LegalSection[] }
 
 const ru: LegalTexts = {
@@ -30,9 +32,24 @@ const ru: LegalTexts = {
       ],
     },
     {
-      paragraphs: [
-        'Специальные категории персональных данных и биометрические данные не обрабатываются. Сервисы веб-аналитики и cookie для отслеживания посещений на сайте не используются; при их подключении Политика будет дополнена.',
+      paragraphs: ['Специальные категории персональных данных и биометрические данные не обрабатываются.'],
+    },
+    {
+      analytics: false,
+      paragraphs: ['Сервисы веб-аналитики и cookie для отслеживания посещений на сайте не используются; при их подключении Политика будет дополнена.'],
+    },
+    {
+      analytics: true,
+      paragraphs: ['Если посетитель согласился на cookie в уведомлении на сайте, сервис веб-аналитики Яндекс Метрика (ООО «ЯНДЕКС», Россия) собирает сведения о посещении:'],
+      bullets: [
+        'файлы cookie и идентификатор браузера;',
+        'IP-адрес, сведения о браузере, устройстве и операционной системе, примерное местоположение;',
+        'просмотренные страницы, источник перехода, время на сайте, нажатия на ссылки и кнопки.',
       ],
+    },
+    {
+      analytics: true,
+      paragraphs: ['Запись действий на странице (Вебвизор) отключена, содержимое полей формы не собирается. Отказаться от cookie веб-аналитики можно в уведомлении о cookie или по ссылке «Настройки cookie» внизу страницы; на работу сайта это не влияет.'],
     },
     {
       heading: '3. Цели обработки',
@@ -44,18 +61,33 @@ const ru: LegalTexts = {
       ],
     },
     {
+      analytics: true,
+      paragraphs: ['С согласия посетителя на cookie — также анализ посещаемости и улучшение сайта.'],
+    },
+    {
       heading: '4. Правовые основания',
       paragraphs: [
         'Согласие субъекта персональных данных (п. 1 ч. 1 ст. 6 Закона № 152-ФЗ), которое оформляется отдельно при отправке заявки, а также действия по заключению договора по инициативе субъекта (п. 5 ч. 1 ст. 6 Закона № 152-ФЗ).',
       ],
     },
     {
+      analytics: true,
+      paragraphs: ['Для cookie веб-аналитики — согласие посетителя, которое он даёт в уведомлении о cookie на сайте.'],
+    },
+    {
       heading: '5. Порядок и условия обработки',
       paragraphs: [
         'Оператор осуществляет сбор, запись, систематизацию, накопление, хранение, уточнение, использование, удаление и уничтожение персональных данных с использованием средств автоматизации и без них.',
         'Запись, систематизация, накопление и хранение персональных данных граждан Российской Федерации осуществляются с использованием баз данных, находящихся на территории Российской Федерации (ч. 5 ст. 18 Закона № 152-ФЗ).',
-        'Оператор не передаёт персональные данные третьим лицам, за исключением случаев, предусмотренных законодательством Российской Федерации. Трансграничная передача персональных данных не осуществляется.',
       ],
+    },
+    {
+      analytics: false,
+      paragraphs: ['Оператор не передаёт персональные данные третьим лицам, за исключением случаев, предусмотренных законодательством Российской Федерации. Трансграничная передача персональных данных не осуществляется.'],
+    },
+    {
+      analytics: true,
+      paragraphs: ['Оператор не передаёт персональные данные третьим лицам, за исключением случаев, предусмотренных законодательством Российской Федерации, и сведений Яндекс Метрики, которые по поручению Оператора обрабатывает ООО «ЯНДЕКС» на серверах в России. Трансграничная передача персональных данных не осуществляется.'],
     },
     {
       heading: '6. Сроки обработки',
@@ -143,9 +175,24 @@ const en: LegalTexts = {
       ],
     },
     {
-      paragraphs: [
-        'No special categories of personal data or biometric data are processed. The site uses no web analytics or tracking cookies; if they are added, this policy will be updated.',
+      paragraphs: ['No special categories of personal data or biometric data are processed.'],
+    },
+    {
+      analytics: false,
+      paragraphs: ['The site uses no web analytics or tracking cookies; if they are added, this policy will be updated.'],
+    },
+    {
+      analytics: true,
+      paragraphs: ['If the visitor accepts cookies in the notice on the site, the Google Analytics web analytics service (Google LLC, USA) collects data about the visit:'],
+      bullets: [
+        'cookies and browser identifiers;',
+        'IP address, browser, device and operating system details, approximate location;',
+        'pages viewed, referral source, time on site, clicks on links and buttons.',
       ],
+    },
+    {
+      analytics: true,
+      paragraphs: ['The contents of form fields are not collected. Analytics cookies can be declined in the cookie notice or via “Cookie settings” at the bottom of the page; the site works without them.'],
     },
     {
       heading: '3. Purposes',
@@ -157,18 +204,33 @@ const en: LegalTexts = {
       ],
     },
     {
+      analytics: true,
+      paragraphs: ['With the visitor’s consent to cookies, also analysing traffic and improving the site.'],
+    },
+    {
       heading: '4. Legal grounds',
       paragraphs: [
         'The data subject’s consent (Art. 6(1)(1) of Law No. 152-FZ), given separately when sending a request, and steps towards concluding a contract at the data subject’s initiative (Art. 6(1)(5)).',
       ],
     },
     {
+      analytics: true,
+      paragraphs: ['For analytics cookies, the visitor’s consent given in the cookie notice on the site.'],
+    },
+    {
       heading: '5. How data are processed',
       paragraphs: [
         'The Operator collects, records, organises, accumulates, stores, updates, uses, deletes and destroys personal data, with and without automated means.',
         'Personal data of Russian citizens are recorded, organised, accumulated and stored in databases located in the Russian Federation (Art. 18(5) of Law No. 152-FZ).',
-        'The Operator does not disclose personal data to third parties except as required by Russian law. Personal data are not transferred across borders.',
       ],
+    },
+    {
+      analytics: false,
+      paragraphs: ['The Operator does not disclose personal data to third parties except as required by Russian law. Personal data are not transferred across borders.'],
+    },
+    {
+      analytics: true,
+      paragraphs: ['The Operator does not disclose personal data to third parties except as required by Russian law. Data collected by Google Analytics with the visitor’s consent are processed by Google LLC on servers outside Russia, which is a cross-border transfer of personal data [the Operator has notified Roskomnadzor of it under Art. 12 of Law No. 152-FZ].'],
     },
     {
       heading: '6. Retention',

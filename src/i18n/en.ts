@@ -364,6 +364,14 @@ const en: UI = {
     privacy: 'Privacy policy',
     consent: 'Data processing consent',
   },
+  cookies: {
+    label: 'Cookie notice',
+    text: 'We use cookies and Google Analytics to understand how visitors use the site. The counter stays off unless you agree.',
+    policy: 'See the privacy policy',
+    accept: 'Accept',
+    decline: 'Decline',
+    settings: 'Cookie settings',
+  },
   legal: {
     privacyTitle: 'Personal data processing policy',
     consentTitle: 'Consent to personal data processing',

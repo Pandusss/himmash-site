@@ -11,6 +11,7 @@ import Footer from '../components/Footer.astro';
 import InquiryDialog from '../components/InquiryDialog.astro';
 import MediaDialog from '../components/MediaDialog.astro';
 import MobileBar from '../components/MobileBar.astro';
+import CookieNotice from '../components/CookieNotice.astro';
 import '@fontsource-variable/golos-text';
 import { type Lang, locales, langMeta, localePath, asset, useTranslations } from '../i18n';
 import { organizationJsonLd } from '../data/company';
@@ -62,6 +63,9 @@ const previewBuild = import.meta.env.PUBLIC_NOINDEX === 'true';
   <title>{title}</title>
   <meta name="description" content={description}>
   {previewBuild && <meta name="robots" content="noindex, nofollow">}
+  {/* Site ownership for Yandex Webmaster and Google Search Console. */}
+  {import.meta.env.PUBLIC_YANDEX_VERIFICATION && <meta name="yandex-verification" content={import.meta.env.PUBLIC_YANDEX_VERIFICATION}>}
+  {import.meta.env.PUBLIC_GOOGLE_VERIFICATION && <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_VERIFICATION}>}
   {noindex ? <meta name="robots" content="noindex"> : (
     <>
       <link rel="canonical" href={canonical}>
@@ -96,6 +100,7 @@ const previewBuild = import.meta.env.PUBLIC_NOINDEX === 'true';
   <MobileBar lang={lang} subject={inquirySubject} need={inquiryNeed} />
   <InquiryDialog lang={lang} />
   <MediaDialog lang={lang} />
+  <CookieNotice lang={lang} />
   <script>
     import '../scripts/site.ts';
   </script>

@@ -4,6 +4,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { domainToUnicode } from 'node:url';
 import { type Lang, localePath, formatDate, siteUrl, useTranslations } from '../i18n';
 import { legalTexts, LEGAL_DATE, CONSENT_VERSION } from '../data/legal';
+import { analyticsFor } from '../data/analytics';
 
 interface Props { lang: Lang; doc: 'privacy' | 'consent' }
 const { lang, doc } = Astro.props;
@@ -14,7 +15,8 @@ const description = doc === 'privacy' ? l.privacyMeta : l.consentMeta;
 // The documents name the site in this language: its own domain, or the address of this build.
 const domain = domainToUnicode(new URL(siteUrl(lang) ?? Astro.site!).hostname);
 const fill = (text: string) => text.replaceAll('{site}', domain);
-const sections = legalTexts[lang][doc];
+const withAnalytics = Boolean(analyticsFor(lang));
+const sections = legalTexts[lang][doc].filter((s) => s.analytics === undefined || s.analytics === withAnalytics);
 const other = doc === 'privacy'
   ? { href: localePath(lang, '/consent/'), label: l.consentTitle }
   : { href: localePath(lang, '/privacy/'), label: l.privacyTitle };
