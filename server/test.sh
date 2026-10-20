@@ -41,11 +41,12 @@ consent=(-F consent=yes -F consent_version=1.2-draft -F consent_at=2026-10-20T10
 
 expect 200 'valid request with a file' "${ru[@]}" "${contact[@]}" "${consent[@]}" -F 'phone=+7 (903) 123-45-67' -F "files[]=@$dir/photo.jpg"
 eml=$(ls "$dir"/storage/outbox/*.eml)
-text=$(php -r '$m = file_get_contents($argv[1]); preg_match("/base64\r\n\r\n(.+?)\r\n--/s", $m, $x); echo base64_decode($x[1]);' "$eml")
+text=$(php -r '$m = file_get_contents($argv[1]); preg_match("/quoted-printable\r\n\r\n(.+?)\r\n--/s", $m, $x); echo quoted_printable_decode($x[1]);' "$eml")
 check 'message has the contacts' 'grep -q "Телефон: +7 (903) 123-45-67" <<<"$text" && grep -q "Компания: ООО «Полимер»" <<<"$text"'
 check 'message has the consent' 'grep -q "версия 1.2-draft, 2026-10-20T10:00:00.000Z" <<<"$text"'
 check 'file is attached' 'grep -q "filename\*=UTF-8'"''"'photo.jpg" "$eml"'
 check 'reply goes to the visitor' 'grep -q "Reply-To: ivan@example.ru" "$eml"'
+check 'sender name has no domain' 'grep -q "^From: =?UTF-8?B?$(printf "Заявки с сайта Химмаш" | base64)?= <noreply@example.ru>" "$eml"'
 check 'consent is logged' '[ "$(wc -l < "$dir/storage/consents.jsonl")" -eq 1 ] && grep -q "\"phone\":\"+7 (903) 123-45-67\"" "$dir/storage/consents.jsonl"'
 
 expect 200 'English site' -H 'Origin: https://example.com' "${contact[@]}" "${consent[@]}" -F lang=en -F 'phone=+44 20 7946 0958'

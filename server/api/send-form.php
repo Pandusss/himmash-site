@@ -226,18 +226,20 @@ array_push(
 );
 
 $boundary = 'part-' . bin2hex(random_bytes(12));
+// The sender's name carries no domain: a name naming another domain than the address looks like phishing to mail filters.
 $headers = [
-    'From: ' . encodeHeader("Сайт $site") . ' <' . $config['from'] . '>',
+    'From: ' . encodeHeader('Заявки с сайта Химмаш') . ' <' . $config['from'] . '>',
     'MIME-Version: 1.0',
     'Content-Type: multipart/mixed; boundary="' . $boundary . '"',
 ];
 if ($data['email'] !== '') {
     $headers[] = 'Reply-To: ' . $data['email'];
 }
+// Text as quoted-printable rather than base64: plain text in base64 counts against a message in spam filters.
 $body = "--$boundary" . EOL
     . 'Content-Type: text/plain; charset=UTF-8' . EOL
-    . 'Content-Transfer-Encoding: base64' . EOL . EOL
-    . chunk_split(base64_encode(implode("\n", $lines)), 76, EOL);
+    . 'Content-Transfer-Encoding: quoted-printable' . EOL . EOL
+    . quoted_printable_encode(implode(EOL, $lines)) . EOL;
 foreach ($files as $file) {
     $body .= "--$boundary" . EOL
         . "Content-Type: {$file['type']}; name=\"" . encodeHeader($file['name']) . '"' . EOL
