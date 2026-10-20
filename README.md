@@ -92,6 +92,21 @@ PUBLIC_SITE_URL_RU=https://<домен>.ru PUBLIC_SITE_URL_EN=https://<доме�
 
 Результат: `dist-ru/` для домена .ru и `dist-en/` для .com, каждый сразу проверен `scripts/check-dist.mjs`. Адреса можно записать в `.env`. Одну сборку делает `npm run build:sites -- en`; внутри это `astro build` с `PUBLIC_SITE_LANG=ru|en` (см. `src/i18n/index.ts`). Домен в тексте политики и согласия подставляется из этих же адресов. Старый домен химмаш24.рф стоит оставить и перенаправить (301) на новый .ru, чтобы не потерять его историю в Яндексе.
 
+
+### Выкладка на хостинг
+
+`.github/workflows/production.yml` собирает оба сайта и загружает их на хостинг REG.RU. Запускается вручную после проверки превью: Actions → Production → Run workflow (оба сайта, только ru или только en). Загрузка — `scripts/deploy.sh` (lftp): копия на сервере повторяет сборку, лишние файлы удаляются, кроме `api/config.php`, `api/storage/` и `.well-known/`.
+
+Настройки репозитория (Settings → Secrets and variables → Actions):
+
+- переменные `PUBLIC_SITE_URL_RU` (основной русский домен, сейчас `https://xn--24-6kc5aua4d2a.xn--p1ai`) и `PUBLIC_SITE_URL_EN` (`https://himmash24.com`);
+- `DEPLOY_URL` — `sftp://server146.hosting.reg.ru`;
+- `DEPLOY_DIRS_RU` и `DEPLOY_DIRS_EN` — папки сайтов на хостинге (как в «Менеджере файлов», например `www/himmash24.com`). Зеркала основного домена перечисляются через пробел: им достаётся та же сборка, а `canonical` на всех страницах ведёт на основной домен, поэтому поисковики не считают зеркало дублем;
+- `PUBLIC_FORM_ENDPOINT=/api/send-form.php`, ID счётчиков и коды подтверждения (см. «Аналитика»);
+- секреты `DEPLOY_USER` и `DEPLOY_PASSWORD` — логин и пароль хостинга.
+
+Перед первой выкладкой на домен со старым сайтом сохраните его копию (ispmanager → «Резервные копии» или скачать папку): выкладка заменяет содержимое папки.
+
 ## Аналитика
 
 Русский сайт — Яндекс Метрика, английский — Google Analytics 4 (`src/data/analytics.ts`). Включаются переменными при сборке:

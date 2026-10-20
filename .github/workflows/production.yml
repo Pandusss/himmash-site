@@ -1,0 +1,54 @@
+name: Production
+
+# Builds the Russian and English sites and uploads them to the hosting. Started by hand
+# (Actions → Production → Run workflow) after the preview has been checked.
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: Which site to publish
+        type: choice
+        options: [both, ru, en]
+        default: both
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build
+        env:
+          SITE: ${{ inputs.site }}
+          # Repository variables (Settings → Secrets and variables → Actions → Variables).
+          PUBLIC_SITE_URL_RU: ${{ vars.PUBLIC_SITE_URL_RU }}
+          PUBLIC_SITE_URL_EN: ${{ vars.PUBLIC_SITE_URL_EN }}
+          PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+          PUBLIC_YANDEX_METRIKA_ID: ${{ vars.PUBLIC_YANDEX_METRIKA_ID }}
+          PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
+          PUBLIC_YANDEX_VERIFICATION: ${{ vars.PUBLIC_YANDEX_VERIFICATION }}
+          PUBLIC_GOOGLE_VERIFICATION: ${{ vars.PUBLIC_GOOGLE_VERIFICATION }}
+        run: if [ "$SITE" = both ]; then npm run build:sites; else npm run build:sites -- "$SITE"; fi
+      - run: sudo apt-get install -y -qq lftp > /dev/null
+      - name: Upload
+        env:
+          SITE: ${{ inputs.site }}
+          DEPLOY_URL: ${{ vars.DEPLOY_URL }}
+          DEPLOY_DIRS_RU: ${{ vars.DEPLOY_DIRS_RU }}
+          DEPLOY_DIRS_EN: ${{ vars.DEPLOY_DIRS_EN }}
+          # Secrets (Settings → Secrets and variables → Actions → Secrets): the hosting login and password.
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          LFTP_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+        run: if [ "$SITE" = both ]; then bash scripts/deploy.sh ru en; else bash scripts/deploy.sh "$SITE"; fi
