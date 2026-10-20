@@ -364,6 +364,12 @@ const en: UI = {
     privacy: 'Privacy policy',
     consent: 'Data processing consent',
   },
+  presentation: {
+    title: 'КПТБО-300 complex presentation',
+    short: 'КПТБО-300 presentation',
+    label: 'Presentation',
+    format: 'PDF',
+  },
   cookies: {
     label: 'Cookie notice',
     text: 'We use cookies and Google Analytics to understand how visitors use the site. The counter stays off unless you agree.',

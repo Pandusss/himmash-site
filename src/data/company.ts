@@ -1,3 +1,5 @@
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
 import { type Lang, localePath, asset } from '../i18n';
 
 export const company = {
@@ -15,6 +17,19 @@ export const company = {
   },
   name: { ru: 'НПО «Химмаш»', en: 'NPO Himmash' },
 };
+
+// Presentation of the КПТБО-300 complex for customers (PDF in public/docs). Russian only for now:
+// the English site shows no links until an English file is added here.
+const presentations: Partial<Record<Lang, string>> = { ru: 'docs/kptbo-300.pdf' };
+
+/** Link and size of the presentation in this language, or null. */
+export function presentationFor(lang: Lang): { href: string; size: string } | null {
+  const file = presentations[lang];
+  if (!file) return null;
+  const kb = statSync(join(process.cwd(), 'public', file)).size / 1024;
+  const size = kb < 1024 ? `${Math.round(kb)} ${lang === 'ru' ? 'КБ' : 'KB'}` : `${(kb / 1024).toFixed(1).replace('.', lang === 'ru' ? ',' : '.')} ${lang === 'ru' ? 'МБ' : 'MB'}`;
+  return { href: asset(file), size };
+}
 
 /** MAX is a Russian messenger: offered on the Russian site only. */
 export function hasMax(lang: Lang): boolean {

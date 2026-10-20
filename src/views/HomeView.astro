@@ -31,6 +31,7 @@ const faqJsonLd = {
   '@type': 'FAQPage',
   mainEntity: t.faq.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })),
 };
+import PresentationLink from '../components/PresentationLink.astro';
 ---
 <Base lang={lang} path="/" title={t.meta.homeTitle} description={t.meta.homeDescription} jsonLd={[faqJsonLd]}>
   <section class="hero wrap" aria-labelledby="home-title">
@@ -43,6 +44,7 @@ const faqJsonLd = {
           <button class="btn" type="button" data-inquiry={t.form.defaultSubject}>{h.hero.cta} <span class="arrow" aria-hidden="true">↗</span></button>
           <a class="text-link" href="#catalog">{h.hero.secondary} <span aria-hidden="true">↓</span></a>
         </div>
+        <PresentationLink lang={lang} class="hero-doc" />
         <div class="hero-footnote" set:html={h.hero.footnote} />
       </div>
       <div class="hero-media">

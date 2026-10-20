@@ -5,6 +5,7 @@ import SectionHead from '../components/SectionHead.astro';
 import ProductCard from '../components/ProductCard.astro';
 import ContactCta from '../components/ContactCta.astro';
 import AnatomyFigure from '../components/AnatomyFigure.astro';
+import PresentationLink from '../components/PresentationLink.astro';
 import { figureById } from '../figures';
 import { type Lang, localePath, asset, useTranslations } from '../i18n';
 import { type ProductMeta, productText, productBySlug } from '../data/products';
@@ -106,6 +107,8 @@ const num = () => String(++n).padStart(2, '0');
         )}
         <button class="btn full" id="product-inquiry" type="button" data-inquiry={text.name} data-need={need}>{p.inquiry} <span class="arrow" aria-hidden="true">↗</span></button>
         <p class="summary-note">{p.inquiryNote}</p>
+        {/* The presentation is about the complete line (КПТБО-300). */}
+        {product.slug === 'granulation-lines' && <PresentationLink lang={lang} class="product-doc" />}
       </div>
     </section>
     <nav class="product-jumps" aria-label={p.jumpsLabel}>

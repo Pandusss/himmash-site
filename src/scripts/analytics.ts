@@ -49,7 +49,7 @@ function saved(): string | null {
   try { return localStorage.getItem(KEY); } catch { return null; }
 }
 
-/** Sends a goal to the counter, if the visitor allowed it: inquiry_open, inquiry_sent, phone_click, email_click, messenger_click. */
+/** Sends a goal to the counter, if the visitor allowed it: inquiry_open, inquiry_sent, phone_click, email_click, messenger_click, presentation_open. */
 export function track(goal: string) {
   if (!loaded || !notice) return;
   if (notice.dataset.provider === 'metrika') window.ym?.(Number(notice.dataset.id), 'reachGoal', goal);
@@ -81,5 +81,6 @@ if (notice) {
     if (href.startsWith('tel:')) track('phone_click');
     else if (href.startsWith('mailto:')) track('email_click');
     else if (/^https:\/\/max\.ru\//.test(href)) track('messenger_click');
+    else if (/\/docs\/[^/]+\.pdf$/.test(href)) track('presentation_open');
   });
 }

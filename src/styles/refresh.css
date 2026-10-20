@@ -281,3 +281,15 @@ h3{letter-spacing:-.03em}
 @keyframes cookie-in{from{opacity:0;transform:translateY(12px)}}
 
 html.menu-open .cookie-notice{display:none}
+
+/* Presentation link: a file chip with its format and size */
+.doc-link{display:inline-flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none}
+.doc-link-icon{display:grid;place-items:center;flex:0 0 40px;width:40px;height:48px;border:1px solid var(--line);border-radius:4px 12px 4px 4px;background:var(--white);font:600 10px/1 var(--font-mono);letter-spacing:.06em;color:var(--green);transition:border-color .15s,background-color .15s}
+.doc-link-text{display:grid;gap:2px}
+.doc-link-text b{font-size:14px;font-weight:600;line-height:1.3}
+.doc-link-text small{font:11px/1.4 var(--font-mono);letter-spacing:.04em;color:var(--muted)}
+.doc-link:hover b{color:var(--green)}
+.doc-link:hover .doc-link-icon{border-color:var(--green)}
+.hero-doc{margin-top:26px}
+.product-doc{margin-top:18px}
+@media(max-width:650px){.hero-doc{margin-top:20px}}

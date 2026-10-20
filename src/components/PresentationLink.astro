@@ -1,0 +1,16 @@
+---
+import { type Lang, useTranslations } from '../i18n';
+import { presentationFor } from '../data/company';
+
+// Link to the company presentation (PDF); renders nothing where there is none for this language.
+interface Props { lang: Lang; class?: string }
+const { lang, class: className } = Astro.props;
+const t = useTranslations(lang).presentation;
+const file = presentationFor(lang);
+---
+{file && (
+  <a class:list={['doc-link', className]} href={file.href} target="_blank" rel="noopener" type="application/pdf">
+    <span class="doc-link-icon" aria-hidden="true">{t.format}</span>
+    <span class="doc-link-text"><b>{t.title}</b><small>{t.format} · {file.size}</small></span>
+  </a>
+)}

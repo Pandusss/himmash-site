@@ -1,12 +1,13 @@
 ---
 import { type Lang, locales, langMeta, localePath, useTranslations } from '../i18n';
-import { company, hasMax, phoneDisplay } from '../data/company';
+import { company, hasMax, phoneDisplay, presentationFor } from '../data/company';
 import { analyticsFor } from '../data/analytics';
 
 interface Props { lang: Lang; path: string; alternates: readonly Lang[] }
 const { lang, path, alternates } = Astro.props;
 const t = useTranslations(lang);
 const year = new Date().getFullYear();
+const presentation = presentationFor(lang);
 const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/');
 ---
 <footer class="site-footer" id="contacts">
@@ -16,6 +17,7 @@ const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/')
         <a class="footer-brand" href={localePath(lang, '/')}>{t.brand.name}</a>
         <p class="footer-tagline">{t.footer.tagline}</p>
         <a class="text-link footer-link" href={localePath(lang, '/equipment/')}>{t.footer.catalog} <span aria-hidden="true">↗</span></a>
+        {presentation && <a class="text-link footer-link small" href={presentation.href} target="_blank" rel="noopener" type="application/pdf">{t.presentation.short} · {t.presentation.format} <span aria-hidden="true">↗</span></a>}
       </div>
       <div class="footer-contact">
         <div class="footer-label">{t.footer.discuss}</div>
