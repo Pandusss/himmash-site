@@ -92,11 +92,11 @@ const previewBuild = import.meta.env.PUBLIC_NOINDEX === 'true';
 </head>
 <body>
   <a class="skip" href="#main">{t.skip}</a>
-  <Header lang={lang} path={path} alternates={alternates} />
+  <Header lang={lang} path={path} />
   <main id="main">
     <slot />
   </main>
-  <Footer lang={lang} path={path} alternates={alternates} />
+  <Footer lang={lang} />
   <MobileBar lang={lang} subject={inquirySubject} need={inquiryNeed} />
   <InquiryDialog lang={lang} />
   <MediaDialog lang={lang} />

@@ -1,14 +1,13 @@
 ---
-import { type Lang, locales, langMeta, localePath, useTranslations } from '../i18n';
+import { type Lang, localePath, useTranslations } from '../i18n';
 import { company, hasMax, phoneDisplay, presentationFor } from '../data/company';
 import { analyticsFor } from '../data/analytics';
 
-interface Props { lang: Lang; path: string; alternates: readonly Lang[] }
-const { lang, path, alternates } = Astro.props;
+interface Props { lang: Lang }
+const { lang } = Astro.props;
 const t = useTranslations(lang);
 const year = new Date().getFullYear();
 const presentation = presentationFor(lang);
-const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/');
 ---
 <footer class="site-footer" id="contacts">
   <div class="wrap">
@@ -46,11 +45,6 @@ const langHref = (l: Lang) => localePath(l, alternates.includes(l) ? path : '/')
         <a href={localePath(lang, '/privacy/')}>{t.footer.privacy}</a>
         <a href={localePath(lang, '/consent/')}>{t.footer.consent}</a>
         {analyticsFor(lang) && <button type="button" class="footer-cookie" data-cookie-settings>{t.cookies.settings}</button>}
-      </span>
-      <span class="footer-langs">
-        {locales.map((l) => (
-          <a href={langHref(l)} hreflang={langMeta[l].hreflang} lang={langMeta[l].htmlLang} aria-current={l === lang ? 'true' : undefined}>{langMeta[l].name}</a>
-        ))}
       </span>
     </div>
   </div>

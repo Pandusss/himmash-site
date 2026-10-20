@@ -14,8 +14,7 @@
   /* Full-screen menu sheet under the header */
   .mobile-nav{position:fixed;left:0;right:0;top:88px;bottom:0;z-index:29;overflow-y:auto;overscroll-behavior:contain;padding:0;border-top:1px solid var(--line);background:var(--paper)}
   .mobile-nav-inner{width:calc(100% - 40px);max-width:560px;min-height:100%;margin:0 auto;padding:18px 0 calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:24px}
-  .mobile-nav-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-  .mobile-nav .mobile-langs{padding:0;border:0}
+  .mobile-nav-top{display:flex;justify-content:flex-end;align-items:center;gap:12px}
   .mobile-links{display:flex;flex-direction:column;border-top:1px solid var(--line)}
   .mobile-nav .mobile-links a{display:flex;justify-content:space-between;align-items:center;padding:15px 0;font-size:22px;letter-spacing:-.02em;border-bottom:1px solid var(--line)}
   .mobile-links a span{color:var(--green);font-size:17px}
@@ -115,8 +114,6 @@
   .catalog-page .custom-tile{grid-column:auto}
 
   /* Footer: languages spaced, links easy to tap, sections in two columns */
-  .site-footer .footer-bottom .footer-langs{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px}
-  .footer-langs a{padding:6px 0}
   .footer-nav{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
   .footer-nav .footer-label{grid-column:1/-1}
   .footer-nav a{padding:9px 0}
@@ -124,10 +121,10 @@
 }
 /* C1: touch targets of at least 44px on phones */
 @media(max-width:650px){
-  .process-links a,.filter,.product-jumps a,.mobile-nav .mobile-langs a,.toc-mobile summary{min-height:44px}
+  .process-links a,.filter,.product-jumps a,.toc-mobile summary{min-height:44px}
   .process-links a{display:inline-flex;align-items:center}
   .theme-toggle{width:44px;height:44px}
-  .footer-nav a,.footer-langs a,.footer-legal a,.footer-contact a,.footer-link{display:inline-flex;align-items:center;min-height:44px;padding-block:0}
+  .footer-nav a,.footer-legal a,.footer-contact a,.footer-link{display:inline-flex;align-items:center;min-height:44px;padding-block:0}
   .footer-nav a{display:flex}
   .catalog-page .product-meta{grid-template-columns:1fr}
 }

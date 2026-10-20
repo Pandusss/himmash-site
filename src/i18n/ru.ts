@@ -22,7 +22,6 @@ const ru = {
     mobile: 'Мобильная навигация',
     openMenu: 'Открыть меню',
     closeMenu: 'Закрыть меню',
-    language: 'Язык сайта',
     theme: 'Тёмная тема',
     breadcrumbs: 'Навигационная цепочка',
   },
