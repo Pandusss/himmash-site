@@ -40,6 +40,10 @@ jobs:
           PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
           PUBLIC_YANDEX_VERIFICATION: ${{ vars.PUBLIC_YANDEX_VERIFICATION }}
           PUBLIC_GOOGLE_VERIFICATION: ${{ vars.PUBLIC_GOOGLE_VERIFICATION }}
+          # Form handler settings (scripts/form-config.mjs): where requests go and from which address.
+          FORM_TO: ${{ vars.FORM_TO }}
+          FORM_FROM: ${{ vars.FORM_FROM }}
+          FORM_ORIGINS: ${{ vars.FORM_ORIGINS }}
         run: if [ "$SITE" = both ]; then npm run build:sites; else npm run build:sites -- "$SITE"; fi
       - run: sudo apt-get install -y -qq lftp > /dev/null
       - name: Upload

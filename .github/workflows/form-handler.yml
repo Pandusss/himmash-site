@@ -2,7 +2,7 @@ name: Form handler
 
 on:
   push:
-    paths: ['server/**', '.github/workflows/form-handler.yml']
+    paths: ['server/**', 'scripts/form-config.mjs', '.github/workflows/form-handler.yml']
   workflow_dispatch:
 
 permissions:
@@ -17,3 +17,8 @@ jobs:
         run: php -v && php -l server/api/send-form.php && php -l server/api/config.example.php
       - name: Requests through PHP's built-in server
         run: bash server/test.sh
+      - name: Settings written from repository variables
+        run: |
+          node -e "import('./scripts/form-config.mjs').then((m) => process.stdout.write(m.formConfig({ FORM_TO: 'a@example.ru, b@example.com', FORM_FROM: 'noreply@xn--24-6kc5aua4d2a.xn--p1ai', FORM_ORIGINS: 'https://himmash24.ru https://химмаш24.рф https://himmash24.com/' })))" > /tmp/config.php
+          php -l /tmp/config.php
+          php -r '$c = require "/tmp/config.php"; var_export($c); assert(count($c["to"]) === 2 && in_array("https://xn--24-6kc5aua4d2a.xn--p1ai", $c["allowed_origins"], true) && in_array("https://himmash24.com", $c["allowed_origins"], true)) or exit(1);'

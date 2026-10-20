@@ -6,6 +6,7 @@
 //        npm run build:sites -- en      one site
 import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { formConfig } from './form-config.mjs';
 
 // Variables already set in the environment win over .env.
 if (existsSync('.env')) process.loadEnvFile('.env');
@@ -30,6 +31,10 @@ function htaccess(dir) {
   return rules.join('\n') + '\n';
 }
 
+// With FORM_TO set the form posts to the handler, and each site gets its settings.
+const handlerConfig = formConfig(env);
+if (handlerConfig && !env.PUBLIC_FORM_ENDPOINT) env.PUBLIC_FORM_ENDPOINT = '/api/send-form.php';
+
 const run = (args, extra) => {
   const result = spawnSync(args[0], args.slice(1), { stdio: 'inherit', shell: process.platform === 'win32', env: { ...process.env, ...extra } });
   if (result.status !== 0) process.exit(result.status ?? 1);
@@ -42,5 +47,6 @@ for (const lang of langs) {
   run(['npx', 'astro', 'build', '--outDir', out], { PUBLIC_SITE_LANG: lang, SITE_URL: '', BASE_PATH: '/' });
   run(['node', 'scripts/check-dist.mjs', out], { PUBLIC_SITE_LANG: lang, BASE_PATH: '/' });
   for (const file of ['send-form.php', '.user.ini']) cpSync(`server/api/${file}`, `${out}/api/${file}`);
+  if (handlerConfig) writeFileSync(`${out}/api/config.php`, handlerConfig);
   writeFileSync(`${out}/.htaccess`, htaccess(out));
 }

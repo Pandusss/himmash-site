@@ -80,8 +80,10 @@ if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
 }
 
 $storage = rtrim((string) $config['storage_dir'], '/');
-foreach ([$storage, "$storage/rate"] as $dir) {
-    if (!is_dir($dir) && !mkdir($dir, 0700, true)) {
+if (!is_dir("$storage/rate") && !@mkdir("$storage/rate", 0700, true)) {
+    // The configured folder is out of reach: keep the logs next to this file, closed to the web below.
+    $storage = __DIR__ . '/storage';
+    if (!is_dir("$storage/rate") && !mkdir("$storage/rate", 0700, true)) {
         respond(500, ['error' => 'storage']);
     }
 }
