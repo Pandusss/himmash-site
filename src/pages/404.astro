@@ -1,22 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
-import { localePath, useTranslations } from '../i18n';
+import { locales, rootLang, langMeta, localePath, useTranslations } from '../i18n';
 
-// GitHub Pages serves this file for every missing URL, so it links to all languages.
-const t = useTranslations('ru');
-const en = useTranslations('en');
+// The host serves this file for every missing URL: it is in the site's language and links to the other ones.
+const t = useTranslations(rootLang);
+const others = locales.filter((l) => l !== rootLang);
 ---
-<Base lang="ru" path="/" title={t.notFound.metaTitle} description={t.notFound.text} alternates={['ru']} noindex>
+<Base lang={rootLang} path="/" title={t.notFound.metaTitle} description={t.notFound.text} alternates={[rootLang]} noindex>
   <section class="wrap not-found">
     <div class="eyebrow">404</div>
     <h1 set:html={t.notFound.title} />
     <p>{t.notFound.text}</p>
     <div class="hero-actions">
-      <a class="btn" href={localePath('ru', '/')}>{t.notFound.home} <span class="arrow" aria-hidden="true">↗</span></a>
-      <a class="text-link" href={localePath('ru', '/equipment/')}>{t.notFound.catalog} <span aria-hidden="true">↗</span></a>
+      <a class="btn" href={localePath(rootLang, '/')}>{t.notFound.home} <span class="arrow" aria-hidden="true">↗</span></a>
+      <a class="text-link" href={localePath(rootLang, '/equipment/')}>{t.notFound.catalog} <span aria-hidden="true">↗</span></a>
     </div>
     <p class="not-found-langs">
-      <a href={localePath('en', '/')} lang="en">{en.notFound.home} — English</a>
+      {others.map((l) => <a href={localePath(l, '/')} lang={langMeta[l].htmlLang}>{useTranslations(l).notFound.home} — {langMeta[l].name}</a>)}
     </p>
   </section>
 </Base>

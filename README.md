@@ -66,17 +66,27 @@ npm run preview  # посмотреть собранный dist/
 
 В настройках репозитория (Settings → Secrets and variables → Actions → Variables) задайте:
 
-- `SITE_URL` и `BASE_PATH`: для превью `https://<user>.github.io` и `/<repo>/`, для своего домена `https://xn--24-6kc5aua4d2a.xn--p1ai` и `/`;
+- `SITE_URL` и `BASE_PATH`: для превью `https://<user>.github.io` и `/<repo>/`;
 - `PUBLIC_NOINDEX=true` для превью, чтобы копия не попала в поиск и не конкурировала с основным доменом;
 - `PUBLIC_FORM_ENDPOINT`, когда будет готов обработчик формы.
 
 В Settings → Pages выберите источник GitHub Actions.
 
-Превью: https://pandusss.github.io/himmash-site/ (закрыто от индексации). Боевой сайт лучше разместить у российского хостера на химмаш24.рф: `npm run build` с `SITE_URL=https://xn--24-6kc5aua4d2a.xn--p1ai` и `BASE_PATH=/`, затем загрузить содержимое `dist/`.
+Превью: https://pandusss.github.io/himmash-site/ (закрыто от индексации). Оно собирается одним сайтом: русский в корне, английский в `/en/`.
+
+### Два домена: русский .ru и английский .com
+
+Боевой сайт — два отдельных сайта: русский на домене .ru, английский на .com, каждый в корне своего домена. Переключатель языка и `hreflang` ведут на тот же раздел другого домена; `x-default` — английский сайт. У каждого домена свои `sitemap.xml` и `robots.txt`. Старые адреса `prod01.html…prod14.html` есть только на русском сайте.
+
+```sh
+PUBLIC_SITE_URL_RU=https://<домен>.ru PUBLIC_SITE_URL_EN=https://<домен>.com npm run build:sites
+```
+
+Результат: `dist-ru/` для домена .ru и `dist-en/` для .com, каждый сразу проверен `scripts/check-dist.mjs`. Адреса можно записать в `.env`. Одну сборку делает `npm run build:sites -- en`; внутри это `astro build` с `PUBLIC_SITE_LANG=ru|en` (см. `src/i18n/index.ts`). Домен в тексте политики и согласия подставляется из этих же адресов. Старый домен химмаш24.рф стоит оставить и перенаправить (301) на новый .ru, чтобы не потерять его историю в Яндексе.
 
 ## SEO
 
 - У каждой страницы и каждого языка свой адрес, `title`, `description`, `canonical` и `hreflang`.
 - `sitemap-index.xml` и `robots.txt` собираются автоматически.
 - Разметка schema.org: организация, хлебные крошки, товары (с ценой, где она указана), статьи, частые вопросы.
-- После переезда на домен добавьте сайт в Яндекс Вебмастер и Google Search Console и отправьте sitemap. Старые адреса `prod01.html…prod14.html` стоит перенаправить на новые страницы оборудования (соответствие — поле `original` в `src/data/products.ts`).
+- После переезда добавьте русский сайт в Яндекс Вебмастер, английский — в Google Search Console (русский можно и туда), и отправьте sitemap каждого. Старые адреса `prod01.html…prod14.html` уже ведут на новые страницы оборудования (соответствие — поле `original` в `src/data/products.ts`).

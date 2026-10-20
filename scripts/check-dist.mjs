@@ -1,9 +1,11 @@
 // Sanity checks for the built site: broken internal links, leftover Cyrillic
-// in translated pages, hreflang tags. Usage: node scripts/check-dist.mjs
+// in translated pages, hreflang tags. Usage: node scripts/check-dist.mjs [dist folder]
+// With PUBLIC_SITE_LANG=en (the English site) every page is checked for Cyrillic, otherwise /en/.
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 
-const dist = resolve('dist');
+const dist = resolve(process.argv[2] || 'dist');
+const englishPage = process.env.PUBLIC_SITE_LANG === 'en' ? () => true : (rel) => /^\/en\//.test(rel);
 const base = (process.env.BASE_PATH || '/').replace(/\/?$/, '/');
 const pages = [];
 (function walk(dir) {
@@ -39,7 +41,7 @@ for (const file of pages) {
     if (/^(https?:|mailto:|tel:|data:|#)/.test(url)) continue;
     if (!exists(url, file)) broken.set(`${rel} → ${url}`, true);
   }
-  if (/^\/en\//.test(rel)) {
+  if (englishPage(rel)) {
     const text = html
       .replace(/<script[\s\S]*?<\/script>/g, '')
       .replace(/<style[\s\S]*?<\/style>/g, '')
@@ -57,5 +59,5 @@ console.log(`pages: ${pages.length}`);
 console.log(`broken internal links: ${broken.size}`);
 for (const k of [...broken.keys()].slice(0, 30)) console.log('  ' + k);
 console.log(`pages without hreflang: ${missingHreflang}`);
-console.log(`Cyrillic snippets in /en/: ${cyrillic.size}`);
+console.log(`Cyrillic snippets in English pages: ${cyrillic.size}`);
 for (const [k, v] of [...cyrillic].sort((a, b) => b[1] - a[1]).slice(0, 40)) console.log(`  ${v}× ${k}`);

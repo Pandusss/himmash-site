@@ -1,10 +1,12 @@
 ---
-// The Chinese version was removed: old /zh/… links lead to the same page in English.
-import { localePath, asset } from '../../i18n';
+// The Chinese version was removed: old /zh/… links of the preview lead to the same page in English.
+// Only the preview had /zh/, so the per-domain builds skip these pages.
+import { localePath, asset, prefixedLangs } from '../../i18n';
 import { products } from '../../data/products';
 import { getArticles, articleSlug } from '../../data/articles';
 
 export async function getStaticPaths() {
+  if (!prefixedLangs.includes('en')) return [];
   const pages = [
     '', 'equipment', 'certificates', 'articles', 'privacy', 'consent',
     ...products.map((product) => `equipment/${product.slug}`),

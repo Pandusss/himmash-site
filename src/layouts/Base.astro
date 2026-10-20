@@ -66,7 +66,8 @@ const previewBuild = import.meta.env.PUBLIC_NOINDEX === 'true';
     <>
       <link rel="canonical" href={canonical}>
       {alternates.map((l) => <link rel="alternate" hreflang={langMeta[l].hreflang} href={absolute(localePath(l, path))}>)}
-      {alternates.includes('ru') && <link rel="alternate" hreflang="x-default" href={absolute(localePath('ru', path))}>}
+      {/* Visitors whose language has no version of its own get the English site. */}
+      <link rel="alternate" hreflang="x-default" href={absolute(localePath(alternates.includes('en') ? 'en' : alternates[0], path))}>
     </>
   )}
   <link rel="icon" type="image/png" sizes="32x32" href={asset('favicon-32.png')}>

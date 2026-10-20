@@ -1,8 +1,9 @@
 ---
+import { rootLang } from '../../i18n';
 import ArticleView from '../../views/ArticleView.astro';
 import { getArticles, articleSlug } from '../../data/articles';
 export async function getStaticPaths() {
-  return (await getArticles('ru')).map((article) => ({ params: { slug: articleSlug(article) }, props: { article } }));
+  return (await getArticles(rootLang)).map((article) => ({ params: { slug: articleSlug(article) }, props: { article } }));
 }
 ---
-<ArticleView lang="ru" article={Astro.props.article} />
+<ArticleView lang={rootLang} article={Astro.props.article} />

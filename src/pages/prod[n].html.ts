@@ -1,10 +1,10 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { products } from '../data/products';
-import { localePath } from '../i18n';
+import { localePath, rootLang } from '../i18n';
 
 // Old site pages prod01.html … prod14.html redirect to the new equipment pages,
-// so search engines and saved links keep working after the move.
-export const getStaticPaths: GetStaticPaths = () =>
+// so search engines and saved links keep working after the move. They belong to the Russian site.
+export const getStaticPaths: GetStaticPaths = () => rootLang !== 'ru' ? [] :
   products.map((p) => ({ params: { n: p.original.replace(/^prod|\.html$/g, '') }, props: { slug: p.slug } }));
 
 export const GET: APIRoute = ({ props, site }) => {

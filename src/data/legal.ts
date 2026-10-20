@@ -2,7 +2,7 @@ import type { Lang } from '../i18n';
 
 // DRAFT texts. The company replaces them with documents approved by its lawyer
 // and fills the bracketed fields. Bump CONSENT_VERSION whenever the consent text changes:
-// the version and date are sent with every request.
+// the version and date are sent with every request. {site} is replaced with the domain of the site.
 export const CONSENT_VERSION = '1.2-draft';
 export const LEGAL_DATE = '2026-10-17';
 
@@ -14,7 +14,7 @@ const ru: LegalTexts = {
     {
       heading: '1. Общие положения',
       paragraphs: [
-        'Политика определяет порядок обработки и меры по защите персональных данных посетителей сайта химмаш24.рф. Политика принята в соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных».',
+        'Политика определяет порядок обработки и меры по защите персональных данных посетителей сайта {site}. Политика принята в соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных».',
         'Оператор персональных данных — [полное наименование юридического лица], ИНН [ИНН], ОГРН [ОГРН], адрес: [юридический адрес с индексом] (далее — Оператор).',
       ],
     },
@@ -95,7 +95,7 @@ const ru: LegalTexts = {
   consent: [
     {
       paragraphs: [
-        'Отправляя заявку на сайте химмаш24.рф и отмечая согласие в форме, я, действуя свободно, своей волей и в своём интересе, даю [полное наименование юридического лица], ИНН [ИНН], ОГРН [ОГРН], адрес: [юридический адрес с индексом] (далее — Оператор) согласие на обработку моих персональных данных на следующих условиях.',
+        'Отправляя заявку на сайте {site} и отмечая согласие в форме, я, действуя свободно, своей волей и в своём интересе, даю [полное наименование юридического лица], ИНН [ИНН], ОГРН [ОГРН], адрес: [юридический адрес с индексом] (далее — Оператор) согласие на обработку моих персональных данных на следующих условиях.',
       ],
     },
     {
@@ -127,7 +127,7 @@ const en: LegalTexts = {
     {
       heading: '1. General provisions',
       paragraphs: [
-        'This policy sets out how the personal data of visitors to the химмаш24.рф website are processed and protected. It is adopted under Russian Federal Law No. 152-FZ of 27.07.2006 “On Personal Data”.',
+        'This policy sets out how the personal data of visitors to the {site} website are processed and protected. It is adopted under Russian Federal Law No. 152-FZ of 27.07.2006 “On Personal Data”.',
         'The personal data operator is [full legal name], INN [taxpayer ID], OGRN [registration number], address: [registered address with postcode] (the “Operator”).',
       ],
     },
@@ -208,7 +208,7 @@ const en: LegalTexts = {
   consent: [
     {
       paragraphs: [
-        'By sending a request on the химмаш24.рф website and ticking the consent box, I freely, of my own will and in my own interest, give [full legal name], INN [taxpayer ID], OGRN [registration number], address: [registered address with postcode] (the “Operator”) my consent to the processing of my personal data on the following terms.',
+        'By sending a request on the {site} website and ticking the consent box, I freely, of my own will and in my own interest, give [full legal name], INN [taxpayer ID], OGRN [registration number], address: [registered address with postcode] (the “Operator”) my consent to the processing of my personal data on the following terms.',
       ],
     },
     { heading: 'Personal data', paragraphs: ['Name, phone number and, if provided, company name, email address, details of the project (equipment needed, feedstock, processing volume, comments) and attached files.'] },
