@@ -1,0 +1,19 @@
+name: Form handler
+
+on:
+  push:
+    paths: ['server/**', '.github/workflows/form-handler.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP syntax
+        run: php -v && php -l server/api/send-form.php && php -l server/api/config.example.php
+      - name: Requests through PHP's built-in server
+        run: bash server/test.sh

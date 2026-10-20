@@ -1,9 +1,10 @@
 // Builds the production sites, one per domain: the Russian site into dist-ru (for the .ru domain)
-// and the English one into dist-en (for .com). Each is checked with check-dist.mjs.
+// and the English one into dist-en (for .com). Each is checked with check-dist.mjs and gets the form
+// handler in api/ (server/api; config.php is created on the hosting, see README).
 // Needs PUBLIC_SITE_URL_RU and PUBLIC_SITE_URL_EN in .env or the environment.
 // Usage: npm run build:sites            both sites
 //        npm run build:sites -- en      one site
-import { existsSync } from 'node:fs';
+import { cpSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 // Variables already set in the environment win over .env.
@@ -27,4 +28,5 @@ for (const lang of langs) {
   // SITE_URL and BASE_PATH of the preview must not leak into a domain build.
   run(['npx', 'astro', 'build', '--outDir', out], { PUBLIC_SITE_LANG: lang, SITE_URL: '', BASE_PATH: '/' });
   run(['node', 'scripts/check-dist.mjs', out], { PUBLIC_SITE_LANG: lang, BASE_PATH: '/' });
+  for (const file of ['send-form.php', '.user.ini']) cpSync(`server/api/${file}`, `${out}/api/${file}`);
 }
