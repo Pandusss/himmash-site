@@ -2,8 +2,8 @@
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { domainToUnicode } from 'node:url';
-import { type Lang, localePath, formatDate, siteUrl, useTranslations } from '../i18n';
-import { legalTexts, LEGAL_DATE, CONSENT_VERSION } from '../data/legal';
+import { type Lang, localePath, siteUrl, useTranslations } from '../i18n';
+import { legalTexts } from '../data/legal';
 import { analyticsFor } from '../data/analytics';
 
 interface Props { lang: Lang; doc: 'privacy' | 'consent' }
@@ -27,9 +27,7 @@ const other = doc === 'privacy'
     <header class="page-head legal-head">
       <div class="eyebrow">{l.eyebrow}</div>
       <h1>{title}</h1>
-      <p class="legal-meta">{l.version} {CONSENT_VERSION.replace('-draft', '')} · {formatDate(new Date(LEGAL_DATE), lang)}</p>
     </header>
-    <p class="legal-draft">{l.draft}</p>
     <article class="prose legal-text">
       {sections.map((s) => (
         <>

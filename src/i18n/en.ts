@@ -379,8 +379,6 @@ const en: UI = {
     consentTitle: 'Consent to personal data processing',
     privacyMeta: 'NPO Himmash personal data policy: purposes, data collected, retention periods and the rights of site visitors.',
     consentMeta: 'Consent to personal data processing given when sending a request on the NPO Himmash website.',
-    draft: 'Draft document. The final text is approved by the company after legal review; fields in square brackets are filled in with the company details.',
-    version: 'Version',
     eyebrow: 'Documents',
   },
   notFound: {

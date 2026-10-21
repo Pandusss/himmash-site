@@ -2,9 +2,8 @@ import type { Lang } from '../i18n';
 
 // DRAFT texts. The company replaces them with documents approved by its lawyer
 // and fills the bracketed fields. Bump CONSENT_VERSION whenever the consent text changes:
-// the version and date are sent with every request. {site} is replaced with the domain of the site.
+// the version is sent with every request. {site} is replaced with the domain of the site.
 export const CONSENT_VERSION = '1.2-draft';
-export const LEGAL_DATE = '2026-10-17';
 
 // `analytics: true` sections appear only on a site with a web analytics counter (see src/data/analytics.ts),
 // `analytics: false` ones only on a site without it.
