@@ -67,10 +67,6 @@ h3{letter-spacing:-.03em}
 /* Certificates page: language tabs for the document text */
 .doc-text-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
 .doc-text-head .doc-label{margin-bottom:0}
-.doc-lang-tabs{display:flex;border:1px solid var(--line);border-radius:30px;padding:3px;background:var(--white)}
-.doc-lang-tabs button{border:0;background:transparent;font:11px/1 var(--font-mono);letter-spacing:.06em;padding:8px 12px;border-radius:20px;color:var(--muted);min-width:40px}
-.doc-lang-tabs button:hover{color:var(--green)}
-.doc-lang-tabs button[aria-selected=true]{background:var(--green);color:var(--white)}
 
 /* Contact block with direct channels */
 .contact-section{padding:72px 0}

@@ -256,7 +256,6 @@ const en: UI = {
     lead: 'Certificates of conformity and technical specifications for recycling lines and complexes: scans and text transcriptions. Expired documents are marked as archived.',
     original: 'Original',
     translation: 'Document text',
-    textLanguage: 'Text language',
     note: 'The text is provided for easier reading and search. Only the original is legally binding.',
     zoom: 'Enlarge scan',
     archive: 'Archive',

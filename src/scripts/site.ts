@@ -120,29 +120,6 @@ media?.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight') showGalleryItem(galleryIndex + 1);
 });
 
-// Certificates page: RU / EN / ZH text of each document. Choosing a language switches every document.
-const docTabs = [...document.querySelectorAll<HTMLButtonElement>('[data-doc-lang]')];
-function setDocLang(lang: string) {
-  docTabs.forEach((tab) => {
-    const on = tab.dataset.docLang === lang;
-    tab.setAttribute('aria-selected', String(on));
-    tab.tabIndex = on ? 0 : -1;
-  });
-  document.querySelectorAll<HTMLElement>('[data-doc-panel]').forEach((panel) => {
-    panel.hidden = panel.dataset.docPanel !== lang;
-  });
-}
-docTabs.forEach((tab) => {
-  tab.addEventListener('click', () => setDocLang(tab.dataset.docLang!));
-  tab.addEventListener('keydown', (event) => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-    const siblings = [...tab.parentElement!.querySelectorAll<HTMLButtonElement>('[data-doc-lang]')];
-    const next = siblings[(siblings.indexOf(tab) + (event.key === 'ArrowRight' ? 1 : -1) + siblings.length) % siblings.length];
-    setDocLang(next.dataset.docLang!);
-    next.focus();
-  });
-});
-
 // Sections below the first screen fade in once as they scroll into view.
 // A plain scroll check (not IntersectionObserver) so nothing stays hidden where observers don't fire.
 let pending: HTMLElement[] = [];
