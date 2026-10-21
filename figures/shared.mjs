@@ -50,7 +50,7 @@ export function writeFigure({ id, svg, css, data = {}, width, height }) {
 const attr = (value) => String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 
 // A standalone page with the kit card, the drawing and the live script inlined, for the browser checks.
-export async function writePreview({ id, file, data = {}, theme = "light", lang = "ru" }) {
+export async function writePreview({ id, file, data = {}, theme = "light", lang = "ru", width = 560 }) {
   const src = join(SITE, "src", "figures", id);
   const { TEXT } = await import(join(src, "text.js"));
   const T = TEXT[lang];
@@ -70,6 +70,6 @@ export async function writePreview({ id, file, data = {}, theme = "light", lang 
   const name = theme === "light" ? "preview-light.html" : "preview.html";
   const style = `<style>.anatomy-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.iso[data-theme="light"]{--anatomy-card:#fff}.iso[data-theme="dark"]{--anatomy-card:#182019;--anatomy-page:#111613}</style>`;
   const dark = theme === "dark" ? `document.documentElement.dataset.theme = "dark";\n` : "";
-  writeFileSync(join(out, name), k.pageHtml({ title: T.title, theme, body: `${style}${card}`, script: dark + live + boot, width: 560 }));
+  writeFileSync(join(out, name), k.pageHtml({ title: T.title, theme, body: `${style}${card}`, script: dark + live + boot, width }));
   return join(out, name);
 }
