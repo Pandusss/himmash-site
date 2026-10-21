@@ -24,7 +24,8 @@ export function mount(stage, { text: T, data: F }) {
   // ---------- camera: the viewBox eases between the whole line and the box round a unit
   const base = svg.viewBox.baseVal;
   const full = { x: base.x, y: base.y, w: base.width, h: base.height };
-  let view = { ...full }, from = view, to = view, zoomStart = 0, zoomed = null;
+  let view = { ...full }, from = view, to = view, zoomStart = 0, zoomed = null, clockMs = 0;
+  const recording = location.hash === "#record";
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
   function boxOf(i, k = 1.5) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -44,7 +45,7 @@ export function mount(stage, { text: T, data: F }) {
   function zoomTo(i, k = 1.5) {
     const target = i === null ? full : boxOf(i, k) || full;
     zoomed = i;
-    from = { ...view }; to = target; zoomStart = performance.now();
+    from = { ...view }; to = target; zoomStart = clockMs;
     run();
   }
   function moveCamera(now) {
@@ -341,6 +342,8 @@ export function mount(stage, { text: T, data: F }) {
   function tick(now) {
     const dt = last ? Math.min((now - last) / 1000, 1 / 20) : 1 / 60;
     last = now;
+    clockMs += dt * 1000;
+    now = clockMs;
     step(dt);
     const moving = moveCamera(now);
     turn(dt);
@@ -351,8 +354,9 @@ export function mount(stage, { text: T, data: F }) {
     if (!visible && story) story = null;
   }
   function run() {
+    if (recording) return;
     if (!frame && visible) { last = 0; frame = requestAnimationFrame(tick); }
-    else if (still.matches) { step(0); moveCamera(performance.now()); draw(); }
+    else if (still.matches) { step(0); moveCamera(clockMs); draw(); }
   }
   function takeOver() { touring = false; quiet = performance.now(); }
   function armRestart() { restartAt = performance.now() + RESTART_MS; clearTimeout(restartTimer); restartTimer = setTimeout(restartTick, 1005); }
@@ -426,6 +430,24 @@ export function mount(stage, { text: T, data: F }) {
     run();
   });
   stage.addEventListener("focus", () => announce(readout ? readout.textContent : ""));
+  // Recording a video (page URL ending in #record): time only moves when the recorder advances it, frame by frame,
+  // and the CSS animations (water marks, glow) are set to the same clock.
+  if (recording) {
+    window.__line = {
+      advance(dt) {
+        step(dt);
+        clockMs += dt * 1000;
+        moveCamera(clockMs);
+        turn(dt);
+        flows.forEach((f) => f.move(dt * flow * startOf(f.unit)));
+        slides.forEach((f) => f.move(dt * flow * startOf(f.unit)));
+        draw();
+        document.getAnimations().forEach((a) => { a.pause(); a.currentTime = clockMs; });
+      },
+      story: startStory,
+      get story_done() { return !story; },
+    };
+  }
   new IntersectionObserver((entries) => { visible = entries[entries.length - 1].isIntersecting; if (visible) run(); }, { rootMargin: "120px 0px" }).observe(stage);
   step(0);
   turn(0);

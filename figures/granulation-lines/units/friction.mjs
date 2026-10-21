@@ -15,6 +15,17 @@ export function friction(L, ports, id, a, b) {
   const slope = Math.atan2(b[2] - a[2], b[0] - a[0]);
   const zUnder = (x) => a[2] + Math.tan(slope) * (x - a[0]) - r / Math.cos(slope);
   const legX = [a[0] + len * Math.cos(slope) * 0.22, a[0] + len * Math.cos(slope) * 0.74];
+  // Service platform at the top end on the far side: deck on posts, toe board, railing, and a ladder down.
+  const px0 = b[0] - 500, px1 = b[0] + 300, py0 = a[1] - 1150, py1 = a[1] - 450, pz = b[2] - 900;
+  for (const [qx, qy] of [[px0 + 40, py0 + 40], [px1 - 40, py0 + 40], [px0 + 40, py1 - 40], [px1 - 40, py1 - 40]]) p.push(leg(qx, qy, 0, pz, 60));
+  p.push(box(px0, py0, px1 - px0, py1 - py0, pz, 40, "mid", { bevel: 0.3, r: 6 }));
+  const grate = [];
+  for (let gx = px0 + 100; gx < px1; gx += 100) grate.push(path3([[gx, py0, pz + 40], [gx, py1, pz + 40]], false));
+  p.push(L.L(grate.join(""), { tone: "faint" }));
+  for (const qx of [px0 + 30, px1 - 30]) p.push(leg(qx, py0 + 30, pz + 40, pz + 1100, 40, "mid"));
+  p.push(box(px0, py0, px1 - px0, 40, pz + 1060, 40, "mid", { bevel: 0.2, r: 4, steps: 2 }), box(px0, py0, px1 - px0, 30, pz + 560, 30, "lo", { bevel: 0.2, r: 4, steps: 2 }));
+  p.push(...[px0 - 30, px0 + 380].map((qx) => leg(qx, py1 + 60, 0, pz + 1000, 40, "mid")));
+  p.push(...Array.from({ length: Math.floor(pz / 280) }, (_, i) => box(px0 - 30, py1 + 40, 450, 40, 250 + i * 280, 30, "lo", { bevel: 0.1, r: 3, steps: 2 })));
   // Far frame: legs, a longitudinal brace and a diagonal.
   for (const lx of legX) p.push(leg(lx, a[1] - 340, 0, zUnder(lx) - 60, 90));
   p.push(brace([legX[0], a[1] - 340, 300], [legX[1], a[1] - 340, 300], 60, "lo"), brace([legX[0], a[1] - 340, 320], [legX[1], a[1] - 340, zUnder(legX[1]) - 120], 55, "lo"));

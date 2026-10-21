@@ -86,6 +86,9 @@ const DATA = {
 
 const CSS = figureCss(`
 .fig-svg{overflow:hidden}
+/* Lines keep their screen width as the camera moves in, so a close view stays a fine drawing. */
+.fig-svg :is(.iso-line,.tb-edge,.ln-ripple,.ln-heat){vector-effect:non-scaling-stroke}
+.fig-svg .iso-line{stroke-width:max(var(--anatomy-weight),.75px)}
 .ln-dot{stroke:var(--ln-flake-edge);stroke-width:.25px}
 .ln-raw{fill:var(--ln-raw)}.ln-wash{fill:var(--ln-wash)}.ln-rinse{fill:var(--ln-rinse)}.ln-clean{fill:var(--ln-cleanflake)}.ln-dry{fill:var(--ln-dry)}.ln-flake{fill:var(--ln-wash)}
 .ln-pellet{fill:var(--ln-pellet);stroke:none}

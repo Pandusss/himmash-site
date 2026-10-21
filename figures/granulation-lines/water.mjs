@@ -31,10 +31,28 @@ export function waterSystem(L, ports) {
     const drop = pipe([[px, CLEAN.y, CLEAN.z], [px, CLEAN.y, pz + 260], [px, py, pz + 260], [px, py, pz + 30]], 32, { cls: "clean", flow: "clean", bend: 4 });
     if (port.inside !== undefined) for (const it of drop) if (it.mid && it.mid[1] > port.inside - 60) it.key = port.key + 1;
     items.push(...drop);
+    // Hand valve on the drop's vertical leg: a bulged body, bonnet, stem and handwheel facing the viewer.
+    const vz = CLEAN.z - 420;
+    const vk = depth([px, CLEAN.y, vz]) + 2;
+    const FV = G.frameOf([px, CLEAN.y, vz - 70], [0, 0, 1], [1, 0, 0], [0, 1, 0]);
+    const valve = [L.S(G.solidOf([[0, 40], [20, 40], [40, 62, 1], [100, 62, 1], [120, 40], [140, 40]], FV, L.P), { tone: "mid" })];
+    const FW = G.frameOf([px, CLEAN.y + 60, vz], [0, 1, 0], [1, 0, 0], [0, 0, 1]);
+    valve.push(L.S(G.disc(0, 70, 22, FW, L.P), { tone: "mid" }), L.S(G.ringBand(70, 90, 70, 95, FW, L.P), { tone: "hi" }));
+    items.push({ key: vk, svg: valve.join("") });
   }
   for (const tx of tees) items.push({ key: depth([tx, CLEAN.y, CLEAN.z]) + 1, svg: L.S(G.sphereOf([tx, CLEAN.y, CLEAN.z], CLEAN.r * 1.4, L.P), { tone: "mid" }) });
   // Header brackets on posts along the far side.
-  for (let px = 1200; px < CLEAN.x1; px += 4000) items.push({ key: depth([px, CLEAN.y - 100, 1500]) - 5, svg: leg(px, CLEAN.y - 140, 0, CLEAN.z - CLEAN.r, 60) + box(px - 60, CLEAN.y - 160, 120, 200, CLEAN.z - CLEAN.r - 40, 40, "lo", { bevel: 0.2 }) });
+  for (let px = 1200; px < CLEAN.x1; px += 4000) {
+    items.push({ key: depth([px, CLEAN.y - 100, 1500]) - 5, svg: leg(px, CLEAN.y - 140, 0, CLEAN.z - CLEAN.r, 60) + box(px - 60, CLEAN.y - 160, 120, 200, CLEAN.z - CLEAN.r - 40, 40, "lo", { bevel: 0.2 }) });
+    items.push({ key: depth([px, CLEAN.y, CLEAN.z]) + 3, svg: L.S(G.ringBand(-20, 20, CLEAN.r, CLEAN.r + 14, G.frameOf([px, CLEAN.y, CLEAN.z], [1, 0, 0], [0, 1, 0], [0, 0, 1]), L.P), { tone: "mid" }) });
+  }
+  // Pressure gauge on the riser: a dial facing the viewer on a short neck.
+  {
+    const gx = -950, gy = CLEAN.y + 700, gz = 1500;
+    const FN = G.frameOf([gx, gy, gz], [1, 0, 0], [0, 1, 0], [0, 0, 1]);
+    const FD = G.frameOf([gx + 120, gy + 30, gz], [0, 1, 0], [1, 0, 0], [0, 0, 1]);
+    items.push({ key: depth([gx + 120, gy + 60, gz]) + 2, svg: L.S(G.disc(0, 120, 14, FN, L.P), { tone: "mid" }) + L.S(G.disc(0, 40, 75, FD, L.P), { tone: "hi" }) + L.L(G.circleOf(FD, 40, 58, L.P), { tone: "lo" }) + L.L(L.path3([[gx + 120, gy + 70, gz], [gx + 160, gy + 70, gz + 35]], false), { tone: "hi", free: "end" }) });
+  }
 
   // ---------- dirty water: drains → collector along the aisle → into the receiving tank
   const collector = [[DIRTY.x1, DIRTY.y, DIRTY.z], [T5.x + 900, DIRTY.y, DIRTY.z], [T5.x + 900, T5.y + 250, DIRTY.z], [T5.x + 900, T5.y + 250, 1200], [T5.x + 900, T5.y + 450, 1200]];
@@ -45,7 +63,10 @@ export function waterSystem(L, ports) {
     items.push(...pipe([[px, py, pz], [px, py + 120, pz], [px, py + 120, DIRTY.z + 60], [px, DIRTY.y, DIRTY.z + 60]], 40, { cls: "dirty", flow: "dirty", bend: 3 }));
     items.push({ key: depth([px, DIRTY.y, DIRTY.z]) + 1, svg: L.S(G.sphereOf([px, DIRTY.y, DIRTY.z], DIRTY.r * 1.35, L.P), { tone: "mid" }) });
   }
-  for (let px = 7000; px < DIRTY.x1; px += 3500) items.push({ key: depth([px, DIRTY.y, 100]) - 5, svg: box(px - 80, DIRTY.y - 90, 160, 180, 0, DIRTY.z - DIRTY.r, "lo", { bevel: 0.2, r: 6 }) });
+  for (let px = 7000; px < DIRTY.x1; px += 3500) {
+    items.push({ key: depth([px, DIRTY.y, 100]) - 5, svg: box(px - 80, DIRTY.y - 90, 160, 180, 0, DIRTY.z - DIRTY.r, "lo", { bevel: 0.2, r: 6 }) });
+    items.push({ key: depth([px, DIRTY.y, DIRTY.z]) + 3, svg: L.S(G.ringBand(-20, 20, DIRTY.r, DIRTY.r + 16, G.frameOf([px, DIRTY.y, DIRTY.z], [1, 0, 0], [0, 1, 0], [0, 0, 1]), L.P), { tone: "mid" }) });
+  }
 
   // ---------- pneumatic line from the blower over the aisle into the storage hopper
   const air = [[40250, YB + 1150, 640], [40250, YB + 1400, 640], [40250, YB + 1400, 4300], [40250, 2550, 4300], [38500, 2550, 4300], [38500, 2550, 3700]];
