@@ -1,9 +1,10 @@
 import type { Lang } from '../i18n';
 
-// DRAFT texts. The company replaces them with documents approved by its lawyer
-// and fills the bracketed fields. Bump CONSENT_VERSION whenever the consent text changes:
-// the version is sent with every request. {site} is replaced with the domain of the site.
-export const CONSENT_VERSION = '1.2-draft';
+// Texts to be confirmed by the company's lawyer; the legal address, a postal address for requests and a
+// retention period are left out until the company gives them. Bump CONSENT_VERSION whenever the consent
+// text changes: the version is sent with every request. {site} becomes the site's domain, {email} the
+// company's email (src/data/company.ts).
+export const CONSENT_VERSION = '1.3-draft';
 
 // `analytics: true` sections appear only on a site with a web analytics counter (see src/data/analytics.ts),
 // `analytics: false` ones only on a site without it.
@@ -16,7 +17,7 @@ const ru: LegalTexts = {
       heading: '1. Общие положения',
       paragraphs: [
         'Политика определяет порядок обработки и меры по защите персональных данных посетителей сайта {site}. Политика принята в соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных».',
-        'Оператор персональных данных — [полное наименование юридического лица], ИНН [ИНН], ОГРН [ОГРН], адрес: [юридический адрес с индексом] (далее — Оператор).',
+        'Оператор персональных данных — Общество с ограниченной ответственностью Научно-производственное объединение «ХИММАШ» (ООО НПО «ХИММАШ»), ИНН 6154153061, ОГРН 1186196033473 (далее — Оператор).',
       ],
     },
     {
@@ -91,7 +92,7 @@ const ru: LegalTexts = {
     {
       heading: '6. Сроки обработки',
       paragraphs: [
-        'Персональные данные обрабатываются до достижения целей обработки, но не дольше [срок, например 3 лет] с момента последнего обращения, либо до отзыва согласия. После этого данные уничтожаются в сроки, установленные ст. 21 Закона № 152-ФЗ.',
+        'Персональные данные обрабатываются до достижения целей обработки либо до отзыва согласия. После этого данные уничтожаются в сроки, установленные ст. 21 Закона № 152-ФЗ.',
       ],
     },
     {
@@ -113,7 +114,7 @@ const ru: LegalTexts = {
     {
       heading: '9. Запросы и отзыв согласия',
       paragraphs: [
-        'Запрос или отзыв согласия направляется письмом на адрес [email для запросов по персональным данным] либо почтой по адресу: [почтовый адрес с индексом]. Оператор отвечает в сроки, установленные Законом № 152-ФЗ.',
+        'Запрос или отзыв согласия направляется письмом на адрес {email}. Оператор отвечает в сроки, установленные Законом № 152-ФЗ.',
       ],
     },
     {
@@ -126,7 +127,7 @@ const ru: LegalTexts = {
   consent: [
     {
       paragraphs: [
-        'Отправляя заявку на сайте {site} и отмечая согласие в форме, я, действуя свободно, своей волей и в своём интересе, даю [полное наименование юридического лица], ИНН [ИНН], ОГРН [ОГРН], адрес: [юридический адрес с индексом] (далее — Оператор) согласие на обработку моих персональных данных на следующих условиях.',
+        'Отправляя заявку на сайте {site} и отмечая согласие в форме, я, действуя свободно, своей волей и в своём интересе, даю Общество с ограниченной ответственностью Научно-производственное объединение «ХИММАШ» (ООО НПО «ХИММАШ»), ИНН 6154153061, ОГРН 1186196033473 (далее — Оператор) согласие на обработку моих персональных данных на следующих условиях.',
       ],
     },
     {
@@ -146,7 +147,7 @@ const ru: LegalTexts = {
     {
       heading: 'Срок действия и отзыв',
       paragraphs: [
-        'Согласие действует до достижения целей обработки, но не дольше [срок, например 3 лет], либо до его отзыва. Отозвать согласие можно письмом на адрес [email для запросов по персональным данным] или почтой по адресу Оператора.',
+        'Согласие действует до достижения целей обработки либо до его отзыва. Отозвать согласие можно письмом на адрес {email}.',
         'Порядок обработки описан в Политике обработки персональных данных.',
       ],
     },
@@ -159,7 +160,7 @@ const en: LegalTexts = {
       heading: '1. General provisions',
       paragraphs: [
         'This policy sets out how the personal data of visitors to the {site} website are processed and protected. It is adopted under Russian Federal Law No. 152-FZ of 27.07.2006 “On Personal Data”.',
-        'The personal data operator is [full legal name], INN [taxpayer ID], OGRN [registration number], address: [registered address with postcode] (the “Operator”).',
+        'The personal data operator is NPO Himmash Limited Liability Company (OOO NPO HIMMASH), INN 6154153061, OGRN 1186196033473 (the “Operator”).',
       ],
     },
     {
@@ -229,12 +230,12 @@ const en: LegalTexts = {
     },
     {
       analytics: true,
-      paragraphs: ['The Operator does not disclose personal data to third parties except as required by Russian law. Data collected by Google Analytics with the visitor’s consent are processed by Google LLC on servers outside Russia, which is a cross-border transfer of personal data [the Operator has notified Roskomnadzor of it under Art. 12 of Law No. 152-FZ].'],
+      paragraphs: ['The Operator does not disclose personal data to third parties except as required by Russian law. Data collected by Google Analytics with the visitor’s consent are processed by Google LLC on servers outside Russia, which is a cross-border transfer of personal data.'],
     },
     {
       heading: '6. Retention',
       paragraphs: [
-        'Personal data are processed until the purposes are achieved, but no longer than [period, e.g. 3 years] after the last request, or until consent is withdrawn. The data are then destroyed within the periods set by Art. 21 of Law No. 152-FZ.',
+        'Personal data are processed until the purposes are achieved or until consent is withdrawn. The data are then destroyed within the periods set by Art. 21 of Law No. 152-FZ.',
       ],
     },
     {
@@ -255,7 +256,7 @@ const en: LegalTexts = {
     {
       heading: '9. Requests and withdrawal of consent',
       paragraphs: [
-        'Send your request or withdrawal of consent to [email for personal data requests] or by post to [postal address with postcode]. The Operator replies within the periods set by Law No. 152-FZ.',
+        'Send your request or withdrawal of consent to {email}. The Operator replies within the periods set by Law No. 152-FZ.',
       ],
     },
     {
@@ -269,7 +270,7 @@ const en: LegalTexts = {
   consent: [
     {
       paragraphs: [
-        'By sending a request on the {site} website and ticking the consent box, I freely, of my own will and in my own interest, give [full legal name], INN [taxpayer ID], OGRN [registration number], address: [registered address with postcode] (the “Operator”) my consent to the processing of my personal data on the following terms.',
+        'By sending a request on the {site} website and ticking the consent box, I freely, of my own will and in my own interest, give NPO Himmash Limited Liability Company (OOO NPO HIMMASH), INN 6154153061, OGRN 1186196033473 (the “Operator”) my consent to the processing of my personal data on the following terms.',
       ],
     },
     { heading: 'Personal data', paragraphs: ['Name, phone number and, if provided, company name, email address, details of the project (equipment needed, feedstock, processing volume, comments) and attached files.'] },
@@ -283,7 +284,7 @@ const en: LegalTexts = {
     {
       heading: 'Validity and withdrawal',
       paragraphs: [
-        'The consent is valid until the purposes are achieved, but no longer than [period, e.g. 3 years], or until withdrawn. It can be withdrawn by writing to [email for personal data requests] or by post to the Operator’s address.',
+        'The consent is valid until the purposes are achieved or until withdrawn. It can be withdrawn by writing to {email}.',
         'Processing is described in the Personal data processing policy. This translation is provided for information; the Russian version prevails.',
       ],
     },

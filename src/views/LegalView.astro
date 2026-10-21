@@ -5,6 +5,7 @@ import { domainToUnicode } from 'node:url';
 import { type Lang, localePath, siteUrl, useTranslations } from '../i18n';
 import { legalTexts } from '../data/legal';
 import { analyticsFor } from '../data/analytics';
+import { company } from '../data/company';
 
 interface Props { lang: Lang; doc: 'privacy' | 'consent' }
 const { lang, doc } = Astro.props;
@@ -14,7 +15,7 @@ const title = doc === 'privacy' ? l.privacyTitle : l.consentTitle;
 const description = doc === 'privacy' ? l.privacyMeta : l.consentMeta;
 // The documents name the site in this language: its own domain, or the address of this build.
 const domain = domainToUnicode(new URL(siteUrl(lang) ?? Astro.site!).hostname);
-const fill = (text: string) => text.replaceAll('{site}', domain);
+const fill = (text: string) => text.replaceAll('{site}', domain).replaceAll('{email}', company.email);
 const withAnalytics = Boolean(analyticsFor(lang));
 const sections = legalTexts[lang][doc].filter((s) => s.analytics === undefined || s.analytics === withAnalytics);
 const other = doc === 'privacy'
