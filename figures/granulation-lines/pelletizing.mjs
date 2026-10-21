@@ -98,14 +98,14 @@ export function pelletizingRow(L) {
     const vents = [30700, 29500];
     zones.forEach((hx, i) => {
       if (vents.some((v) => Math.abs(hx + 230 - v) < 350)) return;
-      if (i === 6) return;
+      if (i >= 5) return;
       p.push(`<g class="ln-hot" style="animation-delay:${(-i * 0.37).toFixed(2)}s">${cylX(hx, hx + 460, YE, ZE, r + 55, "mid")}</g>`);
       p.push(box(hx + 170, YE - 50, 120, 100, ZE + r + 50, 80, "mid", { bevel: 0.3, r: 10 }));
       p.push(cylZ(hx + 230, YE, 650, ZE - r - 60, 110, "lo"));
     });
     const wz = zones[6];
-    const win = path3([[wz, YE + 10, ZE + r], [wz + 460, YE + 10, ZE + r], [wz + 460, YE + r * 0.7, ZE + r * 0.7], [wz, YE + r * 0.7, ZE + r * 0.7]]);
-    p.push(clipped(win, `<path class="ln-melt" d="${win}"/>` + rotor("screw", { o: [xb0, YE, ZE], a: [1, 0, 0], u: [0, 1, 0], v: [0, 0, 1], speed: 1.2, flight: { s0: wz - xb0 - 100, s1: wz - xb0 + 560, r0: 70, r1: 128, pitch: 150, hand: -1 }, shaft: { s0: wz - xb0 - 120, s1: wz - xb0 + 580, r: 70 } })));
+    const win = path3([[wz - 520, YE - 20, ZE + r], [wz + 460, YE - 20, ZE + r], [wz + 460, YE + r * 0.92, ZE + r * 0.4], [wz - 520, YE + r * 0.92, ZE + r * 0.4]]);
+    p.push(clipped(win, `<path class="ln-melt" d="${win}"/>` + rotor("screw", { o: [xb0, YE, ZE], a: [1, 0, 0], u: [0, 1, 0], v: [0, 0, 1], speed: 1.2, flight: { s0: wz - xb0 - 620, s1: wz - xb0 + 560, r0: 70, r1: 128, pitch: 150, hand: -1 }, shaft: { s0: wz - xb0 - 640, s1: wz - xb0 + 580, r: 70 } })));
     p.push(L.L(win, { tone: "lo" }));
     for (const vx of vents) p.push(cylZ(vx, YE, ZE + r, ZE + 380, 90, "mid"), turned(vx, YE, ZE + 380, [[0, 130], [40, 130], [60, 90, 1], [90, 0, 1]], "hi"));
     for (const sx of [29000, 31900]) p.push(box(sx - 60, YE - 90, 120, 180, 620, ZE - r - 620, "lo", { bevel: 0.3 }));

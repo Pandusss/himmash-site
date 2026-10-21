@@ -12,19 +12,21 @@ const STORY_STEP = 4.2;    // seconds per unit on the material path
 const BOOT_STEP = 0.24;    // seconds between units starting up
 
 export function mount(stage, { text: T, data: F }) {
-  const svg = stage.querySelector("svg");
-  if (T.label) svg.setAttribute("aria-label", T.label);
+  const base0 = stage.querySelector("svg");
+  if (T.label) base0.setAttribute("aria-label", T.label);
+  const svg = splitLayers(base0, F);       // the live layer: moving parts and what stands in front of them
+  const layers2 = [base0, svg];
   const plate = stage.closest(".iso-plate, .anatomy-plate") || stage.parentElement;
   const readout = plate.querySelector("[data-readout]");
   const live = stage.querySelector(".anatomy-live");
   const still = matchMedia("(prefers-reduced-motion: reduce)");
   const count = F.units.length;
-  const groups = Array.from({ length: count }, (_, i) => [...svg.querySelectorAll(`[data-unit="${i}"]`)]);
+  const groups = Array.from({ length: count }, (_, i) => layers2.flatMap((layer) => [...layer.querySelectorAll(`[data-unit="${i}"]`)]));
 
   // ---------- camera: the viewBox eases between the whole line and the box round a unit
   const base = svg.viewBox.baseVal;
   const full = { x: base.x, y: base.y, w: base.width, h: base.height };
-  let view = { ...full }, from = view, to = view, zoomStart = 0, zoomed = null, clockMs = 0;
+  let view = { ...full }, from = view, to = view, zoomStart = 0, zoomed = null, clockMs = 0, lastVb = "";
   const recording = location.hash === "#record";
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
   function boxOf(i, k = 1.5) {
@@ -52,7 +54,8 @@ export function mount(stage, { text: T, data: F }) {
     const t = still.matches ? 1 : Math.min(1, (now - zoomStart) / ZOOM_MS);
     const e = ease(t);
     view = { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, w: from.w + (to.w - from.w) * e, h: from.h + (to.h - from.h) * e };
-    svg.setAttribute("viewBox", `${view.x.toFixed(2)} ${view.y.toFixed(2)} ${view.w.toFixed(2)} ${view.h.toFixed(2)}`);
+    const vb = `${view.x.toFixed(2)} ${view.y.toFixed(2)} ${view.w.toFixed(2)} ${view.h.toFixed(2)}`;
+    if (vb !== lastVb) { lastVb = vb; layers2.forEach((layer) => layer.setAttribute("viewBox", vb)); }
     return t < 1;
   }
 
@@ -167,7 +170,6 @@ export function mount(stage, { text: T, data: F }) {
           path.setAttribute("d", d);
         }
         bd.fill.setAttribute("d", sh.fill);
-        bd.crease.setAttribute("d", sh.crease);
         bd.edge.setAttribute("d", sh.edge);
         bd.depth = bd.s * axisDepth + sh.depth;
         const layer = sh.back ? "back" : "front";
@@ -192,14 +194,24 @@ export function mount(stage, { text: T, data: F }) {
   }).filter(Boolean);
   const angles = rotors.map(() => 0);
   const inView = (b) => b.x < view.x + view.w && b.x + b.w > view.x && b.y < view.y + view.h && b.y + b.h > view.y;
-  let rotorTick = 0;
+  // Rotors are redrawn at most 30 times a second, and 12 times on the whole-line view where they are small; each
+  // keeps its own phase, so the redraws of different rotors fall on different frames.
+  const due = rotors.map((_, i) => i * 0.0137);
+  let svgPx = base0.getBoundingClientRect().width || 1000;
+  new ResizeObserver(() => { svgPx = base0.getBoundingClientRect().width || svgPx; }).observe(base0);
   function turn(dt) {
     const wide = view.w > full.w * 0.6;
-    rotorTick++;
+    const every = still.matches ? 0 : wide ? 1 / 12 : 1 / 30;
     rotors.forEach((r, i) => {
       angles[i] += dt * r.R.speed * TAU * flow * startOf(r.unit);
-      if (wide && (rotorTick + i) % 2) return;
+      due[i] -= dt;
+      if (due[i] > 0 && dt > 0) return;
+      due[i] += every;
+      if (due[i] < 0) due[i] = every;
       if (!inView(r.box)) return;
+      // A rotor a few pixels across shows no motion worth the redraw.
+      const px = (Math.max(r.box.w, r.box.h) * svgPx) / view.w;
+      if (px < 14) return;
       r.draw(angles[i]);
     });
   }
@@ -210,9 +222,12 @@ export function mount(stage, { text: T, data: F }) {
     let off = spec.phase || 0;
     return {
       unit: unitIndex(nodes[0]),
+      last: "",
       move(dt) {
         off = (off + dt * spec.speed) % spec.period;
         const t = `translate(${f1(off * spec.step[0])} ${f1(off * spec.step[1])})`;
+        if (t === this.last) return;
+        this.last = t;
         nodes.forEach((n) => n.setAttribute("transform", t));
       },
     };
@@ -236,7 +251,11 @@ export function mount(stage, { text: T, data: F }) {
       const t = (d - cum[i - 1]) / (cum[i] - cum[i - 1] || 1);
       return [0, 1, 2].map((c) => pts[i - 1][c] + (pts[i][c] - pts[i - 1][c]) * t);
     }
+    let acc = 0;
     function move(dt) {
+      acc += dt;
+      if (dt > 0 && acc < 1 / 30) return;
+      dt = acc; acc = 0;
       for (const p of dots) {
         p.u = (p.u + (dt * spec.speed) / total) % 1;
         const w = at(p.u);
@@ -321,7 +340,7 @@ export function mount(stage, { text: T, data: F }) {
     }
     flow += ((running ? 1 : 0) - flow) * (still.matches ? 1 : 1 - Math.exp(-dt / 0.6));
     if (!running && flow < 1e-3) flow = 0;
-    svg.toggleAttribute("data-stopped", !running);
+    layers2.forEach((layer) => layer.toggleAttribute("data-stopped", !running));
   }
 
   let lastOn = -2;
@@ -351,7 +370,6 @@ export function mount(stage, { text: T, data: F }) {
     slides.forEach((f) => f.move(dt * flow * startOf(f.unit)));
     draw();
     frame = visible && (!still.matches || moving) ? requestAnimationFrame(tick) : 0;
-    if (!visible && story) story = null;
   }
   function run() {
     if (recording) return;
@@ -395,13 +413,13 @@ export function mount(stage, { text: T, data: F }) {
     const node = event.target.closest && event.target.closest("[data-unit]");
     return node ? Number(node.dataset.unit) : null;
   };
-  svg.addEventListener("pointermove", (event) => {
+  base0.addEventListener("pointermove", (event) => {
     if (event.pointerType !== "mouse" || zoomed !== null) return;
     const i = unitOf(event);
     if (i !== hovered) { hovered = i; run(); }
   });
-  svg.addEventListener("pointerleave", () => { if (hovered === null) return; hovered = null; run(); });
-  svg.addEventListener("click", (event) => {
+  base0.addEventListener("pointerleave", () => { if (hovered === null) return; hovered = null; run(); });
+  base0.addEventListener("click", (event) => {
     if (story) { story = null; }
     const i = unitOf(event);
     takeOver();
@@ -455,3 +473,124 @@ export function mount(stage, { text: T, data: F }) {
   slides.forEach((f) => f.move(0));
   draw();
 }
+
+// The drawing has thousands of paths; if anything in it moves, the browser re-rasters all of it every frame. So it is
+// split into two stacked SVGs: the base keeps everything that stands still (the moving parts hidden) and is rastered
+// once per camera move; a live copy on top keeps only the moving parts and the still parts painted after them that
+// overlap them on screen, so the painter's order holds. The live copy takes no pointer events.
+function splitLayers(base, F) {
+  if (/nosplit/.test(location.search)) return base;
+  const MOVING = "[data-rotor],[data-slide],.ln-flow,.ln-flowline,.ln-hot,.ln-melt";
+  const live = base.cloneNode(true);
+  live.removeAttribute("aria-label");
+  live.setAttribute("aria-hidden", "true");
+  live.classList.add("ln-live");
+  live.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;will-change:transform";
+  base.style.willChange = "transform";
+  const host = base.parentElement;
+  if (getComputedStyle(host).position === "static") host.style.position = "relative";
+  base.insertAdjacentElement("afterend", live);
+  // Lay the live copy exactly over the base, whatever padding the stage has.
+  const place = () => { live.style.left = `${base.offsetLeft}px`; live.style.top = `${base.offsetTop}px`; live.style.width = `${base.offsetWidth}px`; live.style.height = `${base.offsetHeight}px`; };
+  place();
+  new ResizeObserver(place).observe(base);
+  const a = [...base.querySelectorAll("*")], b = [...live.querySelectorAll("*")];
+  const index = new Map(a.map((el, i) => [el, i]));
+  const isLeaf = (el) => el.matches("g.iso-solid, g.tb, g.iso-dots, path, circle, ellipse, polygon, line") && !el.closest("defs, clipPath, mask, linearGradient");
+  const moving = new Set(a.filter((el) => el.matches(MOVING) && !el.parentElement.closest(MOVING)));
+  // Screen boxes in the drawing's own units; a clip ancestor bounds what can show.
+  const back = base.getScreenCTM().inverse();
+  const boxOf = (el) => {
+    const r = el.getBoundingClientRect();
+    if (!r.width && !r.height) return null;
+    const p = new DOMPoint(r.left, r.top).matrixTransform(back), q = new DOMPoint(r.right, r.bottom).matrixTransform(back);
+    let box = [p.x, p.y, q.x, q.y];
+    const clipHost = el.closest("[clip-path]");
+    if (clipHost) {
+      const id = (clipHost.getAttribute("clip-path").match(/#([^)]+)/) || [])[1];
+      const shape = id && base.querySelector(`[id="${id}"] path`);
+      if (shape) { const c = shape.getBBox(); box = [Math.max(box[0], c.x), Math.max(box[1], c.y), Math.min(box[2], c.x + c.width), Math.min(box[3], c.y + c.height)]; }
+    }
+    return box[2] > box[0] && box[3] > box[1] ? box : null;
+  };
+  // A coarse grid of the moving parts' boxes, filled as the walk goes, so a still part only meets moving parts
+  // painted before it.
+  const CELL = 40, grid = new Map();
+  const cells = (box, fn) => { for (let gx = Math.floor(box[0] / CELL); gx <= Math.floor(box[2] / CELL); gx++) for (let gy = Math.floor(box[1] / CELL); gy <= Math.floor(box[3] / CELL); gy++) if (fn(`${gx},${gy}`)) return true; return false; };
+  const overlaps = (box) => cells(box, (key) => (grid.get(key) || []).some((m) => m[0] < box[2] && m[2] > box[0] && m[1] < box[3] && m[3] > box[1]));
+  // A moving part's footprint: thin lines (the flow marks in the pipes) and the dot trails as strings of small boxes
+  // along their path, everything else as its clipped box.
+  const { ox, oy, k: KS, sinA, cosA, sinE, cosE } = F.proj;
+  const iso = (x, y, z) => [ox + (x * sinA - y * cosA) * KS, oy + ((x * cosA + y * sinA) * sinE - z * cosE) * KS];
+  const trail = new Map((F.flows || []).map((f) => [f.id, f]));
+  const footprint = (el) => {
+    if (el.matches("path.ln-flowline")) {
+      const len = el.getTotalLength(), out = [];
+      for (let d = 0; d <= len; d += 3) { const q = el.getPointAtLength(d); out.push([q.x - 1.5, q.y - 1.5, q.x + 1.5, q.y + 1.5]); }
+      return out;
+    }
+    if (el.matches(".ln-flow")) {
+      const f = trail.get(el.dataset.flow);
+      if (!f) return [];
+      const pad = f.spread * KS + f.size * 1.4 + 1, out = [];
+      for (let i = 1; i < f.points.length; i++) {
+        const a = iso(...f.points[i - 1]), b = iso(...f.points[i]);
+        const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 4));
+        for (let j = 0; j <= n; j++) { const x = a[0] + ((b[0] - a[0]) * j) / n, y = a[1] + ((b[1] - a[1]) * j) / n; out.push([x - pad, y - pad, x + pad, y + pad]); }
+      }
+      return out;
+    }
+    const box = boxOf(el);
+    return box ? [box] : [];
+  };
+  // Flow marks are optional: a stretch of pipe that anything painted later covers keeps still marks in the base, so
+  // the live layer does not have to carry copies of whatever stands in front of it.
+  const order = new Map();
+  let n = 0;
+  const leafBoxes = [];
+  for (const el of a) {
+    order.set(el, n++);
+    if (isLeaf(el) && !el.closest(MOVING) && !(el.parentElement && el.parentElement.closest("g.iso-solid, g.tb, g.iso-dots"))) {
+      const box = boxOf(el);
+      if (box) leafBoxes.push([order.get(el), box]);
+    }
+  }
+  const LG = new Map();
+  for (const [i, box] of leafBoxes) cells(box, (key) => { (LG.get(key) || LG.set(key, []).get(key)).push([i, box]); return false; });
+  const coveredLater = (el, fp) => { const at = order.get(el); return fp.some((box) => cells(box, (key) => (LG.get(key) || []).some(([i, m]) => i > at && m[0] < box[2] && m[2] > box[0] && m[1] < box[3] && m[3] > box[1]))); };
+  for (const el of [...moving]) {
+    if (!el.matches(".ln-flowline")) continue;
+    if (coveredLater(el, footprint(el))) { moving.delete(el); el.style.animation = "none"; b[index.get(el)].setAttribute("display", "none"); }
+  }
+  const keepLive = new Set();
+  const walker = document.createTreeWalker(base, NodeFilter.SHOW_ELEMENT);
+  for (let el = walker.nextNode(); el; el = walker.nextNode()) {
+    if (moving.has(el)) {
+      for (const box of footprint(el)) cells(box, (key) => { (grid.get(key) || grid.set(key, []).get(key)).push(box); return false; });
+      // Skip the moving subtree: it goes to the live layer whole.
+      let next = el;
+      while (next && !next.nextElementSibling) next = next.parentElement === base ? null : next.parentElement;
+      if (!next) break;
+      walker.currentNode = next.nextElementSibling;
+      walker.previousNode();
+      continue;
+    }
+    if (!isLeaf(el) || el.closest(MOVING)) continue;
+    const box = boxOf(el);
+    if (box && overlaps(box)) keepLive.add(el);
+    // A leaf's children are drawn with it.
+    let next = el;
+    while (next && !next.nextElementSibling) next = next.parentElement === base ? null : next.parentElement;
+    if (!next) break;
+    walker.currentNode = next.nextElementSibling;
+    walker.previousNode();
+  }
+  for (const el of moving) el.setAttribute("display", "none");
+  a.forEach((el, i) => {
+    if (!isLeaf(el) || el.closest(MOVING) || keepLive.has(el)) return;
+    if (el.parentElement && el.parentElement.closest("g.iso-solid, g.tb, g.iso-dots") && el.parentElement !== el) return;
+    b[i].setAttribute("display", "none");
+  });
+  return live;
+}
+

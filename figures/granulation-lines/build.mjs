@@ -71,6 +71,44 @@ items.sort((a, b) => a.key - b.key);
 const body = [`<defs>${L.defs.join("")}</defs>`, floor(), ...items.map((it) => it.svg)];
 const svg = k.figureSvg({ width: WIDTH, height: HEIGHT, className: SVG_CLASS, label: "", body });
 
+const f1 = (v) => (Math.round(v * 10) / 10).toString();
+// Douglas-Peucker thinning of the kit's dense outlines and tone sheets (the same for a fill and its outline).
+function thin(points, tol) {
+  if (points.length < 3) return points;
+  const keep = new Uint8Array(points.length);
+  keep[0] = keep[points.length - 1] = 1;
+  const stack = [[0, points.length - 1]];
+  while (stack.length) {
+    const [a, b] = stack.pop();
+    const [ax, ay] = points[a], [bx, by] = points[b];
+    const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
+    let worst = -1, idx = -1;
+    for (let i = a + 1; i < b; i++) {
+      const [px, py] = points[i];
+      const dd = len > 1e-6 ? Math.abs((px - ax) * dy - (py - ay) * dx) / len : Math.hypot(px - ax, py - ay);
+      if (dd > worst) { worst = dd; idx = i; }
+    }
+    if (worst > tol) { keep[idx] = 1; stack.push([a, idx], [idx, b]); }
+  }
+  return points.filter((_, i) => keep[i]);
+}
+function thinPath(d, tol = 0.12) {
+  if (/[^MLZ0-9 .\-]/.test(d)) return d;
+  return d.split(/(?=M)/).map((sub) => {
+    const closed = /Z$/.test(sub);
+    const pts = sub.replace(/Z$/, "").slice(1).split("L").map((pair) => pair.trim().split(/\s+/).map(Number));
+    let out;
+    if (closed && pts.length > 4) {
+      let far = 0, best = -1;
+      pts.forEach(([x, y], i) => { const dd = Math.hypot(x - pts[0][0], y - pts[0][1]); if (dd > best) { best = dd; far = i; } });
+      const a = thin(pts.slice(0, far + 1), tol), b = thin([...pts.slice(far), pts[0]], tol);
+      out = [...a, ...b.slice(1, -1)];
+    } else out = thin(pts, tol);
+    return `M${out.map(([x, y]) => `${f1(x)} ${f1(y)}`).join("L")}${closed ? "Z" : ""}`;
+  }).join("");
+}
+const thinSvg = (markup) => markup.replace(/(<path class="(?:iso-fill|iso-line iso-edge|iso-line iso-crease|iso-line iso-bevel|iso-shade|iso-top|tb-body|tb-shine|tb-shade|iso-line tb-edge)"[^>]*? d=")([^"]*)"/g, (_, head, d) => `${head}${thinPath(d)}"`);
+
 const DATA = {
   view: { origin: P.origin, scale: P.scale, azimuth: P.azimuth, elevation: P.elevation },
   units: ORDER,
@@ -135,6 +173,6 @@ const CSS = figureCss(`
   dark: "--ln-cavity:#0b100d;--ln-glass:#1f2e31;--ln-clean-fill:#1d3a55;--ln-clean-shine:#2a5378;--ln-clean-shade:#152b40;--ln-clean-edge:#7fb6ee;--ln-dirty-fill:#3d3121;--ln-dirty-shine:#54442d;--ln-dirty-shade:#2c2317;--ln-dirty-edge:#c9a26a;--ln-mid-fill:#24302c;--ln-body:#3a3022;--ln-flakes:#2f3a33;--ln-melt:#5a4128;--ln-raw:#7d6545;--ln-wash:#9b8766;--ln-rinse:#bcae92;--ln-cleanflake:#dcd7c8;--ln-dry:#f2f2ee;--ln-pellet:#a9b7ae;--ln-flake-edge:#1a140c;--ln-ripple:#6d5a3d;--ln-heat:#e08a4e;--ln-hot1:#3a2a1e;--ln-hot2:#7a3e1c;--ln-melt2:#b5602a",
 });
 
-const file = writeFigure({ id: "granulation-lines", svg, css: CSS, data: DATA, width: WIDTH, height: HEIGHT });
+const file = writeFigure({ id: "granulation-lines", svg: thinSvg(svg), css: CSS, data: DATA, width: WIDTH, height: HEIGHT });
 const page = await writePreview({ id: "granulation-lines", file, data: DATA, theme, width: 1180 });
 console.log("wrote", page, "·", (file.length / 1024).toFixed(0), "KB svg ·", items.length, "items");
