@@ -269,6 +269,7 @@ export function mount(stage, { text: T, data: F }) {
     }
     flow += ((running ? 1 : 0) - flow) * (still.matches ? 1 : 1 - Math.exp(-dt / 0.6));
     if (!running && flow < 1e-3) flow = 0;
+    svg.toggleAttribute("data-stopped", !running);
   }
 
   let lastOn = -2;

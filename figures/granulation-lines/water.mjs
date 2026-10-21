@@ -5,6 +5,7 @@
 // drop into every washer and bath; dirty water (brown) leaves every washer at the bottom, runs along the aisle
 // in a collector and back into the receiving tank. The pneumatic pipe lifts the dry flakes over the aisle.
 import { YB, CLEAN, DIRTY, T5 } from "./layout.mjs";
+import { t5000 } from "./units/t5000.mjs";
 
 export function waterSystem(L, ports) {
   const { box, cylZ, cylY, cylX, hopper, cavity, water, clipped, motor, leg, legs, path3, depth, pipe, flange, G } = L;
@@ -12,38 +13,9 @@ export function waterSystem(L, ports) {
   const items = [];
 
   // ---------- T-5000
-  {
-    const p = [];
-    const { x, y, w, d } = T5;
-    p.push(box(x, y, w, d, 0, 140, "lo", { bevel: 0.4, seam: 70 }));
-    // 1 Receiving tank with its step screen and debris bin.
-    const rt = [x + 200, y + 400, 1400, 1700];
-    p.push(box(rt[0], rt[1], rt[2], rt[3], 140, 1400, "mid", { seam: 300, r: 20 }));
-    const m1 = [[rt[0] + 50, rt[1] + 50, 1540], [rt[0] + rt[2] - 50, rt[1] + 50, 1540], [rt[0] + rt[2] - 50, rt[1] + rt[3] - 50, 1540], [rt[0] + 50, rt[1] + rt[3] - 50, 1540]];
-    p.push(cavity(m1), clipped(path3(m1), water(m1.map(([a, b]) => [a, b, 1350]), "dirty")), L.L(path3(m1), { tone: "lo" }));
-    p.push(L.rod([rt[0] + 300, rt[1] + rt[3] - 200, 1250], [rt[0] + 300, rt[1] + rt[3] + 500, 2100], 160, "hi"));
-    p.push(box(rt[0] + 100, rt[1] + rt[3] + 450, 600, 500, 140, 600, "mid", { bevel: 0.4 }));
-    // 2 Electroflotation bath with the electrode pack and the scraper bridge.
-    const ef = [x + 1800, y + 300, 2000, 1900];
-    p.push(box(ef[0], ef[1], ef[2], ef[3], 140, 1200, "mid", { seam: 300, r: 20 }));
-    const m2 = [[ef[0] + 50, ef[1] + 50, 1340], [ef[0] + ef[2] - 50, ef[1] + 50, 1340], [ef[0] + ef[2] - 50, ef[1] + ef[3] - 50, 1340], [ef[0] + 50, ef[1] + ef[3] - 50, 1340]];
-    p.push(cavity(m2), clipped(path3(m2), water(m2.map(([a, b]) => [a, b, 1250]), "mid") + Array.from({ length: 6 }, (_, i) => box(ef[0] + 300 + i * 220, ef[1] + 300, 30, ef[3] - 600, 500, 760, "lo", { bevel: 0.2, r: 4, steps: 2 })).join("")), L.L(path3(m2), { tone: "lo" }));
-    p.push(box(ef[0] + 900, ef[1] - 60, 160, ef[3] + 120, 1400, 120, "hi", { bevel: 0.3 }));
-    p.push(box(ef[0] + ef[2], ef[1] + 200, 300, ef[3] - 400, 900, 300, "mid", { bevel: 0.3 }));
-    // 3 Filter battery: four columns, 4 bactericidal cell, 5 clean water tank.
-    for (const [i, fy] of [[0, y + 600], [1, y + 1400]]) for (const fx of [x + 4100, x + 4700]) {
-      p.push(cylZ(fx, fy + i * 0, 140, 1700, 230, "hi"), L.turned(fx, fy, 1700, [[0, 230], [120, 200, 1], [200, 0, 1]], "hi"));
-    }
-    p.push(cylZ(x + 4400, y + 2400, 140, 1000, 160, "mid"));
-    const ct = [x + 3900, y + 2700, 2000, 700];
-    p.push(box(ct[0], ct[1], ct[2], ct[3], 140, 1500, "hi", { seam: 300, r: 20 }));
-    p.push(box(x + 5400, y + 1900, 500, 500, 140, 1800, "mid", { seam: 1600 }));
-    // The clean water pump.
-    p.push(box(x + 600, y + d - 400, 700, 300, 140, 120, "lo", { bevel: 0.3 }));
-    p.push(motor([x + 1100, y + d - 250, 420], [x + 650, y + d - 250, 420], 140));
-    p.push(cylY(y + d - 330, y + d - 170, x + 1250, 420, 160, "mid"));
-    units.push({ id: "t5000", items: [{ key: depth([x + w / 2, y + d / 2, 800]), svg: p.join("") }] });
-  }
+  const t5 = t5000(L);
+  units.push(t5.unit);
+  items.push(...t5.items);
 
   // ---------- clean water: pump → riser → across the aisle → header along the far side → drops
   // The pump's line runs low along the floor to the far left corner, climbs a riser there and becomes the header.

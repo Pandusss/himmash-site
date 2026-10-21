@@ -149,11 +149,35 @@ export function makeLib(P) {
   function pipe(route, r, { bend = 3, tone = "hi", cls = "", flow = "" } = {}) {
     const pts = G.fillet(route, r * bend, 7, { P, tube: r });
     const pieces = tubePieces(pts, r, P, { maxLength: 600, spacing: 1.2 / K });
-    return pieces.map((piece) => ({
-      key: G.dot3(piece.mid, V),
-      mid: piece.mid,
-      svg: `<g class="ln-pipe"${cls ? ` data-pipe="${cls}"` : ""}>${tubeSvg(piece, { tone })}</g>`,
-    })).concat(flow ? [{ key: -Infinity, svg: "", flow: { kind: flow, points: pts, r } }] : []);
+    // Flow marks: dashes along each chunk's centreline, phased by the screen length from the route's start so
+    // they run on without a break through every chunk joint (the CSS animation shifts them all together).
+    let screenAt = null;
+    if (flow) {
+      const cum3 = [0], cumS = [0];
+      for (let i = 1; i < pts.length; i++) {
+        cum3.push(cum3[i - 1] + G.len3(G.sub3(pts[i], pts[i - 1])));
+        const a = at(pts[i - 1]), b = at(pts[i]);
+        cumS.push(cumS[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1]));
+      }
+      screenAt = (d) => {
+        let i = 1;
+        while (i < cum3.length - 1 && cum3[i] < d) i++;
+        const t = (d - cum3[i - 1]) / (cum3[i] - cum3[i - 1] || 1);
+        return cumS[i - 1] + (cumS[i] - cumS[i - 1]) * Math.max(0, Math.min(1, t));
+      };
+    }
+    return pieces.map((piece) => {
+      let marks = "";
+      if (flow && piece.points.length > 1) {
+        const off = screenAt(piece.from ?? 0);
+        marks = `<path class="ln-flowline" data-flow-kind="${flow}" style="--o:${(-off).toFixed(1)}px" d="${pathOf(piece.points.map(at), false)}"/>`;
+      }
+      return {
+        key: G.dot3(piece.mid, V),
+        mid: piece.mid,
+        svg: `<g class="ln-pipe"${cls ? ` data-pipe="${cls}"` : ""}>${tubeSvg(piece, { tone })}${marks}</g>`,
+      };
+    });
   }
   // A flange collar on a route point.
   const flange = (p, dir, r, t = 30, tone = "mid") => S(G.disc(-t / 2, t / 2, r, G.frameAlong(p, dir), P), { tone });

@@ -22,9 +22,10 @@ export function beltConveyor(L, id, a, b, w, { legsAt = [0.3, 0.8], sideH = 120,
   out.push(prismY(y - w / 2, y + w / 2, [[x0, z0 - 70], [x1, z1 - 70], [x1, z1], [x0, z0]], "hi"));
   const top = [[x0, y - w / 2, z0], [x1, y - w / 2, z1], [x1, y + w / 2, z1], [x0, y + w / 2, z0]];
   const lines = [];
-  for (let s = -cleats; s < len + cleats; s += cleats) {
+  // Lines from the tail to the head; sliding forward by up to one pitch never opens a gap wider than a pitch.
+  for (let s = 0; s <= len; s += cleats) {
     const px = x0 + dir[0] * s, pz = z0 + dir[2] * s;
-    lines.push(path3([[px, y - w / 2 + 40, pz + 2], [px, y + w / 2 - 40, pz + 2]], false));
+    lines.push(path3([[px, y - w / 2, pz + 2], [px, y + w / 2, pz + 2]], false));
   }
   out.push(slide(`${id}-cleats`, L.L(lines.join(""), { tone: "lo" }), { dir, speed, period: cleats, clip: path3(top) }));
   if (flakes) out.push(flow(`${id}-flakes`, [[x0 + 150, y, z0 + 30], [x1 - 60, y, z1 + 30]], { speed, count: Math.round(len / 160), size: 30, spread: w * 0.3 }));
