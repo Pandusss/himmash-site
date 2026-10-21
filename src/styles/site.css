@@ -75,7 +75,8 @@ a.doc-item{color:inherit}
 .contact-section .eyebrow{margin-bottom:20px;color:var(--green)}
 .footer-grid{grid-template-columns:1.1fr 1fr 1fr .8fr}
 .footer-link{border-color:#ffffff40;margin-top:18px;color:#d4e4ce}
-.footer-link.small{font-size:12px;display:inline-flex;margin-top:8px}
+.footer-link{display:flex;width:fit-content}
+.footer-link.small{font-size:12px;margin-top:8px}
 .footer-nav a{display:block;font-size:14px;line-height:1.5;padding:4px 0;color:#e7eee6}
 .footer-nav a:hover,.footer-contact a:hover{color:var(--lime)}
 

@@ -125,7 +125,10 @@
   .process-links a{display:inline-flex;align-items:center}
   .theme-toggle{width:44px;height:44px}
   .footer-nav a,.footer-legal a,.footer-contact a,.footer-link{display:inline-flex;align-items:center;min-height:44px;padding-block:0}
+  /* Phone and email, the catalog and presentation links: each on its own line */
   .footer-nav a{display:flex}
+  .footer-contact a,.footer-link{display:flex;width:fit-content}
+  .footer-link + .footer-link{margin-top:4px}
   .catalog-page .product-meta{grid-template-columns:1fr}
 }
 @media(max-width:650px) and (prefers-reduced-motion:no-preference){
