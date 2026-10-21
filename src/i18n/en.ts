@@ -29,7 +29,6 @@ const en: UI = {
     phone: '+7 961 405-35-58',
     hours: 'Mon–Sat · 09:00–17:00 (Moscow time)',
     hoursLong: 'Mon–Sat: 09:00–17:00 (Moscow time)<br>Sunday: closed',
-    max: 'Message us on MAX messenger',
     address: '154 Sotsialisticheskaya St.<br>Taganrog, Rostov Oblast, 347905, Russia',
   },
   categories: {
@@ -349,7 +348,7 @@ const en: UI = {
     modernizationSubject: 'Upgrading an existing line',
     generalSubject: 'Discussing a recycling project',
   },
-  mobileBar: { call: 'Call', max: 'MAX', email: 'Email', request: 'Request' },
+  mobileBar: { call: 'Call', email: 'Email', request: 'Request' },
   media: { label: 'Image viewer', close: 'Close image' },
   footer: {
     route: 'Get directions',

@@ -1,6 +1,6 @@
 ---
 import { type Lang, useTranslations } from '../i18n';
-import { company, hasMax, phoneDisplay, presentationFor } from '../data/company';
+import { company, phoneDisplay, presentationFor } from '../data/company';
 
 interface Props { lang: Lang; title?: string; text?: string; button?: string; subject?: string }
 const { lang } = Astro.props;
@@ -32,13 +32,6 @@ const {
         <strong>{company.email}</strong>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
-      {hasMax(lang) && (
-        <a class="channel" href={company.max} target="_blank" rel="noopener">
-          <span class="channel-label">MAX</span>
-          <strong>{t.contact.max}</strong>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-      )}
       {presentation && (
         <a class="channel" href={presentation.href} target="_blank" rel="noopener" type="application/pdf">
           <span class="channel-label">{t.presentation.label} · {t.presentation.format}, {presentation.size}</span>

@@ -29,7 +29,6 @@ const ru = {
     phone: '+7 (961) 405-35-58',
     hours: 'Пн–Сб · 09:00–17:00',
     hoursLong: 'Пн–Сб: 09:00–17:00<br>Воскресенье — выходной',
-    max: 'Написать в MAX',
     address: '347905, Таганрог, Ростовская область<br>ул. Социалистическая, 154',
   },
   categories: {
@@ -349,7 +348,7 @@ const ru = {
     modernizationSubject: 'Модернизация действующей линии',
     generalSubject: 'Обсуждение задачи переработки',
   },
-  mobileBar: { call: 'Позвонить', max: 'MAX', email: 'Почта', request: 'Заявка' },
+  mobileBar: { call: 'Позвонить', email: 'Почта', request: 'Заявка' },
   media: { label: 'Просмотр изображения', close: 'Закрыть изображение' },
   footer: {
     route: 'Построить маршрут',

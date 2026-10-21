@@ -1,6 +1,6 @@
 ---
 import { type Lang, localePath, useTranslations } from '../i18n';
-import { company, hasMax, phoneDisplay } from '../data/company';
+import { company, phoneDisplay } from '../data/company';
 import { CONSENT_VERSION } from '../data/legal';
 
 interface Props { lang: Lang }
@@ -34,7 +34,6 @@ const errors = {
         <p class="inquiry-direct-title">{f.directTitle}</p>
         <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
         <a href={`mailto:${company.email}`}>{company.email}</a>
-        {hasMax(lang) && <a href={company.max} target="_blank" rel="noopener">MAX</a>}
         <small>{f.hours}</small>
       </div>
     </div>
