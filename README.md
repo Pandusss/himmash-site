@@ -106,7 +106,7 @@ PUBLIC_SITE_URL_RU=https://<домен>.ru PUBLIC_SITE_URL_EN=https://<доме�
 
 Настройки репозитория (Settings → Secrets and variables → Actions):
 
-- переменные `PUBLIC_SITE_URL_RU` (основной русский домен: `https://himmash24.ru`) и `PUBLIC_SITE_URL_EN` (`https://himmash24.com`);
+- переменные `PUBLIC_SITE_URL_RU` (основной русский домен: пока himmash24.ru не на нашем хостинге — `https://xn--24-6kc5aua4d2a.xn--p1ai` (химмаш24.рф), после переезда — `https://himmash24.ru` с переездом сайта в Яндекс Вебмастере) и `PUBLIC_SITE_URL_EN` (`https://himmash24.com`);
 - `DEPLOY_URL` — `sftp://server146.hosting.reg.ru`;
 - `DEPLOY_DIRS_RU` и `DEPLOY_DIRS_EN` — папки сайтов на хостинге (как в «Менеджере файлов», например `www/himmash24.com`). Зеркала основного домена перечисляются через пробел: им достаётся та же сборка, а `canonical` на всех страницах ведёт на основной домен, поэтому поисковики не считают зеркало дублем;
 - `FORM_TO`, `FORM_FROM`, `FORM_ORIGINS` (см. «Обработчик на хостинге»), ID счётчиков и коды подтверждения (см. «Аналитика»);
