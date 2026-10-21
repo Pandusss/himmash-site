@@ -351,7 +351,6 @@ const en: UI = {
   mobileBar: { call: 'Call', email: 'Email', request: 'Request' },
   media: { label: 'Image viewer', close: 'Close image' },
   footer: {
-    route: 'Get directions',
     tagline: 'Equipment. Technology. Manufacturing.',
     catalog: 'Go to catalog',
     discuss: 'DISCUSS YOUR PROJECT',

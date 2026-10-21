@@ -6,7 +6,6 @@ export const company = {
   phone: '+79614053558',
   phoneDisplay: { ru: '+7 (961) 405-35-58', intl: '+7 961 405-35-58' },
   email: 'ggg13@yandex.ru',
-  route: 'https://yandex.ru/maps/?rtext=~%D1%83%D0%BB.%20%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%20154%2C%20%D0%A2%D0%B0%D0%B3%D0%B0%D0%BD%D1%80%D0%BE%D0%B3%2C%20%D0%A0%D0%BE%D1%81%D1%82%D0%BE%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C%2C%20347905&rtt=auto',
   address: {
     streetAddress: { ru: 'ул. Социалистическая, 154', en: '154 Sotsialisticheskaya St.' },
     addressLocality: { ru: 'Таганрог', en: 'Taganrog' },
