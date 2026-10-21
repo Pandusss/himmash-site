@@ -23,9 +23,11 @@ function load() {
     const ym = function (...args: unknown[]) { (ym.a = ym.a || []).push(args); } as NonNullable<Window['ym']>;
     ym.l = Date.now();
     window.ym = ym;
-    addScript('https://mc.yandex.ru/metrika/tag.js');
+    // As in the code Metrika gives for the counter (tag.js?id=, ssr), loaded only after consent and without its
+    // <noscript> pixel, which would count visits without it.
+    addScript(`https://mc.yandex.ru/metrika/tag.js?id=${encodeURIComponent(id)}`);
     // Session recording (Webvisor) stays off: it would capture what visitors type into the form.
-    ym(Number(id), 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: false });
+    ym(Number(id), 'init', { ssr: true, clickmap: true, trackLinks: true, accurateTrackBounce: true, referrer: document.referrer, url: location.href, webvisor: false });
   } else {
     window.dataLayer = window.dataLayer || [];
     window.gtag = function () { window.dataLayer!.push(arguments); };
