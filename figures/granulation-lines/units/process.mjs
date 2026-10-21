@@ -19,7 +19,7 @@ export function intense(L, ports) {
   const wd = faceWindow(L, y0 + d, x + 220, x + w - 220, zc - 300, zc + 300);
   const blades = [];
   for (let i = 0; i < 11; i++) for (let k = 0; k < 4; k++) blades.push({ s: 230 + i * 130, phase: k * (Math.PI / 2) + i * 0.35, type: 0 });
-  p.push(clipped(wd, `<path class="ln-cavity" d="${wd}"/>` + rotor("intense", { o: [x, YB, zc], a: [1, 0, 0], u: [0, 1, 0], v: [0, 0, 1], speed: 2.2, types: [{ r0: 70, r1: 330, w: 70, t: 24, beta: 0.5 }], blades, shaft: { s0: 120, s1: w - 120, r: 70 } }) + flow("intense-churn", [[x + 260, YB + 200, zc - 200], [x + w - 260, YB + 200, zc + 150]], { speed: 900, count: 12, size: 28, spread: 220 })));
+  p.push(clipped(wd, `<path class="ln-cavity" d="${wd}"/>` + rotor("intense", { o: [x, YB, zc], a: [1, 0, 0], u: [0, 1, 0], v: [0, 0, 1], speed: 2.2, types: [{ r0: 70, r1: 330, w: 70, t: 24, beta: 0.5 }], blades, shaft: { s0: 120, s1: w - 120, r: 70 } }) + flow("intense-churn", [[x + 260, YB + 200, zc - 200], [x + w - 260, YB + 200, zc + 150]], { speed: 900, count: 12, size: 28, spread: 220, kind: "wash" })));
   p.push(L.L(wd, { tone: "hi" }));
   const fr = [];
   for (let i = 0; i < 9; i++) fr.push([x + 120 + i * 210, y0 + d, z1 - 60]);
@@ -70,7 +70,7 @@ export function dryer(L, ports) {
   const p = [];
   const x = 34800, w = 3500, y0 = YB - 750, d = 1500, z0 = 300, z1 = 2300;
   // Loading screw with its hopper (Ø400, 1100 long) and gear motor.
-  p.push(...screwConveyor(L, "dryer-in", [33800, YB + 120, 1080], [x, YB + 120, 1080], 200, { stands: [0.4], inlet: false, speed: 0.8 }).filter((_, i, arr) => true));
+  p.push(...screwConveyor(L, "dryer-in", [33800, YB + 120, 1080], [x, YB + 120, 1080], 200, { stands: [0.4], inlet: false, speed: 0.8, kind: "clean" }).filter((_, i, arr) => true));
   p.push(hopper([33980, YB - 80, 420, 420], 1290, [33830, YB - 230, 720, 720], 1780, "mid"));
   // Body on vibration mounts.
   for (const vx of [x + 250, x + w - 250]) for (const vy of [y0 + 150, y0 + d - 150]) p.push(box(vx - 110, vy - 90, 220, 180, 0, z0, "lo", { bevel: 0.3 }), cylZ(vx, vy, z0 - 120, z0, 70, "mid"));
@@ -83,10 +83,11 @@ export function dryer(L, ports) {
   const wd = faceWindow(L, fy, x + 1300, x + 2200, 460, 860);
   const blades = [];
   for (let i = 0; i < 26; i++) for (let k = 0; k < 2; k++) blades.push({ s: 150 + i * 125, phase: k * Math.PI + i * 0.45, type: 0 });
-  p.push(clipped(wd, `<path class="ln-cavity" d="${wd}"/>` + rotor("dryer", { o: [x + 60, YB + 300, 660], a: [1, 0, 0], u: [0, 1, 0], v: [0, 0, 1], speed: 0.9, types: [{ r0: 60, r1: 260, w: 90, t: 20, beta: 0.6 }], blades, shaft: { s0: 0, s1: w - 120, r: 60 } }) + flow("dryer-tumble", [[x + 1350, YB + 400, 560], [x + 2150, YB + 400, 760]], { speed: 600, count: 9, size: 28, spread: 120 })));
+  p.push(clipped(wd, `<path class="ln-cavity" d="${wd}"/>` + rotor("dryer", { o: [x + 60, YB + 300, 660], a: [1, 0, 0], u: [0, 1, 0], v: [0, 0, 1], speed: 0.9, types: [{ r0: 60, r1: 260, w: 90, t: 20, beta: 0.6 }], blades, shaft: { s0: 0, s1: w - 120, r: 60 } }) + flow("dryer-tumble", [[x + 1350, YB + 400, 560], [x + 2150, YB + 400, 760]], { speed: 600, count: 9, size: 28, spread: 120, kind: "clean" })));
   p.push(L.L(wd, { tone: "hi" }));
   // Thermo-block on the roof: heater with its fan, the louvred air box, the hot air duct down the right side.
-  p.push(box(x + 200, YB - 350, 600, 700, z1, 450, "mid", { bevel: 0.4, seam: z1 + 225 }));
+  p.push(`<g class="ln-hot">${box(x + 200, YB - 350, 600, 700, z1, 450, "mid", { bevel: 0.4, seam: z1 + 225 })}</g>`);
+  p.push(L.heat("dryer-heat", x + 1100, x + 2700, YB, z1 + 420, z1 + 1250));
   p.push(L.L(path3([[x + 260, YB + 350, z1 + 60], [x + 740, YB + 350, z1 + 390]], false) + path3([[x + 260, YB + 350, z1 + 390], [x + 740, YB + 350, z1 + 60]], false), { tone: "lo" }));
   p.push(box(x + 1000, YB - 420, 1900, 840, z1 + 80, 340, "mid", { bevel: 0.4, seam: z1 + 260 }));
   for (const lx of [x + 1100, x + 1700, x + 2300]) {
@@ -96,7 +97,7 @@ export function dryer(L, ports) {
   }
   p.push(box(x + w - 120, YB + 300, 180, 180, z1 - 450, 870, "mid", { bevel: 0.3 }));
   // Unloading screw (300 mm) up to the air separator.
-  p.push(...screwConveyor(L, "dryer-out", [x + w + 120, YB + 120, 720], [x + w + 1650, YB + 120, 2650], 160, { stands: [0.55], inlet: false, speed: 1 }));
+  p.push(...screwConveyor(L, "dryer-out", [x + w + 120, YB + 120, 720], [x + w + 1650, YB + 120, 2650], 160, { stands: [0.55], inlet: false, speed: 1, kind: "dry" }));
   return { id: "dryer", items: [{ key: depth([x + w / 2, YB, 1300]), svg: p.join("") }] };
 }
 
@@ -115,7 +116,7 @@ export function aero(L) {
     const zz = 1400 + i * 320, left = i % 2 === 0;
     baffles.push(L.convex([[[cx + (left ? -250 : 250), cy - 250, zz], [cx, cy - 250, zz - 160], [cx, cy + 250, zz - 160], [cx + (left ? -250 : 250), cy + 250, zz]], [[cx + (left ? -250 : 250), cy - 250, zz + 20], [cx, cy - 250, zz - 140], [cx, cy + 250, zz - 140], [cx + (left ? -250 : 250), cy + 250, zz + 20]]], "mid"));
   }
-  p.push(clipped(wd, `<path class="ln-cavity" d="${wd}"/>` + baffles.join("") + flow("aero-heavy", [[cx - 100, cy + 100, 3200], [cx + 80, cy + 100, 2400], [cx - 80, cy + 100, 1500]], { speed: 600, count: 9, size: 30, spread: 60 }) + flow("aero-light", [[cx + 60, cy + 100, 1500], [cx - 60, cy + 100, 2400], [cx + 60, cy + 100, 3300]], { speed: 900, count: 9, size: 22, spread: 80, kind: "paper" })));
+  p.push(clipped(wd, `<path class="ln-cavity" d="${wd}"/>` + baffles.join("") + flow("aero-heavy", [[cx - 100, cy + 100, 3200], [cx + 80, cy + 100, 2400], [cx - 80, cy + 100, 1500]], { speed: 600, count: 9, size: 30, spread: 60, kind: "dry" }) + flow("aero-light", [[cx + 60, cy + 100, 1500], [cx - 60, cy + 100, 2400], [cx + 60, cy + 100, 3300]], { speed: 900, count: 9, size: 22, spread: 80, kind: "paper" })));
   p.push(L.L(wd, { tone: "hi" }));
   // Light fraction up a duct into the cyclone; the rotary valve under it and the dust bag.
   const kx = cx + 900, ky = cy - 900;

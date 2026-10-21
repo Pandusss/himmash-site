@@ -24,7 +24,7 @@ export function pelletizingRow(L) {
     p.push(far, brace([x + 80, y0 + 80, 300], [x + w / 2, y0 + 80, z0 - 200], 70), brace([x + w - 80, y0 + 80, 300], [x + w / 2, y0 + 80, z0 - 200], 70));
     // Doser trough with a window on its near side, gear motor on the right, outlet chute at the left end.
     p.push(prismX(x, x + w, [[y0, z0], [y0 + d, z0], [yb + 260, zd + 200], [yb - 260, zd + 200]], "mid"));
-    p.push(...screwConveyor(L, "doser", [x - 700, yb, zd], [x + w + 100, yb, zd], 200, { stands: [], inlet: false, speed: 0.5, pitch: 300 }).slice(0, -1));
+    p.push(...screwConveyor(L, "doser", [x - 700, yb, zd], [x + w + 100, yb, zd], 200, { stands: [], inlet: false, speed: 0.5, pitch: 300, kind: "dry" }).slice(0, -1));
     p.push(frustum([x - 640, yb - 180, 360, 360], zd - 200, [FX - 160, yb + 300, 320, 320], 1520, "mid"));
     p.push(box(x, y0, w, d, z0, z1 - z0, "hi", { seams: [z0 + 120, z1 - 100], r: 20 }));
     // Panel joints and windows on the near face: the lower part of each window is filled with flakes.
@@ -99,7 +99,7 @@ export function pelletizingRow(L) {
     zones.forEach((hx, i) => {
       if (vents.some((v) => Math.abs(hx + 230 - v) < 350)) return;
       if (i === 6) return;
-      p.push(cylX(hx, hx + 460, YE, ZE, r + 55, "mid"));
+      p.push(`<g class="ln-hot" style="animation-delay:${(-i * 0.37).toFixed(2)}s">${cylX(hx, hx + 460, YE, ZE, r + 55, "mid")}</g>`);
       p.push(box(hx + 170, YE - 50, 120, 100, ZE + r + 50, 80, "mid", { bevel: 0.3, r: 10 }));
       p.push(cylZ(hx + 230, YE, 650, ZE - r - 60, 110, "lo"));
     });

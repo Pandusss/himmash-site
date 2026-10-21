@@ -1,12 +1,15 @@
-// Live behaviour of the whole-line figure. The idle tour walks the line unit by unit in the order the material
-// meets them, lighting each and naming its role; the reader picks a unit by clicking it or with the arrow keys,
-// and the camera moves in onto it (Escape, or a second click, returns to the whole line). Space stops and
-// starts the line.
+// Live behaviour of the whole-line figure. On first sight the line starts up unit by unit along the material flow.
+// The idle tour then walks the line, lighting each unit and naming its role; the reader picks a unit by clicking it
+// or with the arrow keys, the camera moves in onto it and a card names it with its key figures and a link to its
+// page (Escape, or a second click, returns to the whole line). P plays the material path: the camera follows the
+// material from the bale to the bag. Space stops and starts the line.
 const STEP = 2.4;          // seconds per unit on the tour
 const REST = 5;            // each lap opens on the whole line
 const RESUME_MS = 12000;   // the tour resumes this long after the last input
 const RESTART_MS = 6000;   // a stop made by the reader comes back on by itself this long after the last input
 const ZOOM_MS = 1100;
+const STORY_STEP = 4.2;    // seconds per unit on the material path
+const BOOT_STEP = 0.24;    // seconds between units starting up
 
 export function mount(stage, { text: T, data: F }) {
   const svg = stage.querySelector("svg");
@@ -23,7 +26,7 @@ export function mount(stage, { text: T, data: F }) {
   const full = { x: base.x, y: base.y, w: base.width, h: base.height };
   let view = { ...full }, from = view, to = view, zoomStart = 0, zoomed = null;
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
-  function boxOf(i) {
+  function boxOf(i, k = 1.5) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const g of groups[i]) {
       const b = g.getBBox();
@@ -31,15 +34,15 @@ export function mount(stage, { text: T, data: F }) {
     }
     if (!isFinite(x0)) return null;
     const ratio = full.w / full.h;
-    let w = Math.max((x1 - x0) * 1.5, full.w / 6), h = (y1 - y0) * 1.5;
+    let w = Math.max((x1 - x0) * k, full.w / 6), h = (y1 - y0) * k;
     if (w / h > ratio) h = w / ratio; else w = h * ratio;
     w = Math.min(w, full.w); h = Math.min(h, full.h);
     const x = Math.min(Math.max((x0 + x1) / 2 - w / 2, full.x), full.x + full.w - w);
     const y = Math.min(Math.max((y0 + y1) / 2 - h / 2, full.y), full.y + full.h - h);
     return { x, y, w, h };
   }
-  function zoomTo(i) {
-    const target = i === null ? full : boxOf(i) || full;
+  function zoomTo(i, k = 1.5) {
+    const target = i === null ? full : boxOf(i, k) || full;
     zoomed = i;
     from = { ...view }; to = target; zoomStart = performance.now();
     run();
@@ -82,6 +85,10 @@ export function mount(stage, { text: T, data: F }) {
     return list;
   })();
   const STEPS = 720;
+  const unitIndex = (node) => { const u = node && node.closest && node.closest("[data-unit]"); return u ? Number(u.dataset.unit) : -1; };
+  let boot = still.matches ? Infinity : 0;
+  const smooth = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
+  const startOf = (i) => (i < 0 || boot === Infinity ? 1 : smooth((boot - BOOT_STEP * i) / 0.8));
   const rotors = (F.rotors || []).map((R) => {
     const root = svg.querySelector(`[data-rotor="${R.id}"]`);
     if (!root) return null;
@@ -180,7 +187,7 @@ export function mount(stage, { text: T, data: F }) {
         flights.forEach((g) => g.setAttribute("transform", t));
       }
     }
-    return { R, root, draw, get box() { if (!box) { const b = root.getBBox(); box = { x: b.x, y: b.y, w: b.width, h: b.height }; } return box; } };
+    return { R, root, draw, unit: unitIndex(root), get box() { if (!box) { const b = root.getBBox(); box = { x: b.x, y: b.y, w: b.width, h: b.height }; } return box; } };
   }).filter(Boolean);
   const angles = rotors.map(() => 0);
   const inView = (b) => b.x < view.x + view.w && b.x + b.w > view.x && b.y < view.y + view.h && b.y + b.h > view.y;
@@ -189,7 +196,7 @@ export function mount(stage, { text: T, data: F }) {
     const wide = view.w > full.w * 0.6;
     rotorTick++;
     rotors.forEach((r, i) => {
-      angles[i] += dt * r.R.speed * TAU * flow;
+      angles[i] += dt * r.R.speed * TAU * flow * startOf(r.unit);
       if (wide && (rotorTick + i) % 2) return;
       if (!inView(r.box)) return;
       r.draw(angles[i]);
@@ -201,6 +208,7 @@ export function mount(stage, { text: T, data: F }) {
     const nodes = [...svg.querySelectorAll(`[data-slide="${spec.id}"]`)];
     let off = spec.phase || 0;
     return {
+      unit: unitIndex(nodes[0]),
       move(dt) {
         off = (off + dt * spec.speed) % spec.period;
         const t = `translate(${f1(off * spec.step[0])} ${f1(off * spec.step[1])})`;
@@ -219,7 +227,7 @@ export function mount(stage, { text: T, data: F }) {
     const total = cum[cum.length - 1];
     let seed = spec.id.length * 97;
     const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    const dots = Array.from({ length: spec.count }, (_, i) => ({ u: i / spec.count + rand() * 0.03, j: [rand() * 2 - 1, rand() * 2 - 1], node: el("circle", { r: spec.size, class: `ln-dot ln-${spec.kind}` }, host) }));
+    const dots = Array.from({ length: spec.count }, (_, i) => ({ u: i / spec.count + rand() * 0.03, j: [rand() * 2 - 1, rand() * 2 - 1], node: el("circle", { r: (spec.size * (0.65 + rand() * 0.7)).toFixed(2), class: `ln-dot ln-${spec.kind}` }, host) }));
     function at(u) {
       const d = u * total;
       let i = 1;
@@ -236,10 +244,44 @@ export function mount(stage, { text: T, data: F }) {
         p.node.setAttribute("cy", f1(q[1]));
       }
     }
-    return { move };
+    return { move, unit: unitIndex(host) };
   }).filter(Boolean);
 
+  // ---------- the unit card: number, name, two key figures, a link to the unit's own page
+  if (!document.getElementById("ln-info-css")) {
+    const css = document.createElement("style");
+    css.id = "ln-info-css";
+    css.textContent = `.ln-info{position:absolute;left:12px;top:12px;z-index:3;max-width:min(380px,62%);background:color-mix(in srgb,var(--white,#fff) 94%,transparent);border:1px solid var(--line,#d9dfd7);border-radius:6px;padding:10px 13px 11px;font-size:13px;line-height:1.4;color:var(--muted,#5e6b63);opacity:0;transform:translateY(-6px);transition:opacity .35s,transform .35s;pointer-events:none}
+.ln-info[data-show]{opacity:1;transform:none;pointer-events:auto}
+.ln-info .n{font:11px/1.4 var(--font-mono,ui-monospace,monospace);letter-spacing:.06em;text-transform:uppercase}
+.ln-info b{display:block;margin:2px 0 3px;font-size:17px;line-height:1.2;font-weight:600;color:var(--ink,#202d28)}
+.ln-info p{margin:0}
+.ln-info a{display:inline-block;margin-top:6px;font-weight:500;color:var(--green,#145445);text-decoration:none}
+.ln-info a:hover{text-decoration:underline}
+.ln-info[data-story] b{font-size:24px}
+.ln-info[data-story] p{font-size:15px}
+@media (max-width:640px){.ln-info{left:6px;top:6px;padding:6px 8px;font-size:11px;max-width:75%}.ln-info b,.ln-info[data-story] b{font-size:14px}.ln-info[data-story] p{font-size:11px}}`;
+    document.head.appendChild(css);
+  }
+  if (getComputedStyle(stage).position === "static") stage.style.position = "relative";
+  const card = document.createElement("div");
+  card.className = "ln-info";
+  card.setAttribute("aria-hidden", "true");
+  stage.appendChild(card);
+  let cardFor = -1, cardStory = false;
+  function showCard(i, asStory) {
+    if (i === cardFor && asStory === cardStory) return;
+    cardFor = i; cardStory = asStory;
+    if (i === null || i < 0) { card.removeAttribute("data-show"); return; }
+    const [title, a, b] = T.info[i];
+    const slug = F.links && F.links[F.units[i]];
+    card.innerHTML = `<div class="n">${String(i + 1).padStart(2, "0")} / ${count}</div><b>${title}</b><p>${a}</p><p>${b}</p>${slug ? `<a href="../${slug}/">${T.more} →</a>` : ""}`;
+    card.toggleAttribute("data-story", asStory);
+    card.setAttribute("data-show", "");
+  }
+
   let clock = 0, last = 0, frame = 0, visible = false, phrase = "";
+  let story = null;          // { i, t } while the material path plays
   let running = true, flow = 1;
   let selected = null, hovered = null, overview = false;
   let touring = !still.matches, tourClock = 0, quiet = 0;
@@ -260,8 +302,17 @@ export function mount(stage, { text: T, data: F }) {
 
   function step(dt) {
     clock += dt;
+    if (boot !== Infinity) { boot += dt; if (boot > BOOT_STEP * count + 1) boot = Infinity; }
+    if (story) {
+      story.t += dt;
+      if (story.t >= STORY_STEP) {
+        story.t = 0; story.i++;
+        if (story.i >= count) { endStory(); }
+        else { zoomTo(story.i, 2.3); announce(stepText(story.i)); }
+      }
+    }
     if (touring) tourClock += dt;
-    else if (!still.matches && hovered === null && quiet && performance.now() - quiet >= RESUME_MS) {
+    else if (!still.matches && !story && hovered === null && quiet && performance.now() - quiet >= RESUME_MS) {
       touring = true; tourClock = 0; quiet = 0; selected = null;
       if (zoomed !== null) zoomTo(null);
       if (!running) { running = true; announce(T.started); }
@@ -274,13 +325,16 @@ export function mount(stage, { text: T, data: F }) {
 
   let lastOn = -2;
   function draw() {
-    const toured = touring && !overview ? tourAt(tourClock) : null;
-    const on = hovered !== null ? hovered : selected !== null ? selected : toured;
+    const booting = boot !== Infinity && boot < BOOT_STEP * count;
+    const toured = booting ? Math.min(count - 1, Math.floor(boot / BOOT_STEP)) : touring && !overview ? tourAt(tourClock) : null;
+    const on = story ? story.i : hovered !== null ? hovered : selected !== null ? selected : toured;
+    showCard(story ? story.i : selected, !!story);
     if (on !== lastOn) {
       lastOn = on;
       groups.forEach((list, i) => list.forEach((node) => node.toggleAttribute("data-on", i === on)));
     }
-    if (on !== null && on !== undefined) say(stepText(on));
+    if (booting && !story && selected === null) say(`${T.starting} · ${on + 1}/${count}`);
+    else if (on !== null && on !== undefined) say(stepText(on));
     else say(running ? T.run : T.stopped);
   }
 
@@ -290,10 +344,11 @@ export function mount(stage, { text: T, data: F }) {
     step(dt);
     const moving = moveCamera(now);
     turn(dt);
-    flows.forEach((f) => f.move(dt * flow));
-    slides.forEach((f) => f.move(dt * flow));
+    flows.forEach((f) => f.move(dt * flow * startOf(f.unit)));
+    slides.forEach((f) => f.move(dt * flow * startOf(f.unit)));
     draw();
     frame = visible && (!still.matches || moving) ? requestAnimationFrame(tick) : 0;
+    if (!visible && story) story = null;
   }
   function run() {
     if (!frame && visible) { last = 0; frame = requestAnimationFrame(tick); }
@@ -311,7 +366,21 @@ export function mount(stage, { text: T, data: F }) {
     run();
   }
   const afterInput = () => (running ? disarmRestart() : armRestart());
+  function startStory() {
+    story = { i: 0, t: 0 };
+    selected = null; hovered = null; overview = false; touring = false;
+    if (!running) running = true;
+    zoomTo(0, 2.3);
+    announce(T.story + ": " + stepText(0));
+  }
+  function endStory() {
+    story = null;
+    zoomTo(null);
+    overview = true;
+    quiet = performance.now();
+  }
   function pick(i) {
+    if (story) story = null;
     selected = i;
     overview = i === null;
     zoomTo(i);
@@ -329,6 +398,7 @@ export function mount(stage, { text: T, data: F }) {
   });
   svg.addEventListener("pointerleave", () => { if (hovered === null) return; hovered = null; run(); });
   svg.addEventListener("click", (event) => {
+    if (story) { story = null; }
     const i = unitOf(event);
     takeOver();
     hovered = null;
@@ -346,6 +416,7 @@ export function mount(stage, { text: T, data: F }) {
     else if (key === "End") pick(count - 1);
     else if (key === "Escape") pick(null);
     else if (key === " " || key === "Enter") { running = !running; announce(running ? T.started : T.halted); }
+    else if (key === "p" || key === "P") { if (story) endStory(); else startStory(); }
     else handled = false;
     if (!handled) return;
     event.preventDefault();

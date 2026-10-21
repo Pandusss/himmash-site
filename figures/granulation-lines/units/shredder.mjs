@@ -56,7 +56,7 @@ export function shredder(L) {
   // Lifting lugs on the far wall's rim.
   for (const lx of [top[0] + 150, top[0] + top[2] - 250]) p.push(box(lx, top[1] - 40, 100, 50, zh1 - 40, 140, "mid", { bevel: 0.3, r: 25 }));
   // Pieces falling into the mouth from the belt.
-  p.push(flow("shred-in", [[x + 120, YB, 2600], [x + 600, YB, 2200], [x + 800, YB, 1500]], { speed: 1100, count: 8, size: 30, spread: 300 }));
+  p.push(flow("shred-in", [[x + 120, YB, 2600], [x + 600, YB, 2200], [x + 800, YB, 1500]], { speed: 1100, count: 8, size: 30, spread: 300, kind: "raw" }));
   p.push(near);
   p.push(motor([x + 900, YB + 330, 380], [x + 1600, YB + 330, 380], 200));
   p.push(brace([x + 80, y0 + d - 80, 200], [x + w - 80, y0 + d - 80, 640], 60));

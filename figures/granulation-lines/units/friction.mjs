@@ -35,7 +35,7 @@ export function friction(L, ports, id, a, b) {
   for (let i = 0; i < 16; i++) blades.push({ s: w0 - 120 + i * ((w1 - w0 + 240) / 15), phase: i * 0.9, type: 0 }, { s: w0 - 120 + i * ((w1 - w0 + 240) / 15), phase: i * 0.9 + Math.PI, type: 0 });
   p.push(`<path class="ln-cavity" d="${wd}"/>`);
   p.push(rotor(id, { o: a, a: axis, u: F.u, v: F.v, speed: 1.1, types: [{ r0: 55, r1: 215, w: 130, t: 22, beta: 0.75 }], blades, shaft: { s0: w0 - 200, s1: w1 + 200, r: 60 }, clip: wd }));
-  p.push(clipped(wd, flow(`${id}-up`, [at(w0, 120, thv), at(w1, 120, thv + 0.5)], { speed: 520, count: 14, size: 30, spread: 90 })));
+  p.push(clipped(wd, flow(`${id}-up`, [at(w0, 120, thv), at(w1, 120, thv + 0.5)], { speed: 520, count: 14, size: 30, spread: 90, kind: id === "fric1" ? "wash" : "rinse" })));
   p.push(L.L(wd, { tone: "lo" }));
   // Flanges and bearing housings at both ends.
   p.push(S(G.disc(-30, 20, r * 1.2, F, P), { tone: "mid" }), S(G.disc(len - 20, len + 30, r * 1.2, F, P), { tone: "mid" }));

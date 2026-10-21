@@ -5,7 +5,7 @@
 import { YB } from "../layout.mjs";
 
 export function bath(L, ports, id, x, w, drums) {
-  const { box, cylY, cylX, leg, brace, prismX, rotor, motor, water, clipped, cavity, path3, bolts, depth, flow, S, G, P } = L;
+  const { box, cylY, cylX, leg, brace, prismX, rotor, motor, water, clipped, cavity, path3, bolts, depth, flow, S, G, P, ripples } = L;
   const p = [];
   const y0 = YB - 750, d = 1500, z1 = 1400, zw = 1250, zv = 820, zb = 330;
   const prof = [[y0, z1], [y0 + d, z1], [y0 + d, zv], [YB + 150, zb], [YB - 150, zb], [y0, zv]];
@@ -17,7 +17,7 @@ export function bath(L, ports, id, x, w, drums) {
   const inner = [[x + 50, y0 + 50, z1], [x + w - 50, y0 + 50, z1], [x + w - 50, y0 + d - 50, z1], [x + 50, y0 + d - 50, z1]];
   const mouth = path3(inner);
   p.push(cavity(inner));
-  p.push(clipped(mouth, water(inner.map(([px, py]) => [px, py, zw]), "dirty") + flow(`${id}-float`, [[x + 150, YB, zw + 4], [x + w - 150, YB, zw + 4]], { speed: 300, count: Math.round(w / 110), size: 34, spread: 600 })));
+  p.push(clipped(mouth, water(inner.map(([px, py]) => [px, py, zw]), "dirty") + ripples(`${id}-rip`, inner.map(([px, py]) => [px, py, zw]), { speed: 300, spacing: 360 }) + flow(`${id}-float`, [[x + 150, YB, zw + 4], [x + w - 150, YB, zw + 4]], { speed: 300, count: Math.round(w / 110), size: 34, spread: 600, kind: id === "flot" ? "rinse" : "clean" })));
   // Paddle drums across the tank (axis along y): two end discs and eight short paddles between them, the lower
   // part in the water (photo: white wheels along the bath).
   const zd = zw + 60;

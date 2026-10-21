@@ -86,6 +86,6 @@ export function breaker(L) {
   p.push(box(380, y1 + 10, 4300, 60, top + 900, 60, "mid", { bevel: 0.2, r: 3, steps: 2 }));
   p.push(box(380, y1 + 10, 4300, 60, top + 300, 50, "lo", { bevel: 0.2, r: 3, steps: 2 }));
   // Torn pieces dropping from under the drums onto the belt.
-  p.push(flow("breaker-drop", [[hx + 560, YB, top + 80], [hx + 820, YB, top - 120], [5700, YB, 700]], { speed: 900, count: 14, size: 30, spread: 260 }));
+  p.push(flow("breaker-drop", [[hx + 560, YB, top + 80], [hx + 820, YB, top - 120], [5700, YB, 700]], { speed: 900, count: 14, size: 30, spread: 260, kind: "raw" }));
   return { id: "breaker", items: [{ key: depth([2500, YB, 900]), svg: p.join("") }] };
 }

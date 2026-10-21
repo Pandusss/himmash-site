@@ -7,7 +7,7 @@
 import { T5 } from "../layout.mjs";
 
 export function t5000(L) {
-  const { box, cylX, cylY, cylZ, turned, motor, cavity, water, clipped, path3, depth, bolts, leg, brace, slide, flow, frustum, pipe, S, G, P } = L;
+  const { box, cylX, cylY, cylZ, turned, motor, cavity, water, clipped, path3, depth, bolts, leg, brace, slide, flow, frustum, pipe, S, G, P, ripples } = L;
   const p = [];
   const items = [];
   const { x, y, w, d } = T5;
@@ -20,7 +20,7 @@ export function t5000(L) {
   const r1 = { x: x + 200, y: y + 400, w: 1400, d: 1700, z: 1540 };
   p.push(box(r1.x, r1.y, r1.w, r1.d, 140, r1.z - 140, "mid", { seams: [300, r1.z - 120], r: 20 }));
   const m1 = [[r1.x + 50, r1.y + 50, r1.z], [r1.x + r1.w - 50, r1.y + 50, r1.z], [r1.x + r1.w - 50, r1.y + r1.d - 50, r1.z], [r1.x + 50, r1.y + r1.d - 50, r1.z]];
-  p.push(cavity(m1), clipped(path3(m1), water(m1.map(([a, b]) => [a, b, 1350]), "dirty")), L.L(path3(m1), { tone: "lo" }));
+  p.push(cavity(m1), clipped(path3(m1), water(m1.map(([a, b]) => [a, b, 1350]), "dirty") + ripples("t5-rip1", m1.map(([a, b]) => [a, b, 1350]), { dir: [1, 0, 0], speed: 120, spacing: 300 })), L.L(path3(m1), { tone: "lo" }));
   // Step screen rising out of the tank toward the viewer, over the debris bin.
   const sa = [r1.x + 300, r1.y + r1.d - 300, 900], sb = [r1.x + 300, r1.y + r1.d + 650, 2050];
   const sF = L.frameBetween(sa, sb);
@@ -73,7 +73,7 @@ export function t5000(L) {
   const r5 = { x: x + 4100, y: y + 2600, w: 2000, d: 800, z: 1640 };
   p.push(box(r5.x, r5.y, r5.w, r5.d, 140, r5.z - 140, "hi", { seams: [300, r5.z - 120], r: 20 }));
   const m5 = [[r5.x + 50, r5.y + 50, r5.z], [r5.x + r5.w - 50, r5.y + 50, r5.z], [r5.x + r5.w - 50, r5.y + r5.d - 50, r5.z], [r5.x + 50, r5.y + r5.d - 50, r5.z]];
-  p.push(cavity(m5), clipped(path3(m5), water(m5.map(([a, b]) => [a, b, 1450]), "clean")), L.L(path3(m5), { tone: "lo" }));
+  p.push(cavity(m5), clipped(path3(m5), water(m5.map(([a, b]) => [a, b, 1450]), "clean") + ripples("t5-rip5", m5.map(([a, b]) => [a, b, 1450]), { dir: [-1, 0, 0], speed: 90, spacing: 300 })), L.L(path3(m5), { tone: "lo" }));
   // Rectifier cabinet and the clean water pump.
   const cab = { x: x + 5300, y: y + 900, w: 700, d: 450 };
   p.push(box(cab.x, cab.y, cab.w, cab.d, 140, 1800, "mid", { seam: 1800 }));

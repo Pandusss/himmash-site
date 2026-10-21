@@ -246,6 +246,46 @@ export function makeLib(P) {
     const g = `<g data-slide="${id}">${inner}</g>`;
     return clip ? clipped(clip, g) : g;
   }
+  // Ripples on a water surface (four corners on the plane): short wavelets in a staggered grid that drift with
+  // the flow, clipped to the surface. They are an effect, not drawing lines (class ln-ripple).
+  function ripples(id, corners, { dir = [1, 0, 0], speed = 200, spacing = 320 } = {}) {
+    const z = corners[0][2];
+    const xs = corners.map((c) => c[0]), ys = corners.map((c) => c[1]);
+    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+    const d = G.unit3(dir);
+    const across = [-d[1], d[0], 0];
+    const segs = [];
+    let row = 0;
+    for (let v = -spacing; v < Math.max(x1 - x0, y1 - y0) + spacing; v += spacing * 0.55, row++) {
+      for (let u = -spacing * 2; u < Math.max(x1 - x0, y1 - y0) + spacing; u += spacing) {
+        const off = (row % 2) * spacing * 0.5;
+        const c = [x0 + d[0] * (u + off) + across[0] * v * Math.sign(across[0] || 1), y0 + d[1] * (u + off) + Math.abs(across[1]) * v, z];
+        if (c[0] < x0 - spacing * 2 || c[0] > x1 + spacing || c[1] < y0 - spacing || c[1] > y1 + spacing) continue;
+        const a = G.add3(c, G.mul3(across, -spacing * 0.22)), b = G.add3(c, G.mul3(across, spacing * 0.22));
+        const m = G.add3(c, G.mul3(d, spacing * 0.08));
+        segs.push(pathOf([at(a), at(m), at(b)], false));
+      }
+    }
+    return slide(id, `<path class="ln-ripple" d="${segs.join("")}"/>`, { dir: d, speed, period: spacing, clip: path3(corners) });
+  }
+  // Heat shimmer: wavy lines rising over a hot box between z0 and z1, fading out toward the top.
+  function heat(id, x0, x1, y, z0, z1) {
+    const lines = [];
+    const wl = 220;
+    for (let x = x0; x <= x1; x += (x1 - x0) / 4) {
+      const pts = [];
+      for (let z = z0 - wl; z <= z1 + wl; z += 30) pts.push(at([x + 40 * Math.sin(((z - z0) / wl) * TAU), y, z]));
+      lines.push(pathOf(pts, false));
+    }
+    const mid = (x0 + x1) / 2;
+    const top = at([mid, y, z1]), bot = at([mid, y, z0]);
+    const gid = `ln-hg-${id}`;
+    defs.push(`<linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="${top[0].toFixed(1)}" y1="${top[1].toFixed(1)}" x2="${bot[0].toFixed(1)}" y2="${bot[1].toFixed(1)}"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".55" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>`);
+    const region = [[x0 - 80, y, z0], [x1 + 80, y, z0], [x1 + 80, y, z1], [x0 - 80, y, z1]];
+    defs.push(`<mask id="${gid}-m" maskUnits="userSpaceOnUse"><path d="${path3(region)}" fill="url(#${gid})"/></mask>`);
+    return `<g mask="url(#${gid}-m)">${slide(id, `<path class="ln-heat" d="${lines.join("")}"/>`, { dir: [0, 0, 1], speed: 260, period: wl })}</g>`;
+  }
+
   // A square-tube brace between two points (s = section).
   function brace(a, b, s = 50, tone = "lo") {
     const F = frameBetween(a, b);
@@ -280,6 +320,6 @@ export function makeLib(P) {
     k, G, P, V, K, at, depth, S, L, D, pathOf, path3, plan,
     FX, FY, FZ, frameBetween,
     box, cylX, cylY, cylZ, rod, prismX, prismY, turned, turnedAlong, ribs, convex, frustum, hopper, cavity, water, defs, clipped,
-    motor, gearbox, leg, legs, foot, pipe, flange, rotor, rotors, flow, flows, slide, slides, brace, pillow, bolts,
+    motor, gearbox, leg, legs, foot, pipe, flange, rotor, rotors, flow, flows, slide, slides, brace, pillow, bolts, ripples, heat,
   };
 }

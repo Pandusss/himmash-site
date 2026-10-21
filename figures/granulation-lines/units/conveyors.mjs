@@ -1,6 +1,6 @@
 // Conveyors used along the line: an inclined belt with troughing idlers, cleats that run with the belt and a gear
 // motor on the head pulley; a screw conveyor whose tube has a window on top, so its flight is seen turning.
-export function beltConveyor(L, id, a, b, w, { legsAt = [0.3, 0.8], sideH = 120, cleats = 260, speed = 260, flakes = true, motorSide = 1 } = {}) {
+export function beltConveyor(L, id, a, b, w, { legsAt = [0.3, 0.8], sideH = 120, cleats = 260, speed = 260, flakes = true, motorSide = 1, kind = "raw" } = {}) {
   const { box, cylY, prismY, leg, brace, slide, flow, motor, path3, bolts, G } = L;
   const out = [];
   const y = a[1];
@@ -28,7 +28,7 @@ export function beltConveyor(L, id, a, b, w, { legsAt = [0.3, 0.8], sideH = 120,
     lines.push(path3([[px, y - w / 2, pz + 2], [px, y + w / 2, pz + 2]], false));
   }
   out.push(slide(`${id}-cleats`, L.L(lines.join(""), { tone: "lo" }), { dir, speed, period: cleats, clip: path3(top) }));
-  if (flakes) out.push(flow(`${id}-flakes`, [[x0 + 150, y, z0 + 30], [x1 - 60, y, z1 + 30]], { speed, count: Math.round(len / 160), size: 30, spread: w * 0.3 }));
+  if (flakes) out.push(flow(`${id}-flakes`, [[x0 + 150, y, z0 + 30], [x1 - 60, y, z1 + 30]], { speed, count: Math.round(len / 160), size: 30, spread: w * 0.3, kind }));
   // Pulleys.
   out.push(cylY(y - w / 2 - 20, y + w / 2 + 20, x0, z0 - 35, 70, "mid"), cylY(y - w / 2 - 20, y + w / 2 + 20, x1, z1 - 35, 70, "mid"));
   // Near channel, skirt, legs and the drive.
@@ -45,7 +45,7 @@ export function beltConveyor(L, id, a, b, w, { legsAt = [0.3, 0.8], sideH = 120,
   return out;
 }
 
-export function screwConveyor(L, id, a, b, r, { stands = [0.4], inlet = true, speed = 0.9, pitch = null, tone = "hi" } = {}) {
+export function screwConveyor(L, id, a, b, r, { stands = [0.4], inlet = true, speed = 0.9, pitch = null, tone = "hi", kind = "raw" } = {}) {
   const { box, leg, rotor, motor, hopper, frustum, S, G, P, path3, at, pathOf } = L;
   const out = [];
   const F = L.frameBetween(a, b);
@@ -67,6 +67,8 @@ export function screwConveyor(L, id, a, b, r, { stands = [0.4], inlet = true, sp
   const wd = path3(win);
   out.push(`<path class="ln-cavity" d="${wd}"/>`);
   out.push(rotor(id, { o: a, a: F.a, u: F.u, v: F.v, speed, flight: { s0: w0 - 40, s1: w1 + 40, r0: r * 0.28, r1: r * 0.9, pitch: pitch || r * 1.6 }, shaft: { s0: w0 - 60, s1: w1 + 60, r: r * 0.28 }, clip: wd }));
+  // Flakes carried along by the flight, seen through the window.
+  if (kind) out.push(L.clipped(wd, L.flow(`${id}-carry`, [pt(w0, r * 0.75, ang), pt(w1, r * 0.75, ang)], { speed: speed * (pitch || r * 1.6), count: 8, size: 30, spread: r * 0.25, kind })));
   out.push(L.L(wd, { tone: "lo" }));
   out.push(S(G.disc(-40, 30, r * 1.18, F, P), { tone: "mid" }), S(G.disc(len - 30, len + 40, r * 1.18, F, P), { tone: "mid" }));
   if (inlet) out.push(hopper([a[0] + 40, a[1] - r * 0.8, r * 1.6, r * 1.6], a[2] + r * 0.8, [a[0] - 60, a[1] - r * 1.4, r * 2.6, r * 2.8], a[2] + r * 0.8 + 380, "mid"));

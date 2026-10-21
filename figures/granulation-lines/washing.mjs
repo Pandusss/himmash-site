@@ -25,9 +25,9 @@ export function washingRow(L) {
   units.push(intense(L, ports));
   units.push(friction(L, ports, "fric2", [19850, YB, 650], [21500, YB, 2150]));
   units.push(bath(L, ports, "flot", 22100, 4200, [450, 1250, 2050, 2850, 3650]));
-  unit("transfer", [26850, YB, 1700], beltConveyor(L, "transfer", [26350, YB, 1300], [27350, YB, 2050], 900, { legsAt: [0.5], sideH: 160, cleats: 180, speed: 200 }));
+  unit("transfer", [26850, YB, 1700], beltConveyor(L, "transfer", [26350, YB, 1300], [27350, YB, 2050], 900, { legsAt: [0.5], sideH: 160, cleats: 180, speed: 200, kind: "clean" }));
   units.push(bath(L, ports, "rinse", 27450, 2600, [500, 1300, 2100]));
-  unit("screw2", [30600, YB + 250, 1700], screwConveyor(L, "screw2", [29900, YB + 250, 1200], [31300, YB + 250, 2300], 170, { stands: [0.5], inlet: false }));
+  unit("screw2", [30600, YB + 250, 1700], screwConveyor(L, "screw2", [29900, YB + 250, 1200], [31300, YB + 250, 2300], 170, { stands: [0.5], inlet: false, kind: "clean" }));
   units.push(centrifuge(L, ports));
   units.push(dryer(L, ports));
   units.push(aero(L));

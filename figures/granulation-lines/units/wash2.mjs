@@ -5,7 +5,7 @@
 import { YB } from "../layout.mjs";
 
 export function wash2(L, ports) {
-  const { box, cylX, cylY, motor, gearbox, legs, brace, bolts, rotor, flow, water, clipped, cavity, path3, depth, S, G, P, pipe } = L;
+  const { box, cylX, cylY, motor, gearbox, legs, brace, bolts, rotor, flow, water, clipped, cavity, path3, depth, S, G, P, pipe, ripples } = L;
   const p = [];
   const x = 11200, w = 3000, y0 = YB - 560, d = 1120, z0 = 650, z1 = 1550;
   const [far, near] = legs(x, y0, w, d, z0, { s: 90, inset: 80 });
@@ -25,7 +25,8 @@ export function wash2(L, ports) {
     return rotor(`wash2-${j}`, { o: [x + 40, sy, zs], a: [1, 0, 0], u: [0, 1, 0], v: [0, 0, 1], speed: j ? -0.35 : 0.35, types: [{ r0: 60, r1: 300, w: 110, t: 26, beta: 0.45 }], blades, shaft: { s0: 0, s1: w - 80, r: 75 } });
   });
   p.push(cavity(inner));
-  p.push(clipped(mouth, water(inner.map(([px, py]) => [px, py, z1 - 200]), "dirty") + flow("wash2-float", [[x + 200, YB, z1 - 195], [x + w - 200, YB, z1 - 195]], { speed: 220, count: 26, size: 34, spread: 380 }) + shafts.join("")));
+  const sprays = [0.2, 0.45, 0.7, 0.9].map((t, i) => flow(`wash2-spray${i}`, [[x + w * t, y0 + 130, z1 - 80], [x + w * t + 40, y0 + 330, z1 - 205]], { speed: 900, count: 5, size: 16, spread: 60, kind: "spray" })).join("");
+  p.push(clipped(mouth, water(inner.map(([px, py]) => [px, py, z1 - 200]), "dirty") + ripples("wash2-rip", inner.map(([px, py]) => [px, py, z1 - 200]), { speed: 220 }) + sprays + flow("wash2-float", [[x + 200, YB, z1 - 195], [x + w - 200, YB, z1 - 195]], { speed: 220, count: 26, size: 34, spread: 380, kind: "raw" }) + shafts.join("")));
   p.push(L.L(mouth, { tone: "lo" }));
   // Spray bar along the inside of the far rim, with its nozzles.
   p.push(cylX(x + 120, x + w - 120, y0 + 90, z1 - 40, 30, "mid"));
