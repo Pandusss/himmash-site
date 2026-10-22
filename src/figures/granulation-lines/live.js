@@ -17,10 +17,17 @@ const FIRST_LIT = 1.5;     // on first sight the tour lights its first unit this
 export function mount(stage, { text: T, data: F }) {
   const base0 = stage.querySelector("svg");
   if (T.label) base0.setAttribute("aria-label", T.label);
+  // The camera moves an HTML box holding both layers: the browser's compositor runs a transform animation on a box but
+  // not on an svg element (on the svg it fell back to the page's own thread, and a move stuttered). The stage clips it.
+  const cam = document.createElement("div");
+  cam.style.cssText = "position:relative;transform-origin:0 0;will-change:transform";
+  base0.before(cam);
+  cam.appendChild(base0);
+  stage.style.overflow = "hidden";
+  const loading = stage.querySelector(".anatomy-loading");
+  if (loading) loading.style.display = "none";   // its rule hides it only after an svg sibling
   const svg = splitLayers(base0, F);       // the live layer: moving parts and what stands in front of them
   const layers2 = [base0, svg];
-  layers2.forEach((layer) => { layer.style.transformOrigin = "0 0"; });
-  base0.parentElement.style.overflow = "hidden";
   const plate = stage.closest(".iso-plate, .anatomy-plate") || stage.parentElement;
   const readout = plate.querySelector("[data-readout]");
   const live = stage.querySelector(".anatomy-live");
@@ -64,7 +71,7 @@ export function mount(stage, { text: T, data: F }) {
   // Animation of the transform, sampled along the camera's own path, so no work on the page can delay a frame of it);
   // the end view is rendered sharp when the move is done. While the camera moves, the drawing holds still. A recording
   // keeps exact frames instead.
-  let rendered = null, shown = null, moving = false, flights = [], flightId = 0;
+  let rendered = null, shown = null, moving = false, flights = [], flightId = 0, flightStart = 0, liftoff = 0;
   const transformOf = (v) => {
     const W = base0.clientWidth || 1000, sc = W / v.w;
     return `translate(${((rendered.x - v.x) * sc).toFixed(2)}px,${((rendered.y - v.y) * sc).toFixed(2)}px) scale(${(rendered.w / v.w).toFixed(5)})`;
@@ -74,7 +81,17 @@ export function mount(stage, { text: T, data: F }) {
     flights.forEach((a) => a.cancel());
     const frames = [];
     for (let i = 0; i <= 24; i++) frames.push({ transform: transformOf(viewAt(ease(i / 24))) });
-    flights = layers2.map((layer) => { const a = layer.animate(frames, { duration: ZOOM_MS, easing: "linear", fill: "forwards" }); a.startTime = start; return a; });
+    const a = cam.animate(frames, { duration: ZOOM_MS, easing: "linear", fill: "forwards" });
+    a.startTime = start;
+    flights = [a];
+    const id = flightId;
+    a.finished.then(() => {
+      if (id !== flightId || !moving) return;
+      // The page's own camera clock stood still during the flight: set it to the end, so it holds the landed view.
+      moving = false; view = { ...to }; zoomStart = clockMs - ZOOM_MS;
+      land();
+      run();
+    }, () => {});
   }
   const holds = (a, b) => a.x <= b.x + 0.5 && a.y <= b.y + 0.5 && a.x + a.w >= b.x + b.w - 0.5 && a.y + a.h >= b.y + b.h - 0.5;
   function land() {
@@ -86,6 +103,8 @@ export function mount(stage, { text: T, data: F }) {
   function zoomTo(i, k = 1.5) {
     const target = i === null ? full : boxOf(i, k) || full;
     zoomed = i;
+    // Where the camera is now: on a flight, from the flight's own clock (the page sleeps while the compositor flies).
+    if (moving && flights.length) view = viewAt(ease(Math.min(1, Math.max(0, (document.timeline.currentTime - flightStart) / ZOOM_MS))));
     from = { ...view }; to = target; zoomStart = clockMs;
     if (!recording && !still.matches) {
       // Render the union of both views, at the card's proportions, once for the whole move.
@@ -98,6 +117,9 @@ export function mount(stage, { text: T, data: F }) {
       rendered = { x: Math.min(Math.max(cx - w / 2, full.x), full.x + full.w - w), y: Math.min(Math.max(cy - h / 2, full.y), full.y + full.h - h), w, h };
       moving = true;
       const union = rendered, start = document.timeline.currentTime, id = ++flightId;
+      flightStart = start; liftoff = performance.now();
+      // The new highlight and card, once the flight has taken off.
+      setTimeout(() => { if (id === flightId) draw(); }, 50);
       if (shown && holds(shown, union)) { rendered = shown; fly(start); }
       else {
         // Take off at once on the picture already on screen (an eased move barely leaves it in its first frames), then
@@ -294,7 +316,7 @@ export function mount(stage, { text: T, data: F }) {
     const on = story ? story.i : hovered !== null ? hovered : selected !== null ? selected : toured;
     // A new highlight and card wait until the flight has taken off: restyling a unit in the same frame delayed the
     // flight's first frame on a slow machine.
-    if (moving && clockMs - zoomStart < 40) return;
+    if (moving && flights.length && performance.now() - liftoff < 40) return;
     showCard(story ? story.i : selected, !!story);
     if (on !== lastOn) {
       lastOn = on;
@@ -334,14 +356,17 @@ export function mount(stage, { text: T, data: F }) {
   }
   const marks = makeMarks(svg);
   function tick(now) {
+    // On a flight the compositor moves the picture and the page sleeps until the landing (a main-thread frame on every
+    // frame of the flight cost the compositor a commit each time).
+    if (moving && flights.length) { frame = 0; last = 0; return; }
     const dt = last ? Math.min((now - last) / 1000, 1 / 20) : 1 / 60;
     if (last) pace(now, now - last);
     last = now;
     clockMs += dt * 1000;
-    const moving = moveCamera(clockMs);
+    const panning = moveCamera(clockMs);
     pending += dt;
     if (pending >= (still.matches ? 0 : PACE[level].frame)) { update(Math.min(pending, 0.1)); pending = 0; }
-    frame = visible && (!still.matches || moving) ? requestAnimationFrame(tick) : 0;
+    frame = visible && (!still.matches || panning) ? requestAnimationFrame(tick) : 0;
   }
   function run() {
     if (recording) return;
