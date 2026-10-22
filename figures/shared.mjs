@@ -47,6 +47,16 @@ export function writeFigure({ id, svg, css, data = {}, width, height }) {
   return file;
 }
 
+// A live script as one classic script: its local imports (import { … } from "./x.js") are inlined once each, ahead of
+// the code that uses them, and the exports become plain declarations.
+function inlineImports(file, seen = new Set()) {
+  seen.add(file);
+  return readFileSync(file, "utf8").replace(/^import \{[^}]*\} from "(\.{1,2}\/[^"]+)";\n/gm, (_, rel) => {
+    const dep = join(dirname(file), rel);
+    return seen.has(dep) ? "" : inlineImports(dep, seen) + "\n";
+  }).replace(/^export /gm, "");
+}
+
 const attr = (value) => String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 
 // A standalone page with the kit card, the drawing and the live script inlined, for the browser checks.
@@ -54,7 +64,7 @@ export async function writePreview({ id, file, data = {}, theme = "light", lang 
   const src = join(SITE, "src", "figures", id);
   const { TEXT } = await import(join(src, "text.js"));
   const T = TEXT[lang];
-  const live = readFileSync(join(src, "live.js"), "utf8").replace(/^export /gm, "");
+  const live = inlineImports(join(src, "live.js"));
   const card = k.plateHtml({
     fig: T.fig,
     title: T.title,

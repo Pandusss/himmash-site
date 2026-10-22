@@ -175,8 +175,12 @@ export function pelletizingRow(L) {
     p.push(turned(dx, dy, 1400, [[0, 400], [150, 400, 1], [300, 220, 1], [360, 0, 1]], "hi"));
     p.push(motor([dx, dy, 1760], [dx, dy, 2200], 150));
     p.push(cylY(dy - 400, dy - 520, dx, 1000, 90, "mid"));
-    // Dry pellets blown up over the pellet hopper and down into its roof.
-    p.push(pipeSvg([[dx, dy - 520, 1000], [dx, dy - 760, 1000], [dx, dy - 760, 3700], [21900, dy - 760, 3700], [21900, YE, 3700], [21900, YE, 3460]], 70, { bend: 4, tone: "hi" }));
+    // Dry pellets blown up over the pellet hopper and down into its roof; drawn without the hopper (a figure of this
+    // unit alone), the line ends in a flange, heading for it.
+    if (L.alone && !L.alone.has("bagging")) {
+      p.push(pipeSvg([[dx, dy - 520, 1000], [dx, dy - 760, 1000], [dx, dy - 760, 2500], [dx - 700, dy - 760, 2500]], 70, { bend: 4, tone: "hi" }));
+      p.push(L.flange([dx - 700, dy - 760, 2500], [-1, 0, 0], 110));
+    } else p.push(pipeSvg([[dx, dy - 520, 1000], [dx, dy - 760, 1000], [dx, dy - 760, 3700], [21900, dy - 760, 3700], [21900, YE, 3700], [21900, YE, 3460]], 70, { bend: 4, tone: "hi" }));
     unit("pelletdry", [24300, YE + 300, 900], p);
   }
 

@@ -32,3 +32,8 @@ The figure on the line's page is the whole KPTBO-300 complex, after the company'
 | `granulation-lines/build.mjs` | Camera, painter's order, styles; writes the SVG and `figure.json` (rotors, flows, slides, unit links). |
 
 `src/figures/granulation-lines/live.js` turns the rotors (blade shapes cached per quarter degree, flights slid along their axis inside a clip), moves the material and the slides, runs the start-up wave, the tour, the unit card, the material path (key P) and the camera. With `#record` at the end of the page's URL, time only moves when `window.__line.advance(dt)` is called and the CSS animations follow the same clock, so a video can be recorded frame by frame.
+
+### Figures of single units (`unit-figure.mjs`)
+
+The pages of the line's units that have no figure of their own (bale breaker, shredder, conveyors, intensive washer, flotation bath, SPU-500 dryer, air separator, pellet dryer, bagging) show the unit cut from the whole-line drawing. `figures/<slug>/build.mjs` calls `unitFigure({ id, units, lit })` with the unit ids of the line (or `make(L)` for a composition of its own, as for the conveyors): the units are drawn alone on a floor slab, and the camera fits itself from a plan view and a first iso view. While a unit is drawn alone, `L.alone` holds the ids in the figure, so a connection to a unit left out can end in a flange. The live parts are the line's own (`src/figures/granulation-lines/parts.js`, shared with the whole-line figure); `unit-live.js` runs them with stop/start and speed, and `src/figures/<slug>/live.js` only calls it.
+

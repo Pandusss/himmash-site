@@ -112,7 +112,7 @@ export function aero(L) {
   p.push(box(cx - 340, cy - 340, 680, 680, 0, 140, "lo", { bevel: 0.3 }));
   p.push(cylY(cy - 300, cy - 120, cx, 560, 300, "mid"));
   p.push(motor([cx, cy - 300, 560], [cx, cy - 760, 560], 170));
-  p.push(box(cx - 260, cy - 260, 520, 520, 900, 2800, "hi", { seams: [1000, 3600], r: 15 }));
+  p.push(`<g data-sh="column">${box(cx - 260, cy - 260, 520, 520, 900, 2800, "hi", { seams: [1000, 3600], r: 15 })}</g>`);
   const wd = path3([[cx - 200, cy + 260, 1300], [cx + 200, cy + 260, 1300], [cx + 200, cy + 260, 3300], [cx - 200, cy + 260, 3300]]);
   const baffles = [];
   for (let i = 0; i < 6; i++) {
