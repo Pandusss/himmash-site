@@ -3,13 +3,13 @@
 // or with the arrow keys, the camera moves in onto it and a card names it with its key figures and a link to its
 // page (Escape, or a second click, returns to the whole line). P plays the material path: the camera follows the
 // material from the bale to the bag. Space stops and starts the line.
-const STEP = 2.4;          // seconds per unit on the tour
+const STEP = 4;            // seconds per unit on the tour: long enough to find the lit unit and read its line
 const REST = 5;            // each lap opens on the whole line
 const RESUME_MS = 12000;   // the tour resumes this long after the last input
 const RESTART_MS = 6000;   // a stop made by the reader comes back on by itself this long after the last input
 const ZOOM_MS = 1100;
 const STORY_STEP = 4.2;    // seconds per unit on the material path
-const BOOT_STEP = 0.24;    // seconds between units starting up
+const BOOT_STEP = 0.3;     // seconds between units starting up (motion only: nothing is lit while the line starts)
 
 export function mount(stage, { text: T, data: F }) {
   const base0 = stage.querySelector("svg");
@@ -391,7 +391,7 @@ export function mount(stage, { text: T, data: F }) {
         else { zoomTo(story.i, 2.3); announce(stepText(story.i)); }
       }
     }
-    if (touring) tourClock += dt;
+    if (touring) { if (boot === Infinity) tourClock += dt; }
     else if (!still.matches && !story && hovered === null && quiet && performance.now() - quiet >= RESUME_MS) {
       touring = true; tourClock = 0; quiet = 0; selected = null;
       if (zoomed !== null) zoomTo(null);
@@ -406,14 +406,14 @@ export function mount(stage, { text: T, data: F }) {
   let lastOn = -2;
   function draw() {
     const booting = boot !== Infinity && boot < BOOT_STEP * count;
-    const toured = booting ? Math.min(count - 1, Math.floor(boot / BOOT_STEP)) : touring && !overview ? tourAt(tourClock) : null;
+    const toured = !booting && touring && !overview ? tourAt(tourClock) : null;
     const on = story ? story.i : hovered !== null ? hovered : selected !== null ? selected : toured;
     showCard(story ? story.i : selected, !!story);
     if (on !== lastOn) {
       lastOn = on;
       groups.forEach((list, i) => list.forEach((node) => node.toggleAttribute("data-on", i === on)));
     }
-    if (booting && !story && selected === null) say(`${T.starting} · ${on + 1}/${count}`);
+    if (booting && !story && on == null) say(`${T.starting} · ${Math.min(count, Math.floor(boot / BOOT_STEP) + 1)}/${count}`);
     else if (on !== null && on !== undefined) say(stepText(on));
     else say(running ? T.run : T.stopped);
   }
