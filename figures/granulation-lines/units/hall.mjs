@@ -41,7 +41,7 @@ export function hall(L) {
   left.push(L.L(path3(pd), { tone: "lo" }));
   items.push({ key: -1e9, svg: `<g data-part="hall">${left.join("")}</g>` });
 
-  // Operators: safety boots, trousers, jacket, arms, head and helmet.
+  // Operators in the aisles (the one by the shredder stands clear of the control cabinet): safety boots, trousers, jacket, arms, head and helmet.
   const person = (x, y, face = 1) => {
     const o = [];
     for (const dy of [-90, 90]) o.push(box(x - 60, y + dy - 55, 120, 110, 0, 80, "lo", { bevel: 0.2, r: 20, steps: 3 }), box(x - 50, y + dy - 45, 100, 90, 80, 780, "mid", { bevel: 0.2, r: 30, steps: 3 }));
@@ -52,7 +52,7 @@ export function hall(L) {
     o.push(L.turned(x, y, 1680, [[0, 130], [20, 125, 1], [80, 100, 1], [120, 0, 1]], "mid"));
     return o.join("");
   };
-  const people = [[6600, -1350, 1], [35100, 5550, -1], [22600, 4500, 1]];
+  const people = [[7500, -400, -1], [35100, 5550, -1], [22600, 4500, 1]];
   for (const [x, y, f] of people) items.push({ key: depth([x, y, 900]), svg: `<g data-part="person">${person(x, y, f)}</g>` });
 
   // Forklift by the finished goods: counterweight body, overhead guard, mast, forks with a pallet, wheels.
