@@ -71,7 +71,7 @@ export function mount(stage, { text: T, data: F }) {
   // Animation of the transform, sampled along the camera's own path, so no work on the page can delay a frame of it);
   // the end view is rendered sharp when the move is done. While the camera moves, the drawing holds still. A recording
   // keeps exact frames instead.
-  let rendered = null, shown = null, moving = false, flights = [], flightId = 0, flightStart = 0, liftoff = 0;
+  let rendered = null, shown = null, moving = false, flights = [], flightId = 0, flightStart = 0;
   const transformOf = (v) => {
     const W = base0.clientWidth || 1000, sc = W / v.w;
     return `translate(${((rendered.x - v.x) * sc).toFixed(2)}px,${((rendered.y - v.y) * sc).toFixed(2)}px) scale(${(rendered.w / v.w).toFixed(5)})`;
@@ -97,6 +97,7 @@ export function mount(stage, { text: T, data: F }) {
   function land() {
     // The sharp end view and the end of the flight in one task, so they reach the screen in the same frame.
     setViewBox(to);
+    cam.style.transform = "";
     flights.forEach((a) => a.cancel());
     flights = [];
   }
@@ -116,24 +117,22 @@ export function mount(stage, { text: T, data: F }) {
       const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
       rendered = { x: Math.min(Math.max(cx - w / 2, full.x), full.x + full.w - w), y: Math.min(Math.max(cy - h / 2, full.y), full.y + full.h - h), w, h };
       moving = true;
-      const union = rendered, start = document.timeline.currentTime, id = ++flightId;
-      flightStart = start; liftoff = performance.now();
-      // The new highlight and card, once the flight has taken off.
-      setTimeout(() => { if (id === flightId) draw(); }, 50);
-      if (shown && holds(shown, union)) { rendered = shown; fly(start); }
-      else {
-        // Take off at once on the picture already on screen (an eased move barely leaves it in its first frames), then
-        // render the union and carry on the same flight on it: the compositor keeps flying on the old picture while
-        // the new one is rastered, so the re-render costs no frame.
-        rendered = shown || full;
-        fly(start);
-        requestAnimationFrame(() => {
-          if (id !== flightId || !moving) return;
-          rendered = union;
-          setViewBox(union);
-          fly(start);
-        });
-      }
+      const id = ++flightId;
+      flights.forEach((a) => a.cancel());
+      flights = [];
+      // All the heavy work before take-off, while the picture stands: render the union (unless the picture on screen
+      // already holds it), show the current view on it, put up the new highlight and card. Two frames later, when
+      // that is on screen, the compositor flies and the page has nothing left to do until the landing (work done
+      // mid-flight, even once, cost the flight a frame on a slow machine).
+      if (shown && holds(shown, rendered)) rendered = shown;
+      else setViewBox(rendered);
+      cam.style.transform = transformOf(from);
+      draw();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (id !== flightId || !moving) return;
+        flightStart = document.timeline.currentTime;
+        fly(flightStart);
+      }));
     }
     run();
   }
@@ -314,9 +313,6 @@ export function mount(stage, { text: T, data: F }) {
     const booting = boot !== Infinity && boot < BOOT_STEP * count;
     const toured = touring && !overview ? tourAt(tourClock) : null;
     const on = story ? story.i : hovered !== null ? hovered : selected !== null ? selected : toured;
-    // A new highlight and card wait until the flight has taken off: restyling a unit in the same frame delayed the
-    // flight's first frame on a slow machine.
-    if (moving && flights.length && performance.now() - liftoff < 40) return;
     showCard(story ? story.i : selected, !!story);
     if (on !== lastOn) {
       lastOn = on;
