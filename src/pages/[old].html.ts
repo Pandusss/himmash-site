@@ -6,7 +6,7 @@ import { localePath, rootLang } from '../i18n';
 // prod01.html … prod14.html of химмаш24.рф and the pages of the earlier site on himmash24.ru (`legacy`).
 // They belong to the Russian site. On the hosting, scripts/build-sites.mjs also turns them into 301 redirects.
 export const getStaticPaths: GetStaticPaths = () => rootLang !== 'ru' ? [] :
-  products.flatMap((p) => [p.original.replace(/\.html$/, ''), ...(p.legacy ?? [])].map((old) => ({ params: { old }, props: { slug: p.slug } })));
+  products.flatMap((p) => [p.original?.replace(/\.html$/, ''), ...(p.legacy ?? [])].filter((old): old is string => Boolean(old)).map((old) => ({ params: { old }, props: { slug: p.slug } })));
 
 export const GET: APIRoute = ({ props, site }) => {
   // The jump stays on the domain the visitor came to (the main one or its mirror); canonical names the main one.

@@ -115,7 +115,7 @@ const DATA = {
   // Units 0…chain-1 are the material's path; the rest (water treatment, cabinet) stand apart from it.
   chain: ORDER.indexOf("t5000"),
   // Units with a page of their own (the link is relative to this page: ../<slug>/).
-  links: { wash2: "flotation-machine", fric1: "friction-washer", fric2: "friction-washer", centrifuge: "centrifuge", aero: "pneumatic-conveying", hopper: "storage-hopper", feeder: "screw-feeder", extruder: "vacuum-degassing", changer: "screen-changer", head: "granulation-head", t5000: "water-treatment-t5000" },
+  links: { breaker: "bale-breaker", belt: "conveyors", shredder: "shredder", screw1: "conveyors", wash2: "flotation-machine", fric1: "friction-washer", intense: "intensive-washer", fric2: "friction-washer", flot: "flotation-bath", transfer: "conveyors", rinse: "flotation-bath", screw2: "conveyors", dryer: "dryer-spu-500", pelletdry: "pellet-dryer", bagging: "bagging", centrifuge: "centrifuge", aero: "air-separator", hopper: "storage-hopper", feeder: "screw-feeder", extruder: "vacuum-degassing", changer: "screen-changer", head: "granulation-head", t5000: "water-treatment-t5000" },
   proj: (() => { const c = k.cameraOf(P); return { ox: P.origin[0], oy: P.origin[1], k: c.k, sinA: c.sinA, cosA: c.cosA, sinE: c.sinE, cosE: c.cosE }; })(),
   light: L.G.lightOf(P),
   bands: [0, 0.2, 0.42, 0.62],

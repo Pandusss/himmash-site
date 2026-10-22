@@ -7,8 +7,8 @@ export const categoryOrder: Category[] = ['line', 'washing', 'granulation', 'sys
 
 export interface ProductMeta {
   slug: string;
-  /** Page on the current химмаш24.рф site the content came from. */
-  original: string;
+  /** Page on the current химмаш24.рф site the content came from (units added from the line's materials have none). */
+  original?: string;
   /** Pages of the earlier site on himmash24.ru that this page replaces (addresses without .html). */
   legacy?: string[];
   category: Category;
@@ -57,6 +57,17 @@ export const products: ProductMeta[] = [
   { slug: 'screen-changer', original: 'prod11.html', legacy: ['shibernyj-filtr-bespreryvnogo-dejstvija'], category: 'granulation', image: 'products/00-11-696x392.webp', photos: ['products/11-01-1200.webp'], related: ['vacuum-degassing', 'granulation-head', 'dies-and-knives'] },
   { slug: 'screws-and-shafts', original: 'prod13.html', category: 'systems', image: 'products/00-13-696x392.webp', photos: ['products/13-02-1200.webp', 'products/02-03-1200x900.webp'], related: ['friction-washer', 'screw-feeder', 'thrust-bearing-unit'] },
   { slug: 'thrust-bearing-unit', original: 'prod14.html', category: 'systems', image: 'products/00-14-696x392.webp', photos: ['products/14-02-1200.webp', 'products/14-01-1200.webp'], related: ['screw-feeder', 'vacuum-degassing', 'screen-changer'] },
+  // Units of the КПТБО-300 line with no page on the old site (company materials, 21.10.2026); images are renders of
+  // the line figure and the company's photos and drawings.
+  { slug: 'bale-breaker', category: 'washing', image: 'products/bale-breaker-card.webp', photos: ['products/bale-breaker-1.webp', 'products/bale-breaker-2.webp', 'products/bale-breaker-3.webp'], related: ['shredder', 'conveyors', 'granulation-lines'] },
+  { slug: 'shredder', category: 'washing', image: 'products/shredder-card.webp', photos: ['products/shredder-1.webp', 'products/shredder-3.webp', 'products/shredder-2.webp'], related: ['bale-breaker', 'conveyors', 'flotation-machine'] },
+  { slug: 'conveyors', category: 'systems', image: 'products/conveyors-card.webp', photos: ['products/conveyors-1.webp', 'products/conveyors-2.webp', 'products/conveyors-3.webp'], related: ['shredder', 'flotation-bath', 'dryer-spu-500'] },
+  { slug: 'intensive-washer', category: 'washing', image: 'products/intensive-washer-card.webp', photos: ['products/intensive-washer-1.webp'], related: ['friction-washer', 'flotation-bath', 'water-treatment-t5000'] },
+  { slug: 'flotation-bath', category: 'washing', image: 'products/flotation-bath-card.webp', photos: ['products/flotation-bath-1.webp', 'products/flotation-bath-2.webp', 'products/flotation-bath-3.webp'], related: ['friction-washer', 'centrifuge', 'water-treatment-t5000'] },
+  { slug: 'dryer-spu-500', category: 'washing', image: 'products/dryer-spu-500-card.webp', photos: ['products/dryer-spu-500-1.webp', 'products/dryer-spu-500-2.webp'], related: ['centrifuge', 'air-separator', 'pneumatic-conveying'] },
+  { slug: 'air-separator', category: 'washing', image: 'products/air-separator-card.webp', photos: ['products/air-separator-1.webp'], related: ['dryer-spu-500', 'pneumatic-conveying', 'storage-hopper'] },
+  { slug: 'pellet-dryer', category: 'granulation', image: 'products/pellet-dryer-card.webp', photos: ['products/pellet-dryer-1.webp'], related: ['granulation-head', 'bagging', 'dies-and-knives'] },
+  { slug: 'bagging', category: 'granulation', image: 'products/bagging-card.webp', photos: ['products/bagging-1.webp'], related: ['pellet-dryer', 'granulation-head', 'granulation-lines'] },
 ];
 
 /** Line process on the home page: each step lists the equipment that covers it. */
