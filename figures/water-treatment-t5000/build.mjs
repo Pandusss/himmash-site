@@ -552,8 +552,8 @@ const CSS = figureCss(`
 .wt-step{fill:none;stroke:var(--anatomy-lo);stroke-width:.5}
 .wt-plate{fill:var(--anatomy-shade-2);stroke:var(--anatomy-mid);stroke-width:var(--anatomy-weight);stroke-linejoin:round}
 .${SVG_CLASS} [data-on] .wt-plate{stroke:var(--anatomy-lit);fill:var(--anatomy-lit-shade)}`, {
-  light: "--wt-w1:#c3bba6;--wt-w2:#9fb8aa;--wt-a:.38;--wt-sa:.5;--wt-w5:#cfe3db;--wt-sludge:#8e8573;--wt-froth:#f3f1e8;--wt-froth-edge:#9a9688;--wt-bubble:#ffffff;--wt-debris:#5b564a;--wt-f1:#8a7f66;--wt-f2:#7f8f80;--wt-f3:#5f8f7d;--wt-f4:#3f8a70;--wt-f5:#1f7a5f",
-  dark: "--wt-w1:#4a4536;--wt-w2:#3c6a5a;--wt-a:.36;--wt-sa:.46;--wt-w5:#2f5a4c;--wt-sludge:#5a5242;--wt-froth:#d9d6c8;--wt-froth-edge:#8a8676;--wt-bubble:#cfe9de;--wt-debris:#b7ae98;--wt-f1:#a99a78;--wt-f2:#9db3a4;--wt-f3:#8ac7ae;--wt-f4:#7fd3b0;--wt-f5:#7fe6bc",
+  light: "--wt-w1:#c9b48f;--wt-w2:#b3bcc0;--wt-a:.38;--wt-sa:.5;--wt-w5:#cfe3f4;--wt-sludge:#8e8573;--wt-froth:#f3f1e8;--wt-froth-edge:#9a9688;--wt-bubble:#ffffff;--wt-debris:#5b564a;--wt-f1:#8a6a3c;--wt-f2:#7f8582;--wt-f3:#6a8aa6;--wt-f4:#4a7fb2;--wt-f5:#2f6fae",
+  dark: "--wt-w1:#7a6440;--wt-w2:#3e4e58;--wt-a:.36;--wt-sa:.46;--wt-w5:#1d3a55;--wt-sludge:#5a5242;--wt-froth:#d9d6c8;--wt-froth-edge:#8a8676;--wt-bubble:#d6e6f6;--wt-debris:#b7ae98;--wt-f1:#c9a26a;--wt-f2:#a0a6a3;--wt-f3:#8fb0cf;--wt-f4:#86b3e6;--wt-f5:#7fb6ee",
 });
 
 const file = writeFigure({ id: ID, svg, css: CSS, data: DATA, width: WIDTH, height: HEIGHT });

@@ -17,7 +17,7 @@ export const TEXT = {
     aria: "Бункер-накопитель со шнековым дозатором. Пробел или Enter — пуск и остановка шнека, стрелки вверх и вниз меняют его скорость с шагом 10 %.",
     label: "Бункер-накопитель на сварной раме: короб с панелями и смотровым окном, V-образное днище и жёлоб со шнеком-дозатором. Справа — мотор-редуктор шнека, датчики верхнего и нижнего уровня, вход пневмотранспорта и пульт с частотным преобразователем; слева — выгрузной патрубок над приёмной воронкой. Две передние панели сняты, чтобы был виден уровень сырья, а в жёлобе сделан вырез со шнеком.",
     keys: [
-      { mark: "lit", label: "Шнек-дозатор 200–300 мм: скорость задаёт оператор с пульта" },
+      { mark: "lit", label: "Шнек-дозатор (на линии КПТБО-300 — Ø400 мм): скорость задаёт оператор с пульта" },
       { mark: "raised", label: "Сырьё в бункере: уровень держат датчики, подпитка — пневмотранспортом" },
     ],
     caption: "Сырьё поступает в бункер по линии пневмотранспорта, отработанный воздух уходит в цех. Шнек-дозатор в жёлобе под V-образным днищем выносит сырьё к выгрузному патрубку; скорость выгрузки оператор задаёт частотным преобразователем. Когда уровень опускается до нижнего датчика, включается подпитка, на верхнем — отключается. Время ускорено: настоящий бункер на 5–10 м³ расходуется часами.",
@@ -51,7 +51,7 @@ export const TEXT = {
     aria: "Storage hopper with a dosing screw. Space or Enter starts and stops the screw; the up and down arrows change its speed in 10 % steps.",
     label: "A storage hopper on a welded frame: a box with panels and an inspection window, a V-shaped bottom and a trough with the dosing screw. On the right are the screw's geared motor, the high and low level switches, the pneumatic conveying inlet and the control box with the inverter; on the left is the discharge spout over a receiving funnel. Two front panels are removed to show the material level, and the trough is cut open to show the screw.",
     keys: [
-      { mark: "lit", label: "Dosing screw, 200–300 mm: the operator sets its speed at the control box" },
+      { mark: "lit", label: "Dosing screw (Ø400 mm on the KPTBO-300 line): the operator sets its speed at the control box" },
       { mark: "raised", label: "Material in the bin: level switches keep the stock, pneumatic conveying refills it" },
     ],
     caption: "Material arrives in the bin through the pneumatic conveying line, and the spent air escapes into the shop. The dosing screw in the trough under the V-shaped bottom carries the material to the discharge spout; the operator sets the discharge rate with the inverter. When the level falls to the low switch, refilling starts, and at the high switch it stops. Time is sped up: a real 5–10 m³ bin lasts for hours.",

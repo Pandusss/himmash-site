@@ -21,7 +21,7 @@ export function bath(L, ports, id, x, w, drums) {
   // Paddle drums across the tank (axis along y): two end discs and eight short paddles between them, the lower
   // part in the water (photo: white wheels along the bath).
   const zd = zw + 60;
-  drums.forEach((dx, j) => {
+  (drums || []).forEach((dx, j) => {
     const blades = [];
     for (let i = 0; i < 8; i++) blades.push({ s: d / 2 - 20, phase: i * (Math.PI / 4) + j * 0.3, type: 0 });
     p.push(rotor(`${id}-${j}`, {
@@ -42,7 +42,7 @@ export function bath(L, ports, id, x, w, drums) {
   p.push(clipped(wd, `<path class="ln-water" data-water="body" d="${wd}"/>` + `<path class="ln-cavity" d="${path3([[wx0, YB + 150, zb], [wx1, YB + 150, zb], [wx1, y0 + d, zv], [wx0, y0 + d, zv]])}"/>` + screw + sinking + sinking2));
   p.push(L.L(wd, { tone: "hi" }));
   // Bearings and a gear motor with a chain guard per drum on the near rim.
-  drums.forEach((dx) => {
+  (drums || []).forEach((dx) => {
     p.push(box(x + dx - 80, y0 + d - 30, 160, 100, z1 - 40, 140, "mid", { bevel: 0.3, r: 8 }));
     p.push(box(x + dx - 70, y0 + d + 70, 140, 120, zd - 300, 420, "hi", { bevel: 0.4, r: 30 }));
     p.push(motor([x + dx, y0 + d + 190, zd - 220], [x + dx, y0 + d + 480, zd - 220], 80));

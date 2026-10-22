@@ -1,7 +1,8 @@
 // Активная флотационная машина: an interactive isometric figure built with the anatomy kit.
 // World units are millimetres. x runs along the bath from the feed end (x = 0) to the outlet end (x = L),
 // y across it (the cut-away long wall faces +y, the viewer), z up from the floor.
-// Two longitudinal shafts with bolted paddles stir the flakes and push the floating fraction to the outlet weir;
+// Two longitudinal shafts with bolted paddles stir the flakes and push the floating fraction to the outlet weir
+// (company photos 2019: both shafts driven from one motor through a V-belt and a gearbox on the feed end);
 // particles heavier than water sink into the V-shaped bottom and are let out through the sludge valve.
 import * as k from "../kit/iso-kit.mjs";
 import * as G from "../kit/lathe.mjs";
@@ -39,7 +40,7 @@ const P = k.fitProjection(
   [
     [-60, -650, 0], [-60, 650, 0], [L + 620, -650, 0], [L + 620, 650, 0],
     [-60, -650, ZT + RIM], [-60, 650, ZT + RIM], [L + 50, 650, ZT + RIM], [L + 50, -650, ZT + RIM],
-    [-440, 0, 1840], [-T - 680, -400, 1400], [-T - 680, 400, 1400],
+    [-440, 0, 1840], [-T - 900, -460, 1450], [-T - 900, 460, 1450], [-T - 900, 0, 0],
   ],
   WIDTH,
   HEIGHT,
@@ -221,29 +222,35 @@ function bearing(y, sign) {
   } else out.push(S(G.disc(56, 96, 58, A, P), { tone: "mid" }));
   return out.join("");
 }
-// Shaft-mounted parallel gear motor on the drive (feed) end; the motor points away from the bath (-x).
-const GB = { a: 120, b: 300, half: 95, z0: 960, z1: 1310 };
-const MOTOR_Z = 1215;
-function gearMotor(y) {
+// Drive on the feed end (company photos): a gearbox across both shafts, its input pulley on the outer face, a V-belt
+// down to the motor on a floor bracket, and a belt guard over the belts.
+const GB = { x0: XF0 - 320, x1: XF0 - 40, y: 420, z0: 930, z1: 1330 };
+const PUL = { x: XF0 - 370, z: 1130, r: 170 };     // gearbox input pulley
+const MP = { x: XF0 - 370, z: 430, r: 70 };        // motor pulley
+function drive() {
   const out = [];
-  const gx0 = XF0 - GB.b, gx1 = XF0 - GB.a;
-  // Torque arm down to a bracket on the end wall.
-  out.push(S(box([XF0 - 150, y - 30, 790], [XF0, y + 30, 840]), { tone: "lo" }));
-  out.push(S(box([XF0 - 160, y - 12, 840], [XF0 - 130, y + 12, GB.z0]), { tone: "lo" }));
-  const body = plan(gx0, y - GB.half, gx1 - gx0, 2 * GB.half, 18);
-  out.push(S(k.slabOf(body, GB.z0, GB.z1 - GB.z0, P, 4, 3), { tone: "mid", inner: Ln(k.sideSeam(body, 1150, P, 4), { tone: "faint" }) }));
-  out.push(D([[gx0 + 30, y - 60], [gx1 - 30, y - 60], [gx0 + 30, y + 60], [gx1 - 30, y + 60]].map(([px, py]) => at([px, py, GB.z1])), { size: 0.5 }));
-  // Motor flange, ribbed motor body and fan cowl.
-  const M = G.frameAlong([gx0, y, MOTOR_Z], [-1, 0, 0]);
-  out.push(S(G.disc(0, 26, 118, M, P), { tone: "mid" }));
-  out.push(D(G.dotsOf(M, 26, 102, 6, P, { fade: [0.04, 0.42] }), { size: 0.45 }));
-  const ribs = G.ribsOf(M, 60, 300, 96, 18, P, { fade: [0.1, 0.55], seams: true });
-  out.push(S(G.disc(26, 330, 96, M, P), { tone: "mid", inner: k.fadedSvg(ribs, { tone: "lo" }) }));
-  out.push(S(G.disc(330, 380, 100, M, P), { tone: "mid", inner: Ln(G.arcOf(M, 352, 100, P), { tone: "faint" }) }));
-  // Terminal box on top of the motor, cable gland on its outer side.
-  out.push(S(box([gx0 - 210, y - 55, MOTOR_Z + 90], [gx0 - 90, y + 55, MOTOR_Z + 170]), { tone: "mid" }));
-  out.push(D([[gx0 - 195, y - 40], [gx0 - 105, y + 40]].map(([px, py]) => at([px, py, MOTOR_Z + 170])), { size: 0.45 }));
-  if (y > 0) out.push(S(G.disc(0, 26, 16, alongY([gx0 - 150, y + 55, MOTOR_Z + 130]), P), { tone: "mid" }));
+  out.push(S(box([XF0 - 900, -230, 0], [XF0 - 340, 230, 60]), { tone: "lo" }));
+  for (const y of [-180, 180]) out.push(S(box([XF0 - 860, y - 25, 60], [XF0 - 380, y + 25, 300]), { tone: "lo" }));
+  const M = G.frameAlong([XF0 - 400, 0, MP.z], [-1, 0, 0]);
+  out.push(S(G.disc(0, 26, 140, M, P), { tone: "mid" }));
+  const ribs = G.ribsOf(M, 60, 380, 120, 20, P, { fade: [0.1, 0.55], seams: true });
+  out.push(S(G.disc(26, 410, 120, M, P), { tone: "mid", inner: k.fadedSvg(ribs, { tone: "lo" }) }));
+  out.push(S(G.disc(410, 460, 124, M, P), { tone: "mid", inner: Ln(G.arcOf(M, 435, 124, P), { tone: "faint" }) }));
+  out.push(S(box([XF0 - 680, -60, MP.z + 110], [XF0 - 540, 60, MP.z + 200]), { tone: "mid" }));
+  for (const y of [-300, 300]) out.push(S(box([GB.x1, y - 30, 820], [XF0, y + 30, 880]), { tone: "lo" }));
+  const body = plan(GB.x0, -GB.y, GB.x1 - GB.x0, 2 * GB.y, 30);
+  out.push(S(k.slabOf(body, GB.z0, GB.z1 - GB.z0, P, 4, 3), { tone: "mid", inner: Ln(k.sideSeam(body, 1130, P, 4), { tone: "faint" }) }));
+  out.push(D([[GB.x0 + 40, -GB.y + 40], [GB.x1 - 40, -GB.y + 40], [GB.x0 + 40, GB.y - 40], [GB.x1 - 40, GB.y - 40]].map(([px, py]) => at([px, py, GB.z1])), { size: 0.5 }));
+  out.push(S(box([GB.x0 + 90, -50, GB.z1], [GB.x0 + 190, 50, GB.z1 + 40]), { tone: "mid" }));
+  const A = G.frameAlong([GB.x0, 0, PUL.z], [-1, 0, 0]);
+  out.push(S(G.disc(0, 30, 40, A, P), { tone: "mid" }));
+  for (const [r, z] of [[PUL.r, PUL.z], [MP.r, MP.z]]) {
+    const F = G.frameAlong([PUL.x + 20, 0, z], [-1, 0, 0]);
+    out.push(S(G.disc(0, 60, r, F, P), { tone: "mid", inner: Ln(G.arcOf(F, 20, r - 6, P) + G.arcOf(F, 40, r - 6, P), { tone: "faint" }) }));
+  }
+  const gpoly = [[-PUL.r - 40, PUL.z - 40], [-PUL.r - 20, PUL.z + PUL.r + 30], [PUL.r + 20, PUL.z + PUL.r + 30], [PUL.r + 40, PUL.z - 40], [MP.r + 50, MP.z], [MP.r + 30, MP.z - MP.r - 40], [-MP.r - 30, MP.z - MP.r - 40], [-MP.r - 50, MP.z]];
+  out.push(S(plate(XF([PUL.x - 70, 0, 0]), gpoly, 0, 120), { tone: "hi" }));
+  out.push(D([[0, PUL.z + 60], [0, MP.z - 30]].map(([y, z]) => at([PUL.x - 70, y, z])), { size: 0.55 }));
   return out.join("");
 }
 
@@ -322,7 +329,7 @@ function sludgeBin() {
 
 // Recycled water from the treatment plant comes in through the end wall.
 function waterInlet() {
-  const out = [];
+  const out = ['<g class="fm-clean">'];
   const y = 480, z = 860;
   const A = alongX([XE, y, z]);
   out.push(S(G.disc(0, 18, 70, A, P), { tone: "mid" }));
@@ -333,6 +340,7 @@ function waterInlet() {
   out.push(S(G.disc(200, 260, 40, A, P), { tone: "mid" }));
   out.push(S(G.disc(260, 276, 70, A, P), { tone: "mid" }));
   out.push(D(G.dotsOf(A, 276, 55, 4, P, { all: true, phase: Math.PI / 4 }), { size: 0.45 }));
+  out.push("</g>");
   return out.join("");
 }
 
@@ -399,9 +407,8 @@ const body = [
   crossRail(LEG_X[0]),
   crossRail(LEG_X[3]),
   bearing(SHAFT_Y[0], -1),
-  gearMotor(SHAFT_Y[0]),
   bearing(SHAFT_Y[1], -1),
-  gearMotor(SHAFT_Y[1]),
+  `<g data-shaft="drive" data-hit>${drive()}</g>`,
   backWall(),
   vBottom(),
   farEnd(),
@@ -463,6 +470,9 @@ const DATA = {
 
 const CSS = figureCss(`
 .fm-water{fill:var(--fm-water);fill-opacity:var(--fm-water-a);stroke:none}
+.fm-clean .iso-top,.fm-clean .iso-fill{fill:var(--fm-clean-fill)}
+.fm-clean .iso-shade{fill:var(--fm-clean-shade)}
+.fm-clean .iso-edge{stroke:var(--fm-clean-edge)}
 .fm-section{fill-opacity:var(--fm-section-a)}
 .fm-hole{fill:var(--anatomy-shade-0);stroke:none}
 .fm-bin{fill:var(--fm-silt);stroke:none}
@@ -476,8 +486,8 @@ const CSS = figureCss(`
 .fm-pad[data-shade="4"]{fill:var(--anatomy-top)}
 .${SVG_CLASS} [data-on] .fm-pad{stroke:var(--anatomy-lit);fill:var(--anatomy-lit-shade)}
 .${SVG_CLASS} [data-on] .fm-pad[data-shade="4"],.${SVG_CLASS} [data-on] .fm-pad[data-shade="3"]{fill:var(--anatomy-lit-top)}`, {
-  light: "--fm-water:#9fc4b6;--fm-water-a:.32;--fm-section-a:.42;--fm-flake:#ffffff;--fm-flake-edge:#5d6b63;--fm-grit:#3a4740;--fm-silt:#b4af9f",
-  dark: "--fm-water:#3f7a66;--fm-water-a:.24;--fm-section-a:.34;--fm-flake:#e4ece6;--fm-flake-edge:#9aa89f;--fm-grit:#0a0d0b;--fm-silt:#4a4537",
+  light: "--fm-water:#c9b48f;--fm-water-a:.34;--fm-clean-fill:#cfe3f4;--fm-clean-shade:#a9c8e6;--fm-clean-edge:#2f6fae;--fm-section-a:.42;--fm-flake:#ffffff;--fm-flake-edge:#5d6b63;--fm-grit:#3a4740;--fm-silt:#b4af9f",
+  dark: "--fm-water:#7a6440;--fm-water-a:.3;--fm-clean-fill:#1d3a55;--fm-clean-shade:#152b40;--fm-clean-edge:#7fb6ee;--fm-section-a:.34;--fm-flake:#e4ece6;--fm-flake-edge:#9aa89f;--fm-grit:#0a0d0b;--fm-silt:#4a4537",
 });
 
 const file = writeFigure({ id: ID, svg, css: CSS, data: DATA, width: WIDTH, height: HEIGHT });

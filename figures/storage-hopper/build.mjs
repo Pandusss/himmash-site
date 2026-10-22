@@ -8,31 +8,32 @@ import { SVG_CLASS, figureCss, writeFigure, writePreview } from "../shared.mjs";
 const theme = process.argv.includes("--light") ? "light" : "dark";
 
 const WIDTH = 520;
-const HEIGHT = 600;
+const HEIGHT = 480;
 
-// ---------- the bin: 3.6 × 1.5 m box over a V bottom, about 8.5 m³ in all (spec: 5–10 m³)
-const LX = 1800;                 // half length
-const LY = 750;                  // half width
-const BOX = [2150, 3250];        // straight walls
-const AZ = 1350;                 // screw axis
-const TR = 170;                  // trough outer radius (screw 300 mm)
+// ---------- the bin, after the company's sketch: 5 m long, the body 2 m tall over a 1.5 m frame, a Ø400 dosing screw
+// that runs 0.5 m past the discharge end, about 9 m³ (sketch: 8–10 m³)
+const LX = 2500;                 // half length
+const LY = 800;                  // half width
+const BOX = [2300, 3500];        // straight walls
+const AZ = 1500;                 // screw axis
+const TR = 220;                  // trough outer radius (screw 300 mm)
 const SHELL = 6;
-const FLIGHT = 150;
-const ROOT = 45;
-const PITCH = 300;
-const TROUGH = [-2250, LX];
-const SPOUT = [-2200, -1960];
-const BASE_TOP = 1100;           // flange joints of the posts on the base frame
+const FLIGHT = 195;
+const ROOT = 55;
+const PITCH = 400;
+const TROUGH = [-3000, LX];
+const SPOUT = [-2950, -2650];
+const BASE_TOP = 1150;           // flange joints of the posts on the base frame
 const POST = 80;
 const TUBE = 60;
 const POSTS_X = [-LX, 0, LX];
-const LOW = 2420, HIGH = 3020;   // level sensors
+const LOW = 2650, HIGH = 3250;   // level sensors
 
 const P = k.fitProjection(
   [
     ...k.boxCorners({ x: -LX - 60, y: -LY - 60, w: 2 * LX + 120, d: 2 * LY + 120, r: 0 }, 0, BOX[1] + 160),
-    ...k.boxCorners({ x: -2350, y: -300, w: 300, d: 600, r: 0 }, 0, 1500),
-    [2330, 420, 2980], [2050, 0, 2000],
+    ...k.boxCorners({ x: TROUGH[0] - 100, y: -300, w: 300, d: 600, r: 0 }, 0, 1500),
+    [LX + 530, 420, BOX[1] - 270], [LX + 250, 0, AZ + 650],
   ],
   WIDTH,
   HEIGHT,
@@ -100,7 +101,7 @@ const railY = (x, y0, y1, z, h = TUBE) => box(x - h / 2, x + h / 2, y0, y1, z - 
 // One long side of the frame (the base truss and the braces under the bin).
 function side(y) {
   const out = [];
-  const xs = [-LX, -900, 0, 900, LX];
+  const xs = [-LX, -LX / 2, 0, LX / 2, LX];
   // Base truss diagonals, then chords and verticals.
   for (let i = 0; i < 4; i++) {
     const [x0, x1] = [xs[i], xs[i + 1]];
@@ -108,7 +109,7 @@ function side(y) {
     out.push(bar([up ? x0 + 40 : x0 + 30, y, up ? 200 : BASE_TOP - 90], [up ? x1 - 30 : x1 - 40, y, up ? BASE_TOP - 90 : 200], 44));
   }
   // V braces from the base to the bin bottom.
-  for (const [x0, xm, x1] of [[-LX, -900, 0], [0, 900, LX]]) {
+  for (const [x0, xm, x1] of [[-LX, -LX / 2, 0], [0, LX / 2, LX]]) {
     out.push(bar([x0 + (x0 ? 40 : 40), y, BASE_TOP + 40], [xm - 30, y, BOX[0] - 70], 44));
     out.push(bar([xm + 30, y, BOX[0] - 70], [x1 - 40, y, BASE_TOP + 40], 44));
   }
@@ -116,7 +117,7 @@ function side(y) {
     out.push(railX(xs[i] + (i ? 30 : 40), xs[i + 1] - (i < 3 ? 30 : 40), y, 200));
     out.push(railX(xs[i] + (i ? 30 : 40), xs[i + 1] - (i < 3 ? 30 : 40), y, BASE_TOP - 30));
   }
-  for (const x of [-900, 900]) out.push(box(x - 30, x + 30, y - 30, y + 30, 200, BASE_TOP - 90));
+  for (const x of [-LX / 2, LX / 2]) out.push(box(x - 30, x + 30, y - 30, y + 30, 200, BASE_TOP - 90));
   out.push(railX(-LX + 40, LX - 40, y, BOX[0]));
   return out.join("");
 }
@@ -167,10 +168,10 @@ function trough() {
   const out = [];
   const F = FX();
   out.push(S(disc(TROUGH[0] - 20, TROUGH[0], TR + 30, F), { tone: "mid" }));
-  out.push(S(disc(TROUGH[0], TROUGH[1], TR, F), { tone: "mid", crease: "none", inner: L([-1200, -600, 0, 600, 1200].map((s) => G.arcOf(F, s, TR, P, { from: deg(-90), to: deg(0) })).join(""), { tone: "faint" }) }));
+  out.push(S(disc(TROUGH[0], TROUGH[1], TR, F), { tone: "mid", crease: "none", inner: L([-2400, -1600, -800, 0, 800, 1600].map((s) => G.arcOf(F, s, TR, P, { from: deg(-90), to: deg(0) })).join(""), { tone: "faint" }) }));
   // Lid over the discharge extension, and the spout below it.
   out.push(box(TROUGH[0], -LX, -TR - 5, TR + 5, AZ, AZ + TR + 12, "mid", 1));
-  out.push(D([-2200, -2050, -1900].map((x) => at([x, TR + 5, AZ + TR + 12])), { size: 0.45 }));
+  out.push(D([TROUGH[0] + 50, TROUGH[0] + 250, TROUGH[0] + 450].map((x) => at([x, TR + 5, AZ + TR + 12])), { size: 0.45 }));
   return out.join("");
 }
 function spout() {
@@ -261,13 +262,13 @@ function panel(x0, x1, tone = "lo") {
   return S(k.slabOf(plan(x0, LY - SHELL - 8, x1 - x0, 8, 1), BOX[0], BOX[1] - BOX[0], P, 2), { tone, crease: "none" });
 }
 // Bay 2 carries a window like the photo; its glass shows the material inside.
-const WINDOW = { x0: -700, x1: -260, z0: 2380, z1: 3080 };
+const WINDOW = { x0: -LX / 4 - 260, x1: -LX / 4 + 260, z0: 2650, z1: 3300 };
 function windowBay() {
   const out = [];
   const y = LY - 8;
   const { x0, x1, z0, z1 } = WINDOW;
   // Panel around the opening: four plates.
-  out.push(S(k.slabOf(plan(-900 + 30, y - 6, x0 - (-900 + 30), 8, 1), BOX[0], BOX[1] - BOX[0], P, 2), { tone: "lo", crease: "none" }));
+  out.push(S(k.slabOf(plan(-LX / 2 + 30, y - 6, x0 - (-LX / 2 + 30), 8, 1), BOX[0], BOX[1] - BOX[0], P, 2), { tone: "lo", crease: "none" }));
   out.push(S(k.slabOf(plan(x1, y - 6, -30 - x1, 8, 1), BOX[0], BOX[1] - BOX[0], P, 2), { tone: "lo", crease: "none" }));
   out.push(S(k.slabOf(plan(x0, y - 6, x1 - x0, 8, 1), BOX[0], z0 - BOX[0], P, 2), { tone: "lo", crease: "none" }));
   out.push(S(k.slabOf(plan(x0, y - 6, x1 - x0, 8, 1), z1, BOX[1] - z1, P, 2), { tone: "lo", crease: "none" }));
@@ -400,7 +401,7 @@ const svg = k.figureSvg({
     ...POSTS_X.map((x) => post(x, -LY)),
     ...POSTS_X.map((x) => joint(x, -LY)),
     side(-LY),
-    box(900 - 30, 900 + 30, -LY - 30, -LY + 30, BOX[0], BOX[1] - TUBE),
+    box(LX / 2 - 30, LX / 2 + 30, -LY - 30, -LY + 30, BOX[0], BOX[1] - TUBE),
     topRails(true),
     inletInside(),
     funnel(),
@@ -418,7 +419,7 @@ const svg = k.figureSvg({
     `<g data-sh="drive" data-hit>${drive()}</g>`,
     matTop(),
     matFront(),
-    panel(-LX + 40, -930),
+    panel(-LX + 40, -LX / 2 - 30),
     windowBay(),
     endWall(),
     roof(),
@@ -427,7 +428,7 @@ const svg = k.figureSvg({
     ...POSTS_X.map((x) => footFront(x, LY)),
     ...POSTS_X.map((x) => post(x, LY)),
     ...POSTS_X.map((x) => joint(x, LY)),
-    ...[-900, 900].map((x) => box(x - 30, x + 30, LY - 30, LY + 30, BOX[0], BOX[1] - TUBE)),
+    ...[-LX / 2, LX / 2].map((x) => box(x - 30, x + 30, LY - 30, LY + 30, BOX[0], BOX[1] - TUBE)),
     `<g data-sh="panel" data-hit>${cabinet()}</g>`,
   ],
 });

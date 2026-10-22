@@ -15,10 +15,12 @@ export const TEXT = {
     ],
     idle: "подача 500 кг/ч · осадок 40 %",
     aria: "Флотационная машина. Клавиша 1 подаёт порцию сырья, 2 останавливает или запускает валы, пробел открывает задвижку слива осадка.",
-    label: "Флотационная ванна длиной около 5 м на раме, ближняя стенка вырезана. Внутри два продольных вала с наклонными лопатками; плавающие хлопья полимера движутся по воде к переливу и лотку на выходе, тяжёлые частицы опускаются в V-образное дно. Снаружи у выхода два мотор-редуктора валов, задвижка слива осадка с пневмоприводом и тележка для осадка.",
+    label: "Флотационная ванна длиной около 5 м на раме, ближняя стенка вырезана. Внутри два продольных вала с наклонными лопатками; плавающие хлопья полимера движутся по воде к переливу и лотку на выходе, тяжёлые частицы опускаются в V-образное дно. Оба вала вращает один мотор через клиноременную передачу и редуктор на торце со стороны загрузки. У выхода — подача чистой воды, задвижка слива осадка с пневмоприводом и тележка для осадка.",
     keys: [
       { mark: "lit", label: "Валы с лопатками или задвижка, когда идёт слив осадка" },
       { mark: "raised", label: "Хлопья ПЭ и ПП плывут к переливу, песок и камни оседают в V-образное дно" },
+      { mark: "clean", label: "Подача чистой воды" },
+      { mark: "dirty", label: "Вода в ванне смывает грязь и уходит на очистку" },
     ],
     caption: "Дроблёнка с грязью падает из лотка в ванну с водой. Наклонные лопатки на двух продольных валах перемешивают её, отбивают грязь и гонят плавающие хлопья к переливу на выходе, откуда они идут на фрикционную мойку. Частицы тяжелее воды тонут и собираются в V-образном дне; когда слой нарастает, открывается задвижка и осадок уходит в тележку. Накопление осадка показано ускоренно.",
     live: {
@@ -49,10 +51,12 @@ export const TEXT = {
     ],
     idle: "feed 500 kg/h · sediment 40 %",
     aria: "Flotation washer. Key 1 drops a batch of feedstock, 2 stops or starts the shafts, Space opens the sludge valve.",
-    label: "A flotation bath about 5 m long on a frame, with the near wall cut away. Inside, two longitudinal shafts carry pitched paddles; floating plastic flakes travel across the water to the overflow weir and the outlet chute, and heavy particles sink into the V-shaped bottom. Outside at the outlet end are the two shaft gear motors, the sludge valve with its pneumatic actuator and the sludge cart.",
+    label: "A flotation bath about 5 m long on a frame, with the near wall cut away. Inside, two longitudinal shafts carry pitched paddles; floating plastic flakes travel across the water to the overflow weir and the outlet chute, and heavy particles sink into the V-shaped bottom. Both shafts are turned by one motor through a V-belt and a gearbox on the feed end. At the outlet end are the clean water inlet, the sludge valve with its pneumatic actuator and the sludge cart.",
     keys: [
       { mark: "lit", label: "The paddle shafts, or the valve while sludge is let out" },
       { mark: "raised", label: "PE and PP flakes float to the weir; sand and stones settle in the V bottom" },
+      { mark: "clean", label: "Clean water supply" },
+      { mark: "dirty", label: "The bath water washes the dirt off and leaves for treatment" },
     ],
     caption: "Shredded plastic and dirt fall from the chute into a bath of water. Pitched paddles on two longitudinal shafts stir it, knock the dirt off and push the floating flakes to the outlet weir, from where they go on to the friction washer. Particles heavier than water sink and collect in the V-shaped bottom; when the layer builds up, the valve opens and the sludge runs into the cart. Sediment build-up is sped up.",
     live: {

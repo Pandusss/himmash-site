@@ -21,7 +21,7 @@ export const TEXT = {
     label: "Контейнерный блок очистки сточных вод со снятыми крышей и боковой стенкой. Слева направо: приёмная ёмкость со ступенчатой решёткой и контейнером для мусора, ванна электрофлотации и электрокоагуляции с пакетом электродов, скребком и лотком флотошлама, батарея механических и сорбционных фильтров, ячейка бактерицидной обработки и бак чистой воды с двумя выходами: в линию мойки и на сброс. Насосы и трубы соединяют ступени, флотошлам уходит в накопительную ёмкость.",
     keys: [
       { mark: "lit", label: "Ступень очистки, выбранная сейчас" },
-      { mark: "raised", label: "Штрихи в трубах идут по потоку и светлеют от ступени к ступени" },
+      { mark: "raised", label: "Штрихи в трубах идут по потоку: бурая грязная вода на входе становится голубой чистой на выходе" },
     ],
     caption: "Стоки сначала проходят решётку, которая поднимает крупный мусор в контейнер, и усредняются в приёмной ёмкости. В ванне электрофлотации газ с электродов поднимает масла и хлопья в пену, скребок сгоняет её в лоток, флотошлам копится в отдельной ёмкости. Фильтры задерживают металлы, органику, нанопластик и ПАВ, затем вода проходит бактерицидную обработку и из бака чистой воды возвращается в линию или уходит на сброс. Схема условная: скорость потока и накопление осадка показаны ускоренно.",
     live: {
@@ -57,7 +57,7 @@ export const TEXT = {
     label: "A wastewater treatment container unit with its roof and side wall removed. From left to right: the intake tank with a step screen and a debris bin, the electroflotation and electrocoagulation tank with its electrode pack, scraper and froth trough, a bank of mechanical and sorption filters, the bactericidal treatment cell, and the clean water tank with two outlets, back to the washing line and to the sewer. Pumps and pipes link the stages, and the flotation sludge goes to a holding tote.",
     keys: [
       { mark: "lit", label: "The treatment stage selected now" },
-      { mark: "raised", label: "Dashes in the pipes run with the flow and get clearer stage by stage" },
+      { mark: "raised", label: "Dashes in the pipes run with the flow: brown dirty water at the inlet turns blue and clean at the outlet" },
     ],
     caption: "The wastewater first passes a screen that lifts coarse debris into a bin, and is equalised in the intake tank. In the electroflotation tank, gas from the electrodes carries oils and flocs up into a froth; the scraper pushes it into a trough, and the flotation sludge collects in a separate tote. The filters retain metals, organics, nanoplastics and surfactants; the water then gets bactericidal treatment and leaves the clean water tank either back to the line or to the sewer. The drawing is schematic: flow and sludge build-up are sped up.",
     live: {

@@ -113,7 +113,7 @@ const DATA = {
   view: { origin: P.origin, scale: P.scale, azimuth: P.azimuth, elevation: P.elevation },
   units: ORDER,
   // Units with a page of their own (the link is relative to this page: ../<slug>/).
-  links: { fric1: "friction-washer", fric2: "friction-washer", flot: "flotation-machine", rinse: "flotation-machine", centrifuge: "centrifuge", aero: "pneumatic-conveying", hopper: "storage-hopper", feeder: "screw-feeder", extruder: "vacuum-degassing", changer: "screen-changer", head: "granulation-head", t5000: "water-treatment-t5000" },
+  links: { wash2: "flotation-machine", fric1: "friction-washer", fric2: "friction-washer", centrifuge: "centrifuge", aero: "pneumatic-conveying", hopper: "storage-hopper", feeder: "screw-feeder", extruder: "vacuum-degassing", changer: "screen-changer", head: "granulation-head", t5000: "water-treatment-t5000" },
   proj: (() => { const c = k.cameraOf(P); return { ox: P.origin[0], oy: P.origin[1], k: c.k, sinA: c.sinA, cosA: c.cosA, sinE: c.sinE, cosE: c.cosE }; })(),
   light: L.G.lightOf(P),
   bands: [0, 0.2, 0.42, 0.62],
