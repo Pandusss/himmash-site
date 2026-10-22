@@ -1,5 +1,6 @@
-// Web analytics after consent: Yandex Metrika on the Russian site, Google Analytics on the English one
-// (src/data/analytics.ts). The choice is kept in this browser; «Cookie settings» in the footer asks again.
+// Web analytics after consent: Yandex Metrika on the Russian site, Google Analytics on the English one and, once its
+// stream is set, on the Russian one too (src/data/analytics.ts). The choice is kept in this browser; «Cookie settings»
+// in the footer asks again.
 declare global {
   interface Window { ym?: ((...args: unknown[]) => void) & { a?: unknown[]; l?: number }; dataLayer?: unknown[]; gtag?: (...args: unknown[]) => void }
 }
@@ -15,26 +16,35 @@ function addScript(src: string) {
   document.head.append(script);
 }
 
+// The page's counters, from the notice: provider:id, separated by spaces.
+const counters = (notice?.dataset.counters ?? '').split(/\s+/).filter(Boolean).map((item) => {
+  const [provider, id] = item.split(':');
+  return { provider, id };
+});
+
 function load() {
   if (loaded || !notice) return;
   loaded = true;
-  const id = notice.dataset.id!;
-  if (notice.dataset.provider === 'metrika') {
-    const ym = function (...args: unknown[]) { (ym.a = ym.a || []).push(args); } as NonNullable<Window['ym']>;
-    ym.l = Date.now();
-    window.ym = ym;
-    // As in the code Metrika gives for the counter (tag.js?id=, ssr), loaded only after consent and without its
-    // <noscript> pixel, which would count visits without it.
-    addScript(`https://mc.yandex.ru/metrika/tag.js?id=${encodeURIComponent(id)}`);
-    // Session recording (Webvisor) stays off: it would capture what visitors type into the form.
-    ym(Number(id), 'init', { ssr: true, clickmap: true, trackLinks: true, accurateTrackBounce: true, referrer: document.referrer, url: location.href, webvisor: false });
-  } else {
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function () { window.dataLayer!.push(arguments); };
-    window.gtag('js', new Date());
-    window.gtag('config', id);
-    addScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`);
-  }
+  counters.forEach(({ provider, id }) => (provider === 'metrika' ? loadMetrika(id) : loadGa(id)));
+}
+
+function loadMetrika(id: string) {
+  const ym = function (...args: unknown[]) { (ym.a = ym.a || []).push(args); } as NonNullable<Window['ym']>;
+  ym.l = Date.now();
+  window.ym = ym;
+  // As in the code Metrika gives for the counter (tag.js?id=, ssr), loaded only after consent and without its
+  // <noscript> pixel, which would count visits without it.
+  addScript(`https://mc.yandex.ru/metrika/tag.js?id=${encodeURIComponent(id)}`);
+  // Session recording (Webvisor) stays off: it would capture what visitors type into the form.
+  ym(Number(id), 'init', { ssr: true, clickmap: true, trackLinks: true, accurateTrackBounce: true, referrer: document.referrer, url: location.href, webvisor: false });
+}
+
+function loadGa(id: string) {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer!.push(arguments); };
+  window.gtag('js', new Date());
+  window.gtag('config', id);
+  addScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`);
 }
 
 /** Counters' own cookies, removed when the visitor declines after accepting. */
@@ -51,11 +61,13 @@ function saved(): string | null {
   try { return localStorage.getItem(KEY); } catch { return null; }
 }
 
-/** Sends a goal to the counter, if the visitor allowed it: inquiry_open, inquiry_sent, phone_click, email_click, presentation_open. */
+/** Sends a goal to every counter, if the visitor allowed it: inquiry_open, inquiry_sent, phone_click, email_click, presentation_open. */
 export function track(goal: string) {
   if (!loaded || !notice) return;
-  if (notice.dataset.provider === 'metrika') window.ym?.(Number(notice.dataset.id), 'reachGoal', goal);
-  else window.gtag?.('event', goal);
+  for (const { provider, id } of counters) {
+    if (provider === 'metrika') window.ym?.(Number(id), 'reachGoal', goal);
+    else window.gtag?.('event', goal);
+  }
 }
 
 if (notice) {

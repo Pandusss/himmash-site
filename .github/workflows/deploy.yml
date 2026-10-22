@@ -42,6 +42,7 @@ jobs:
           # stay out of the real statistics; separate preview counters can be set (see src/data/analytics.ts).
           PUBLIC_YANDEX_METRIKA_ID: ${{ vars.PREVIEW_YANDEX_METRIKA_ID }}
           PUBLIC_GA_ID: ${{ vars.PREVIEW_GA_ID }}
+          PUBLIC_GA_ID_RU: ${{ vars.PREVIEW_GA_ID_RU }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

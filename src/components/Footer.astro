@@ -1,7 +1,7 @@
 ---
 import { type Lang, localePath, useTranslations } from '../i18n';
 import { company, phoneDisplay, presentationFor } from '../data/company';
-import { analyticsFor } from '../data/analytics';
+import { countersFor } from '../data/analytics';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -42,7 +42,7 @@ const presentation = presentationFor(lang);
         <span>{t.footer.rights}, {year}</span>
         <a href={localePath(lang, '/privacy/')}>{t.footer.privacy}</a>
         <a href={localePath(lang, '/consent/')}>{t.footer.consent}</a>
-        {analyticsFor(lang) && <button type="button" class="footer-cookie" data-cookie-settings>{t.cookies.settings}</button>}
+        {countersFor(lang).length > 0 && <button type="button" class="footer-cookie" data-cookie-settings>{t.cookies.settings}</button>}
       </span>
     </div>
   </div>

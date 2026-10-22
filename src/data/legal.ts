@@ -7,8 +7,9 @@ import type { Lang } from '../i18n';
 export const CONSENT_VERSION = '1.3-draft';
 
 // `analytics: true` sections appear only on a site with a web analytics counter (see src/data/analytics.ts),
-// `analytics: false` ones only on a site without it.
-export interface LegalSection { heading?: string; paragraphs?: string[]; bullets?: string[]; analytics?: boolean }
+// `analytics: false` ones only on a site without it; likewise `ga` for a Google Analytics counter (on the Russian site
+// it comes in addition to Metrika and makes the transfer of visit data cross-border).
+export interface LegalSection { heading?: string; paragraphs?: string[]; bullets?: string[]; analytics?: boolean; ga?: boolean }
 export interface LegalTexts { privacy: LegalSection[]; consent: LegalSection[] }
 
 const ru: LegalTexts = {
@@ -46,6 +47,10 @@ const ru: LegalTexts = {
         'IP-адрес, сведения о браузере, устройстве и операционной системе, примерное местоположение;',
         'просмотренные страницы, источник перехода, время на сайте, нажатия на ссылки и кнопки.',
       ],
+    },
+    {
+      ga: true,
+      paragraphs: ['С тем же согласием те же сведения собирает сервис веб-аналитики Google Analytics (Google LLC, США).'],
     },
     {
       analytics: true,
@@ -87,7 +92,13 @@ const ru: LegalTexts = {
     },
     {
       analytics: true,
+      ga: false,
       paragraphs: ['Оператор не передаёт персональные данные третьим лицам, за исключением случаев, предусмотренных законодательством Российской Федерации, и сведений Яндекс Метрики, которые по поручению Оператора обрабатывает ООО «ЯНДЕКС» на серверах в России. Трансграничная передача персональных данных не осуществляется.'],
+    },
+    {
+      analytics: true,
+      ga: true,
+      paragraphs: ['Оператор не передаёт персональные данные третьим лицам, за исключением случаев, предусмотренных законодательством Российской Федерации, и сведений веб-аналитики: сведения Яндекс Метрики по поручению Оператора обрабатывает ООО «ЯНДЕКС» на серверах в России, сведения Google Analytics — Google LLC на серверах за пределами России. Передача сведений Google Analytics является трансграничной передачей персональных данных и осуществляется только с согласия посетителя на cookie.'],
     },
     {
       heading: '6. Сроки обработки',

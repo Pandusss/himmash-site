@@ -1,16 +1,18 @@
 ---
 import { type Lang, localePath, useTranslations } from '../i18n';
-import { analyticsFor } from '../data/analytics';
+import { countersFor } from '../data/analytics';
 
 // Shown until the visitor accepts or declines analytics cookies; nothing is rendered on a site without a counter.
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const c = useTranslations(lang).cookies;
-const analytics = analyticsFor(lang);
+const counters = countersFor(lang);
+// Each counter as provider:id, separated by spaces (src/scripts/analytics.ts reads them).
+const list = counters.map((counter) => `${counter.provider}:${counter.id}`).join(' ');
 ---
-{analytics && (
-  <section class="cookie-notice" id="cookie-notice" aria-label={c.label} data-provider={analytics.provider} data-id={analytics.id} hidden>
-    <p>{c.text} <a href={localePath(lang, '/privacy/')}>{c.policy}</a></p>
+{counters.length > 0 && (
+  <section class="cookie-notice" id="cookie-notice" aria-label={c.label} data-counters={list} hidden>
+    <p>{counters.length > 1 ? c.textBoth : c.text} <a href={localePath(lang, '/privacy/')}>{c.policy}</a></p>
     <div class="cookie-actions">
       <button class="btn" type="button" data-cookie="granted">{c.accept}</button>
       <button class="btn secondary" type="button" data-cookie="denied">{c.decline}</button>
