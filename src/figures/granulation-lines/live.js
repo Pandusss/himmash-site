@@ -3,7 +3,7 @@
 // or with the arrow keys, the camera moves in onto it and a card names it with its key figures and a link to its
 // page (Escape, or a second click, returns to the whole line). P plays the material path: the camera follows the
 // material from the bale to the bag. Space stops and starts the line.
-const STEP = 4;            // seconds per unit on the tour: long enough to find the lit unit and read its line
+const STEP = 3;            // seconds per unit on the tour: long enough to find the lit unit and read its line
 const REST = 5;            // each lap opens on the whole line
 const RESUME_MS = 12000;   // the tour resumes this long after the last input
 const RESTART_MS = 6000;   // a stop made by the reader comes back on by itself this long after the last input

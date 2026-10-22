@@ -41,7 +41,9 @@ export function beltConveyor(L, id, a, b, w, { legsAt = [0.3, 0.8], sideH = 120,
   out.push(bolts(bl));
   const side = motorSide > 0 ? y + w / 2 + 30 : y - w / 2 - 30;
   out.push(box(x1 - 130, side + (motorSide > 0 ? 0 : -220), 260, 220, z1 - 160, 260, "mid", { bevel: 0.4, r: 20 }));
-  out.push(motor([x1 - 260, side + motorSide * 110, z1 - 30], [x1 - 700, side + motorSide * 110, z1 - 30], 85));
+  // The gear motor runs back from the head gearbox along the side channel, at the belt's slope, so it sits on the frame.
+  const hub = [x1, side + motorSide * 110, z1 - 30];
+  out.push(motor(G.sub3(hub, G.mul3(dir, 260)), G.sub3(hub, G.mul3(dir, 700)), 85));
   return out;
 }
 
