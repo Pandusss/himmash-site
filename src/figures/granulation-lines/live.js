@@ -16,6 +16,8 @@ export function mount(stage, { text: T, data: F }) {
   if (T.label) base0.setAttribute("aria-label", T.label);
   const svg = splitLayers(base0, F);       // the live layer: moving parts and what stands in front of them
   const layers2 = [base0, svg];
+  layers2.forEach((layer) => { layer.style.transformOrigin = "0 0"; });
+  base0.parentElement.style.overflow = "hidden";
   const plate = stage.closest(".iso-plate, .anatomy-plate") || stage.parentElement;
   const readout = plate.querySelector("[data-readout]");
   const live = stage.querySelector(".anatomy-live");
@@ -29,13 +31,23 @@ export function mount(stage, { text: T, data: F }) {
   let view = { ...full }, from = view, to = view, zoomStart = 0, zoomed = null, clockMs = 0, lastVb = "";
   const recording = location.hash === "#record";
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
-  function boxOf(i, k = 1.5) {
+  // A unit's box, measured once on both layers; a copy whose parts are all hidden in its layer measures 0 × 0 at the
+  // origin and is left out (it pulled the camera out to the whole line).
+  const unitBoxes = [];
+  function unitBox(i) {
+    if (unitBoxes[i] !== undefined) return unitBoxes[i];
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const g of groups[i]) {
       const b = g.getBBox();
+      if (!b.width && !b.height) continue;
       x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
     }
-    if (!isFinite(x0)) return null;
+    return (unitBoxes[i] = isFinite(x0) ? [x0, y0, x1, y1] : null);
+  }
+  function boxOf(i, k = 1.5) {
+    const ub = unitBox(i);
+    if (!ub) return null;
+    const [x0, y0, x1, y1] = ub;
     const ratio = full.w / full.h;
     let w = Math.max((x1 - x0) * k, full.w / 6), h = (y1 - y0) * k;
     if (w / h > ratio) h = w / ratio; else w = h * ratio;
@@ -44,18 +56,46 @@ export function mount(stage, { text: T, data: F }) {
     const y = Math.min(Math.max((y0 + y1) / 2 - h / 2, full.y), full.y + full.h - h);
     return { x, y, w, h };
   }
+  // The camera. Re-rastering thousands of paths at every step of a zoom made it stutter, so a move renders once the box
+  // that holds both the start and the end view, slides and scales that picture with a CSS transform (the compositor
+  // does it), and renders the end view sharp when the move is done. A recording keeps exact frames instead.
+  let rendered = null, moving = false;
+  function setTransform(v) {
+    if (!v) { layers2.forEach((layer) => { layer.style.transform = ""; }); return; }
+    const W = base0.clientWidth || 1000, sc = W / v.w;
+    const t = `translate(${((rendered.x - v.x) * sc).toFixed(2)}px,${((rendered.y - v.y) * sc).toFixed(2)}px) scale(${(rendered.w / v.w).toFixed(5)})`;
+    layers2.forEach((layer) => { layer.style.transform = t; });
+  }
   function zoomTo(i, k = 1.5) {
     const target = i === null ? full : boxOf(i, k) || full;
     zoomed = i;
     from = { ...view }; to = target; zoomStart = clockMs;
+    if (!recording && !still.matches) {
+      // Render the union of both views, at the card's proportions, once for the whole move.
+      const x0 = Math.min(from.x, to.x), y0 = Math.min(from.y, to.y), x1 = Math.max(from.x + from.w, to.x + to.w), y1 = Math.max(from.y + from.h, to.y + to.h);
+      let w = x1 - x0, h = y1 - y0;
+      const ratio = full.w / full.h;
+      if (w / h > ratio) h = w / ratio; else w = h * ratio;
+      w = Math.min(w, full.w); h = Math.min(h, full.h);
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+      rendered = { x: Math.min(Math.max(cx - w / 2, full.x), full.x + full.w - w), y: Math.min(Math.max(cy - h / 2, full.y), full.y + full.h - h), w, h };
+      moving = true;
+      setViewBox(rendered);
+      setTransform(from);
+    }
     run();
+  }
+  function setViewBox(r) {
+    const vb = `${r.x.toFixed(2)} ${r.y.toFixed(2)} ${r.w.toFixed(2)} ${r.h.toFixed(2)}`;
+    if (vb !== lastVb) { lastVb = vb; layers2.forEach((layer) => layer.setAttribute("viewBox", vb)); }
   }
   function moveCamera(now) {
     const t = still.matches ? 1 : Math.min(1, (now - zoomStart) / ZOOM_MS);
     const e = ease(t);
     view = { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, w: from.w + (to.w - from.w) * e, h: from.h + (to.h - from.h) * e };
-    const vb = `${view.x.toFixed(2)} ${view.y.toFixed(2)} ${view.w.toFixed(2)} ${view.h.toFixed(2)}`;
-    if (vb !== lastVb) { lastVb = vb; layers2.forEach((layer) => layer.setAttribute("viewBox", vb)); }
+    if (!moving) setViewBox(view);
+    else if (t < 1) setTransform(view);
+    else { moving = false; setViewBox(to); setTransform(null); }
     return t < 1;
   }
 
@@ -204,6 +244,7 @@ export function mount(stage, { text: T, data: F }) {
     const every = still.matches ? 0 : wide ? 1 / 12 : 1 / 30;
     rotors.forEach((r, i) => {
       angles[i] += dt * r.R.speed * TAU * flow * startOf(r.unit);
+      if (moving) return;
       due[i] -= dt;
       if (due[i] > 0 && dt > 0) return;
       due[i] += every;
@@ -278,6 +319,9 @@ export function mount(stage, { text: T, data: F }) {
 .ln-info p{margin:0}
 .ln-info a{display:inline-block;margin-top:6px;font-weight:500;color:var(--green,#145445);text-decoration:none}
 .ln-info a:hover{text-decoration:underline}
+.ln-info .r{display:grid;gap:2px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line,#d9dfd7);font-size:12px}
+.ln-info .r button{border:0;padding:0;background:none;font:inherit;color:var(--ink,#202d28);text-decoration:underline;text-decoration-color:var(--line,#d9dfd7);text-underline-offset:2px;cursor:pointer}
+.ln-info .r button:hover{color:var(--green,#145445)}
 .ln-info[data-story] b{font-size:24px}
 .ln-info[data-story] p{font-size:15px}
 @media (max-width:640px){.ln-info{left:6px;top:6px;padding:6px 8px;font-size:11px;max-width:75%}.ln-info b,.ln-info[data-story] b{font-size:14px}.ln-info[data-story] p{font-size:11px}}`;
@@ -288,6 +332,16 @@ export function mount(stage, { text: T, data: F }) {
   card.className = "ln-info";
   card.setAttribute("aria-hidden", "true");
   stage.appendChild(card);
+  // The neighbours named on the card are buttons that step to them.
+  card.addEventListener("click", (event) => {
+    const go = event.target.closest("[data-go]");
+    if (!go) return;
+    event.stopPropagation();
+    takeOver();
+    pick(Number(go.dataset.go));
+    afterInput();
+    run();
+  });
   let cardFor = -1, cardStory = false;
   function showCard(i, asStory) {
     if (i === cardFor && asStory === cardStory) return;
@@ -295,7 +349,13 @@ export function mount(stage, { text: T, data: F }) {
     if (i === null || i < 0) { card.removeAttribute("data-show"); return; }
     const [title, a, b] = T.info[i];
     const slug = F.links && F.links[F.units[i]];
-    card.innerHTML = `<div class="n">${String(i + 1).padStart(2, "0")} / ${count}</div><b>${title}</b><p>${a}</p><p>${b}</p>${slug ? `<a href="../${slug}/">${T.more} →</a>` : ""}`;
+    // Where the material comes from and goes next, along the material chain (the water treatment and the cabinet stand
+    // apart from it).
+    const chain = F.chain || count;
+    const prev = i > 0 && i < chain ? T.info[i - 1][0] : null;
+    const next = i < chain - 1 ? T.info[i + 1][0] : null;
+    const route = i < chain ? `<div class="r">${prev ? `<span>${T.from}: <button type="button" data-go="${i - 1}">${prev}</button></span>` : ""}${next ? `<span>${T.to}: <button type="button" data-go="${i + 1}">${next}</button></span>` : ""}</div>` : "";
+    card.innerHTML = `<div class="n">${String(i + 1).padStart(2, "0")} / ${count}</div><b>${title}</b><p>${a}</p><p>${b}</p>${route}${slug ? `<a href="../${slug}/">${T.more} →</a>` : ""}`;
     card.toggleAttribute("data-story", asStory);
     card.setAttribute("data-show", "");
   }
@@ -358,17 +418,45 @@ export function mount(stage, { text: T, data: F }) {
     else say(running ? T.run : T.stopped);
   }
 
+  // The drawing changes at most 30 times a second (20 on the whole-line view, where everything is small): between those
+  // updates nothing in it changes and the browser repaints nothing; only the camera moves every frame.
+  let pending = 0;
+  function update(dt) {
+    step(dt);
+    turn(dt);
+    flows.forEach((f) => f.move(dt * flow * startOf(f.unit)));
+    slides.forEach((f) => f.move(dt * flow * startOf(f.unit)));
+    marks(dt);
+    draw();
+  }
+  let ft = 0, fa = 0, glowT = 0;
+  function marks(dt) {
+    ft = (ft + dt * flow * 8.2) % 9;
+    fa = (fa + dt * flow * 18) % 9;
+    glowT += dt * flow;
+    const hg = 40 + 35 * Math.sin(glowT * 1.3), mg = 45 + 40 * Math.sin(glowT * 1.75);
+    // Set on the few elements that use them, not on the root: a variable on the root restyles the whole layer.
+    const fts = `${ft.toFixed(1)}px`, fas = `${fa.toFixed(1)}px`, hgs = `${hg.toFixed(0)}%`, mgs = `${mg.toFixed(0)}%`;
+    for (const el of markEls.water) el.style.setProperty("--ft", fts);
+    for (const el of markEls.air) el.style.setProperty("--fa", fas);
+    for (const el of markEls.hot) el.style.setProperty("--hg", hgs);
+    for (const el of markEls.melt) el.style.setProperty("--mg", mgs);
+  }
+  const shown = (el) => !el.closest("[display=none]");
+  const markEls = {
+    water: [...svg.querySelectorAll(".ln-flowline:not([data-flow-kind=air])")].filter(shown),
+    air: [...svg.querySelectorAll(".ln-flowline[data-flow-kind=air]")].filter(shown),
+    hot: [...svg.querySelectorAll(".ln-hot")].filter(shown),
+    melt: [...svg.querySelectorAll(".ln-melt")].filter(shown),
+  };
   function tick(now) {
     const dt = last ? Math.min((now - last) / 1000, 1 / 20) : 1 / 60;
     last = now;
     clockMs += dt * 1000;
-    now = clockMs;
-    step(dt);
-    const moving = moveCamera(now);
-    turn(dt);
-    flows.forEach((f) => f.move(dt * flow * startOf(f.unit)));
-    slides.forEach((f) => f.move(dt * flow * startOf(f.unit)));
-    draw();
+    const moving = moveCamera(clockMs);
+    pending += dt;
+    const every = view.w > full.w * 0.6 ? 1 / 20 : 1 / 30;
+    if (pending >= every || still.matches) { update(Math.min(pending, 0.1)); pending = 0; }
     frame = visible && (!still.matches || moving) ? requestAnimationFrame(tick) : 0;
   }
   function run() {
@@ -453,25 +541,16 @@ export function mount(stage, { text: T, data: F }) {
   if (recording) {
     window.__line = {
       advance(dt) {
-        step(dt);
         clockMs += dt * 1000;
         moveCamera(clockMs);
-        turn(dt);
-        flows.forEach((f) => f.move(dt * flow * startOf(f.unit)));
-        slides.forEach((f) => f.move(dt * flow * startOf(f.unit)));
-        draw();
-        document.getAnimations().forEach((a) => { a.pause(); a.currentTime = clockMs; });
+        update(dt);
       },
       story: startStory,
       get story_done() { return !story; },
     };
   }
   new IntersectionObserver((entries) => { visible = entries[entries.length - 1].isIntersecting; if (visible) run(); }, { rootMargin: "120px 0px" }).observe(stage);
-  step(0);
-  turn(0);
-  flows.forEach((f) => f.move(0));
-  slides.forEach((f) => f.move(0));
-  draw();
+  update(0);
 }
 
 // The drawing has thousands of paths; if anything in it moves, the browser re-rasters all of it every frame. So it is

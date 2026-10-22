@@ -53,7 +53,7 @@ const pel = pelletizingRow(L);
 const wat = waterSystem(L, wash.ports);
 const units = [...wash.units, ...pel.units, ...wat.units];
 // Units the reader steps through, in the order the material meets them.
-const ORDER = ["breaker", "belt", "shredder", "screw1", "wash2", "fric1", "intense", "fric2", "flot", "transfer", "rinse", "screw2", "centrifuge", "dryer", "aero", "hopper", "feeder", "extruder", "changer", "head", "pelletdry", "bagging", "t5000"];
+const ORDER = ["breaker", "belt", "shredder", "screw1", "wash2", "fric1", "intense", "fric2", "flot", "transfer", "rinse", "screw2", "centrifuge", "dryer", "aero", "hopper", "feeder", "extruder", "changer", "head", "pelletdry", "bagging", "t5000", "cabinet"];
 const index = new Map(ORDER.map((id, i) => [id, i]));
 const items = [];
 for (const u of units) for (const it of u.items) {
@@ -112,6 +112,8 @@ const thinSvg = (markup) => markup.replace(/(<path class="(?:iso-fill|iso-line i
 const DATA = {
   view: { origin: P.origin, scale: P.scale, azimuth: P.azimuth, elevation: P.elevation },
   units: ORDER,
+  // Units 0…chain-1 are the material's path; the rest (water treatment, cabinet) stand apart from it.
+  chain: ORDER.indexOf("t5000"),
   // Units with a page of their own (the link is relative to this page: ../<slug>/).
   links: { wash2: "flotation-machine", fric1: "friction-washer", fric2: "friction-washer", centrifuge: "centrifuge", aero: "pneumatic-conveying", hopper: "storage-hopper", feeder: "screw-feeder", extruder: "vacuum-degassing", changer: "screen-changer", head: "granulation-head", t5000: "water-treatment-t5000" },
   proj: (() => { const c = k.cameraOf(P); return { ox: P.origin[0], oy: P.origin[1], k: c.k, sinA: c.sinA, cosA: c.cosA, sinE: c.sinE, cosE: c.cosE }; })(),
@@ -133,12 +135,9 @@ const CSS = figureCss(`
 .ln-spray{fill:var(--ln-clean-edge);stroke:none;opacity:.7}
 .ln-ripple{fill:none;stroke:var(--ln-ripple);stroke-width:.35px;stroke-linecap:round}
 .ln-heat{fill:none;stroke:var(--ln-heat);stroke-width:.6px;stroke-linecap:round}
-.ln-hot .iso-shade,.ln-hot .iso-top{animation:ln-glow 2.4s ease-in-out infinite alternate}
-.ln-melt{animation:ln-glow-melt 1.8s ease-in-out infinite alternate}
-@keyframes ln-glow{from{fill:var(--ln-hot1)}to{fill:var(--ln-hot2)}}
-@keyframes ln-glow-melt{from{fill:var(--ln-melt)}to{fill:var(--ln-melt2)}}
-.fig-svg[data-stopped] :is(.ln-hot .iso-shade,.ln-hot .iso-top,.ln-melt){animation-play-state:paused}
-@media (prefers-reduced-motion:reduce){:is(.ln-hot .iso-shade,.ln-hot .iso-top,.ln-melt){animation:none}}
+/* Glow and flow marks follow variables the page writes at its own frame rate (no CSS animations: each frame of one
+   repaints the whole live layer). */
+.fig-svg .ln-hot .iso-solid>:is(.iso-shade,.iso-top){fill:color-mix(in srgb,var(--ln-hot2) var(--hg,40%),var(--ln-hot1))}
 .ln-cavity{fill:var(--ln-cavity);stroke:none}
 .ln-glass{fill:var(--ln-glass);stroke:none}
 .ln-water[data-water=clean]{fill:var(--ln-clean-fill);stroke:none}
@@ -146,7 +145,7 @@ const CSS = figureCss(`
 .ln-water[data-water=mid]{fill:var(--ln-mid-fill);stroke:none}
 .ln-water[data-water=body]{fill:var(--ln-body);stroke:none}
 .ln-fill{fill:var(--ln-flakes);stroke:none}
-.ln-melt{fill:var(--ln-melt);stroke:none}
+.ln-melt{fill:color-mix(in srgb,var(--ln-melt2) var(--mg,40%),var(--ln-melt));stroke:none}
 .ln-grit{fill:var(--anatomy-hi);stroke:none}
 .ln-paper{fill:var(--anatomy-paper);stroke:var(--anatomy-mid);stroke-width:.3px}
 [data-pipe=clean] .tb-body{fill:var(--ln-clean-fill)}
@@ -162,13 +161,11 @@ const CSS = figureCss(`
 .ln-flowline[data-flow-kind=mid]{stroke:var(--anatomy-mid)}
 .ln-foam{fill:var(--anatomy-paper);stroke:var(--anatomy-lo);stroke-width:.3px}
 .ln-bubble{fill:none;stroke:var(--anatomy-mid);stroke-width:.3px}
-.ln-flowline{fill:none;stroke-width:.7px;stroke-linecap:round;stroke-dasharray:1.6 7.4;stroke-dashoffset:var(--o);animation:ln-flow 1.1s linear infinite}
+.ln-flowline{fill:none;stroke-width:.7px;stroke-linecap:round;stroke-dasharray:1.6 7.4;stroke-dashoffset:calc(var(--o) - var(--ft,0px))}
 .ln-flowline[data-flow-kind=clean]{stroke:var(--ln-clean-edge)}
 .ln-flowline[data-flow-kind=dirty]{stroke:var(--ln-dirty-edge)}
-.ln-flowline[data-flow-kind=air]{stroke:var(--anatomy-mid);animation-duration:.5s}
-@keyframes ln-flow{from{stroke-dashoffset:var(--o)}to{stroke-dashoffset:calc(var(--o) - 9px)}}
-.fig-svg[data-stopped] .ln-flowline{animation-play-state:paused}
-@media (prefers-reduced-motion:reduce){.ln-flowline{animation:none}}`, {
+.ln-flowline[data-flow-kind=air]{stroke:var(--anatomy-mid);stroke-dashoffset:calc(var(--o) - var(--fa,0px))}
+`, {
   light: "--ln-cavity:#c9d0c7;--ln-glass:#dfe8ea;--ln-clean-fill:#cfe3f4;--ln-clean-shine:#e6f1fb;--ln-clean-shade:#a9c8e6;--ln-clean-edge:#2f6fae;--ln-dirty-fill:#e3d6c3;--ln-dirty-shine:#efe6d8;--ln-dirty-shade:#cdb898;--ln-dirty-edge:#8a6a3c;--ln-mid-fill:#dde3e0;--ln-body:#d9cdb8;--ln-flakes:#d6dcd2;--ln-melt:#e8c9a0;--ln-raw:#8c7454;--ln-wash:#ad9876;--ln-rinse:#cdbfa3;--ln-cleanflake:#e9e4d6;--ln-dry:#fff;--ln-pellet:#4d5c55;--ln-flake-edge:#5a4a35;--ln-ripple:#9f8a68;--ln-heat:#d2793d;--ln-hot1:#f4dcc4;--ln-hot2:#f6b98b;--ln-melt2:#f2a35a",
   dark: "--ln-cavity:#0b100d;--ln-glass:#1f2e31;--ln-clean-fill:#1d3a55;--ln-clean-shine:#2a5378;--ln-clean-shade:#152b40;--ln-clean-edge:#7fb6ee;--ln-dirty-fill:#3d3121;--ln-dirty-shine:#54442d;--ln-dirty-shade:#2c2317;--ln-dirty-edge:#c9a26a;--ln-mid-fill:#24302c;--ln-body:#3a3022;--ln-flakes:#2f3a33;--ln-melt:#5a4128;--ln-raw:#7d6545;--ln-wash:#9b8766;--ln-rinse:#bcae92;--ln-cleanflake:#dcd7c8;--ln-dry:#f2f2ee;--ln-pellet:#a9b7ae;--ln-flake-edge:#1a140c;--ln-ripple:#6d5a3d;--ln-heat:#e08a4e;--ln-hot1:#3a2a1e;--ln-hot2:#7a3e1c;--ln-melt2:#b5602a",
 });

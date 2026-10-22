@@ -286,6 +286,36 @@ export function makeLib(P) {
     return `<g mask="url(#${gid}-m)">${slide(id, `<path class="ln-heat" d="${lines.join("")}"/>`, { dir: [0, 0, 1], speed: 260, period: wl })}</g>`;
   }
 
+  // A transfer between two units: an open chute (bottom plate and two side plates) along a polyline, the material
+  // running down it as dots. It belongs to the unit that receives the material, so it lights up with it.
+  function transfer(id, pts, { w = 340, h = 150, kind = "raw", speed = 700, count = null } = {}) {
+    const out = [];
+    const t = 12;
+    const segs = [];
+    for (let i = 1; i < pts.length; i++) segs.push([pts[i - 1], pts[i]]);
+    const sides = [];
+    const bottoms = [];
+    for (const [a, b] of segs) {
+      const F = frameBetween(a, b);
+      const len = G.len3(G.sub3(b, a));
+      let up = F.v[2] < 0 ? G.mul3(F.v, -1) : F.v;
+      if (Math.abs(F.a[2]) > 0.95) up = F.v;
+      const Fx = G.frameOf(a, F.a, F.u, up);
+      bottoms.push(S(G.prismOf(Fx, [[-w / 2 - t, -t], [w / 2 + t, -t], [w / 2 + t, 0], [-w / 2 - t, 0]], -t, len + t, P), { tone: "mid" }));
+      for (const sgn of [-1, 1]) {
+        const poly = sgn < 0 ? [[-w / 2 - t, 0], [-w / 2, 0], [-w / 2, h], [-w / 2 - t, h]] : [[w / 2, 0], [w / 2 + t, 0], [w / 2 + t, h], [w / 2, h]];
+        const near = G.dot3(G.mul3(F.u, sgn), V) > 0;
+        sides.push({ near, svg: S(G.prismOf(Fx, poly, -t, len + t, P), { tone: "mid" }) });
+      }
+    }
+    out.push(...sides.filter((s2) => !s2.near).map((s2) => s2.svg), ...bottoms);
+    const lift = pts.map((q, i) => G.add3(q, [0, 0, 30]));
+    const total = segs.reduce((a2, [a, b]) => a2 + G.len3(G.sub3(b, a)), 0);
+    out.push(flow(id, lift, { speed, count: count || Math.max(4, Math.round(total / 140)), size: 30, spread: w * 0.25, kind }));
+    out.push(...sides.filter((s2) => s2.near).map((s2) => s2.svg));
+    return out.join("");
+  }
+
   // A square-tube brace between two points (s = section).
   function brace(a, b, s = 50, tone = "lo") {
     const F = frameBetween(a, b);
@@ -320,6 +350,6 @@ export function makeLib(P) {
     k, G, P, V, K, at, depth, S, L, D, pathOf, path3, plan,
     FX, FY, FZ, frameBetween,
     box, cylX, cylY, cylZ, rod, prismX, prismY, turned, turnedAlong, ribs, convex, frustum, hopper, cavity, water, defs, clipped,
-    motor, gearbox, leg, legs, foot, pipe, flange, rotor, rotors, flow, flows, slide, slides, brace, pillow, bolts, ripples, heat,
+    motor, gearbox, leg, legs, foot, pipe, flange, rotor, rotors, flow, flows, slide, slides, brace, pillow, bolts, ripples, heat, transfer,
   };
 }

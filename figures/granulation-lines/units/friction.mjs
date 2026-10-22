@@ -3,7 +3,7 @@
 // a perforated trough along the bottom drains the dirty water. A window cut in the tube shows the rotor turning.
 import { YB } from "../layout.mjs";
 
-export function friction(L, ports, id, a, b) {
+export function friction(L, ports, id, a, b, { inlet = null, outlet = null, kindIn = "raw" } = {}) {
   const { box, leg, brace, rotor, motor, hopper, frustum, S, G, P, path3, bolts, depth, clipped, cylX, flow } = L;
   const p = [];
   const r = 250;
@@ -62,7 +62,12 @@ export function friction(L, ports, id, a, b) {
   const top = G.add3(b, G.mul3(axis, 30));
   p.push(S(G.disc(0, 180, 150, G.frameAlong(top, axis), P), { tone: "mid" }));
   p.push(motor(G.add3(top, G.mul3(axis, 180)), G.add3(top, G.mul3(axis, 700)), 185));
-  p.push(frustum([b[0] + 60, b[1] - 220, 340, 440], b[2] - 180, [b[0] + 260, b[1] - 170, 300, 340], b[2] - 760, "mid"));
+  // Discharge: the top outlet box, then a chute into the next unit (or the built-in spout).
+  const top0 = G.add3(b, [60, 0, -230]);
+  p.push(L.box(top0[0] - 90, a[1] - 170, 280, 340, top0[2] - 60, 120, "mid", { bevel: 0.4 }));
+  if (outlet) p.push(L.transfer(`${id}-out`, [[top0[0] + 150, a[1], top0[2]], ...outlet], { kind: id === "fric1" ? "wash" : "rinse" }));
+  else p.push(frustum([b[0] + 60, b[1] - 220, 340, 440], b[2] - 180, [b[0] + 260, b[1] - 170, 300, 340], b[2] - 760, "mid"));
+  if (inlet) p.push(L.transfer(`${id}-in`, [...inlet, [a[0] - 60, a[1], a[2] + 640]], { kind: kindIn }));
   // Near frame.
   for (const lx of legX) p.push(leg(lx, a[1] + 340, 0, zUnder(lx) - 60, 90));
   p.push(brace([legX[0], a[1] + 340, 300], [legX[1], a[1] + 340, 300], 60, "lo"), brace([legX[0], a[1] + 340, 320], [legX[1], a[1] + 340, zUnder(legX[1]) - 120], 55, "lo"));

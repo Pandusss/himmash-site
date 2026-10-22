@@ -9,7 +9,7 @@ const faceWindow = (L, y, x0, x1, z0, z1) => L.path3([[x0, y, z0], [x1, y, z0], 
 export function intense(L, ports) {
   const { box, legs, brace, motor, rotor, frustum, clipped, bolts, depth, prismX, path3, flow } = L;
   const p = [];
-  const x = 16900, w = 1800, y0 = YB - 460, d = 920, z0 = 560, z1 = 1480;
+  const x = 16900, w = 1800, y0 = YB - 460, d = 920, z0 = 1150, z1 = 2000;
   const [far, near] = legs(x, y0, w, d, z0, { s: 90, inset: 70 });
   p.push(far, brace([x + 70, y0 + 70, 120], [x + w - 70, y0 + 70, z0 - 40], 50));
   p.push(box(x, y0, w, d, z0, z1 - z0, "mid", { seams: [z0 + 100, z1 - 160], r: 30 }));
@@ -24,13 +24,13 @@ export function intense(L, ports) {
   const fr = [];
   for (let i = 0; i < 9; i++) fr.push([x + 120 + i * 210, y0 + d, z1 - 60]);
   p.push(bolts(fr));
-  // Drive: bearing on the right end, belt guard down to the motor on its base.
-  p.push(box(x + w, YB - 120, 140, 240, zc - 120, 240, "mid", { bevel: 0.3, r: 10 }));
-  p.push(box(x + w + 140, YB - 200, 180, 400, 260, zc + 100 - 260, "hi", { bevel: 0.6, r: 40 }));
-  p.push(box(x + w - 100, YB - 340, 900, 680, 0, 120, "lo", { bevel: 0.3 }));
-  p.push(motor([x + w + 350, YB, 400], [x + w + 820, YB, 400], 190));
+  // Drive: bearing on the left end, belt guard down to the motor on its base (the right end feeds friction washer II).
+  p.push(box(x - 140, YB - 120, 140, 240, zc - 120, 240, "mid", { bevel: 0.3, r: 10 }));
+  p.push(box(x - 320, YB - 200, 180, 400, 260, zc + 100 - 260, "hi", { bevel: 0.6, r: 40 }));
+  p.push(box(x - 900, YB - 340, 900, 680, 0, 120, "lo", { bevel: 0.3 }));
+  p.push(motor([x - 350, YB, 400], [x - 820, YB, 400], 190));
   p.push(frustum([x + 140, YB - 300, 420, 600], z1 + 280, [x + 80, YB - 360, 540, 720], z1 + 560, "mid"));
-  p.push(frustum([x + w - 450, YB - 250, 380, 500], z0, [x + w - 400, YB - 200, 280, 400], z0 - 260, "mid"));
+  p.push(frustum([x + w - 450, YB - 250, 380, 500], z0, [x + w - 400, YB - 200, 280, 400], z0 - 120, "mid"));
   p.push(near, brace([x + 70, y0 + d - 70, 120], [x + w - 70, y0 + d - 70, z0 - 40], 50));
   ports.intense = { clean: [x + w * 0.5, y0 + 140, z1 + 280], key: depth([x + w / 2, YB, 1000]), dirty: [x + 400, y0 + d, z0 + 50] };
   return { id: "intense", items: [{ key: depth([x + w / 2, YB, 1000]), svg: p.join("") }] };
@@ -56,7 +56,9 @@ export function centrifuge(L, ports) {
   // Inlet on top of the left end (from the discharge screw), outlet duct on the right end into the dryer's hopper.
   p.push(cylZ(x0 + 250, YB + 250, zc + r - 60, zc + r + 300, 140, "mid"));
   p.push(cylX(x1, x1 + 80, YB, zc + 120, 220, "mid"));
-  p.push(L.rod([x1 + 80, YB, zc + 120], [x1 + 500, YB + 120, zc + 500], 150, "mid"));
+  // Spun flakes leave by a duct up and over into the dryer's loading hopper.
+  p.push(L.pipe([[x1 + 80, YB, zc + 120], [x1 + 420, YB, zc + 120], [x1 + 420, YB, 2150], [34190, YB, 2150], [34190, YB, 1830]], 110, { bend: 3, tone: "hi" }).map((i) => i.svg).join(""));
+  p.push(L.flow("cen-duct", [[x1 + 80, YB, zc + 120], [x1 + 420, YB, zc + 120], [x1 + 420, YB, 2150], [34190, YB, 2150], [34190, YB, 1830]], { speed: 1200, count: 10, size: 28, kind: "clean" }));
   // Belt drive: motor on the base, belt guard on the right end.
   p.push(box(x1 + 60, YB - 250, 200, 500, zb, zc + 100 - zb, "hi", { bevel: 0.6, r: 40, seam: zc - 200 }));
   p.push(motor([x1 + 270, YB + 380, 520], [x1 + 760, YB + 380, 520], 170));
@@ -98,6 +100,7 @@ export function dryer(L, ports) {
   p.push(box(x + w - 120, YB + 300, 180, 180, z1 - 450, 870, "mid", { bevel: 0.3 }));
   // Unloading screw (300 mm) up to the air separator.
   p.push(...screwConveyor(L, "dryer-out", [x + w + 120, YB + 120, 720], [x + w + 1650, YB + 120, 2650], 160, { stands: [0.55], inlet: false, speed: 1, kind: "dry" }));
+  p.push(L.transfer("dryer-aero", [[x + w + 1650, YB + 120, 2200], [40240, YB - 120, 2060]], { w: 260, h: 120, kind: "dry" }));
   return { id: "dryer", items: [{ key: depth([x + w / 2, YB, 1300]), svg: p.join("") }] };
 }
 
@@ -127,7 +130,8 @@ export function aero(L) {
   p.push(cylZ(kx, ky, 1300, 1650, 140, "mid"));
   p.push(box(kx - 160, ky - 160, 320, 320, 1100, 200, "mid", { bevel: 0.3 }));
   p.push(turned(kx, ky, 300, [[0, 250], [500, 280, 1], [800, 120, 1]], "hi"));
-  // The blower of the pneumatic line, on the aisle side.
+  // Clean flakes fall out of the column bottom into the blower of the pneumatic line, on the aisle side.
+  p.push(L.transfer("aero-blower", [[cx, cy + 120, 880], [cx - 250, YB + 430, 700]], { w: 240, h: 110, kind: "dry" }));
   p.push(box(cx - 600, YB + 450, 1000, 650, 0, 140, "lo", { bevel: 0.3 }));
   p.push(cylY(YB + 450, YB + 700, cx - 250, 640, 380, "mid"));
   p.push(motor([cx - 250, YB + 700, 640], [cx - 250, YB + 1150, 640], 190));
