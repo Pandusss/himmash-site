@@ -110,17 +110,47 @@ export function mount(stage, { text: T, data: F }) {
   const rotors = makeRotors(svg, F);
   const angles = rotors.map(() => 0);
   const inView = (b) => b.x < view.x + view.w && b.x + b.w > view.x && b.y < view.y + view.h && b.y + b.h > view.y;
-  // Rotors are redrawn at most 30 times a second, and 12 times on the whole-line view where they are small; each
-  // keeps its own phase, so the redraws of different rotors fall on different frames.
+  // Pacing. How often the drawing changes adapts to the machine: the page watches its own frame intervals and, while
+  // frames come on time, steps the rates up (smooth motion on a strong machine); when they run late, it steps them down,
+  // so a weak machine keeps its frame rate and the motion stays even. Per level: the whole drawing on the whole-line view
+  // and on a close view; rotors on the whole line (the lit unit's apart) and on a close view. Each rotor keeps its own
+  // phase, so the redraws of different rotors fall on different frames.
+  // `frame` is how often the drawing may change at all (each change costs the browser a repaint of the live layer,
+  // however small); the parts' own rates spread their work over those frames. On the lowest level the rotors of the
+  // whole-line view stand still, except the lit unit's.
+  const PACE = [
+    { frame: 1 / 15, wide: 1 / 10, close: 1 / 15, rotor: Infinity, lit: 1 / 10, near: 1 / 12 },
+    { frame: 1 / 20, wide: 1 / 15, close: 1 / 20, rotor: 1 / 8, lit: 1 / 15, near: 1 / 20 },
+    { frame: 1 / 30, wide: 1 / 24, close: 1 / 30, rotor: 1 / 12, lit: 1 / 24, near: 1 / 30 },
+    { frame: 1 / 45, wide: 1 / 40, close: 1 / 45, rotor: 1 / 24, lit: 1 / 40, near: 1 / 45 },
+  ];
+  let level = recording ? PACE.length - 1 : 2, paceAt = 0, good = 0;
+  const gaps = [];
+  function pace(now, gap) {
+    if (recording || moving || !visible || still.matches) return;
+    gaps.push(gap);
+    if (now - paceAt < 1500) return;
+    paceAt = now;
+    if (gaps.length >= 20) {
+      // Late: a frame longer than 25 ms (under 40 frames a second, whatever the display's own rate).
+      const late = gaps.filter((g) => g > 25).length / gaps.length;
+      if (late > 0.08 && level > 0) { level--; good = 0; }
+      else if (late < 0.02 && level < PACE.length - 1 && ++good >= 2) { level++; good = 0; }
+      stage.dataset.pace = level;
+    }
+    gaps.length = 0;
+  }
   const due = rotors.map((_, i) => i * 0.0137);
   let svgPx = base0.getBoundingClientRect().width || 1000;
   new ResizeObserver(() => { svgPx = base0.getBoundingClientRect().width || svgPx; }).observe(base0);
   function turn(dt) {
     const wide = view.w > full.w * 0.6;
-    const every = still.matches ? 0 : wide ? 1 / 12 : 1 / 30;
     rotors.forEach((r, i) => {
       angles[i] += dt * r.R.speed * TAU * flow * startOf(r.unit);
       if (moving) return;
+      const P = PACE[level];
+      const every = still.matches || recording ? 0 : !wide ? P.near : r.unit === lastOn ? P.lit : P.rotor;
+      if (every === Infinity) return;
       due[i] -= dt;
       if (due[i] > 0 && dt > 0) return;
       due[i] += every;
@@ -246,26 +276,41 @@ export function mount(stage, { text: T, data: F }) {
     else say(running ? T.run : T.stopped);
   }
 
-  // The drawing changes at most 30 times a second (20 on the whole-line view, where everything is small): between those
-  // updates nothing in it changes and the browser repaints nothing; only the camera moves every frame.
+  // Each update does a share of the work: each rotor and each material trail, the slides and the marks keep their own
+  // clock and phase, so their changes spread evenly over the updates instead of landing together on one (a weak machine
+  // felt that one long frame as a stutter). How often each changes follows the pacing; in between it stays as it is.
   let pending = 0;
+  const fdue = flows.map((_, i) => i * 0.0071), facc = flows.map(() => 0);
+  let sdue = 0.005, sacc = 0, mdue = 0.011, macc = 0;
+  const due1 = (d, dt, every) => (d > 0 && dt > 0 ? d : Math.max(d + every, 0) || every);
   function update(dt) {
     step(dt);
     turn(dt);
-    flows.forEach((f) => f.move(dt * flow * startOf(f.unit)));
-    slides.forEach((f) => f.move(dt * flow * startOf(f.unit)));
-    marks(dt, flow);
+    const P = PACE[level], every = still.matches || recording ? 0 : view.w > full.w * 0.6 ? P.wide : P.close;
+    flows.forEach((f, i) => {
+      facc[i] += dt * flow * startOf(f.unit);
+      fdue[i] -= dt;
+      if (fdue[i] > 0 && dt > 0) return;
+      fdue[i] = due1(fdue[i], dt, every);
+      // A trail out of a close view keeps its time and catches up when it comes back into view.
+      if (dt && !inView(f.box)) return;
+      if (facc[i] || !dt) { f.move(facc[i]); facc[i] = 0; }
+    });
+    sacc += dt * flow; sdue -= dt;
+    if (!(sdue > 0 && dt > 0)) { sdue = due1(sdue, dt, every); slides.forEach((f) => f.move(sacc * startOf(f.unit))); sacc = 0; }
+    macc += dt; mdue -= dt;
+    if (!(mdue > 0 && dt > 0)) { mdue = due1(mdue, dt, every); marks(macc, flow); macc = 0; }
     draw();
   }
   const marks = makeMarks(svg);
   function tick(now) {
     const dt = last ? Math.min((now - last) / 1000, 1 / 20) : 1 / 60;
+    if (last) pace(now, now - last);
     last = now;
     clockMs += dt * 1000;
     const moving = moveCamera(clockMs);
     pending += dt;
-    const every = view.w > full.w * 0.6 ? 1 / 20 : 1 / 30;
-    if (pending >= every || still.matches) { update(Math.min(pending, 0.1)); pending = 0; }
+    if (pending >= (still.matches ? 0 : PACE[level].frame)) { update(Math.min(pending, 0.1)); pending = 0; }
     frame = visible && (!still.matches || moving) ? requestAnimationFrame(tick) : 0;
   }
   function run() {

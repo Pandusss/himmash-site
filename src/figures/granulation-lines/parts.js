@@ -37,7 +37,9 @@ export function projector(F) {
   return { NS, TAU, iso, VW, dotV, toneOf, f1, el, EDGES, light: [lx, ly, lz] };
 }
 
-// Rotating parts (data from the build): each has draw(theta) and a lazily measured box.
+// Rotating parts (data from the build): each has draw(theta) and a lazily measured box. A blade is three faces and an
+// outline (the faces are opaque and seamless, so no silhouette fill under them); a blade wholly outside the window its
+// rotor is seen through is not drawn.
 export function makeRotors(svg, F) {
   const { TAU, iso, dotV, toneOf, f1, el, EDGES, light: [lx, ly, lz] } = projector(F);
   return (F.rotors || []).map((R) => {
@@ -67,67 +69,82 @@ export function makeRotors(svg, F) {
       const normals = [er, er.map((v) => -v), ew, ew.map((v) => -v), en, en.map((v) => -v)];
       const seen = normals.map((n) => dotV(n) > 1e-6);
       const p = (i) => `${f1(flat[i][0])} ${f1(flat[i][1])}`;
-      let fill = "";
       const faces = [];
       for (let fi = 0; fi < 6; fi++) {
         if (!seen[fi]) continue;
         const f = FACE[fi];
         const d = `M${p(f[0])}L${p(f[1])}L${p(f[2])}L${p(f[3])}Z`;
-        fill += d;
         const n = normals[fi];
         faces.push([d, toneOf(n[0] * lx + n[1] * ly + n[2] * lz)]);
       }
       while (faces.length < 3) faces.push(["", -1]);
-      let crease = "", edge = "";
-      for (const [i, j, fa, fb] of EDGES) {
-        const n = (seen[fa] ? 1 : 0) + (seen[fb] ? 1 : 0);
-        if (!n) continue;
-        if (n === 2) crease += `M${p(i)}L${p(j)}`; else edge += `M${p(i)}L${p(j)}`;
-      }
-      shape = { fill, faces, crease, edge, back: dotV(er) < 0, depth: dotV(ctr) };
+      let edge = "";
+      for (const [i, j, fa, fb] of EDGES) if (seen[fa] !== seen[fb]) edge += `M${p(i)}L${p(j)}`;
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const [x, y] of flat) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      shape = { faces, edge, back: dotV(er) < 0, depth: dotV(ctr), box: [x0, y0, x1, y1] };
       cache.set(key, shape);
       return shape;
     }
     const axisDepth = dotV(R.a);
-    const blades = R.blades.map((B) => {
-      const node = el("g", { class: "iso-solid", transform: `translate(${f1(B.s * step[0])} ${f1(B.s * step[1])})` }, layers.front);
-      const fill = el("path", { class: "iso-fill" }, node);
-      const faces = [0, 1, 2].map(() => el("path", { class: "iso-shade", "data-shade": "1" }, node));
-      const crease = el("path", { class: "iso-line iso-crease", "data-tone": "faint" }, node);
-      const edge = el("path", { class: "iso-line iso-edge", "data-tone": "hi" }, node);
-      return { ...B, node, fill, faces, crease, edge, layer: "front", depth: 0, key: -1, tones: [-1, -1, -1] };
-    });
+    // The window: the box of the nearest clip round the rotor, in drawing units.
+    const clipHost = root.closest("[clip-path]");
+    const clipId = clipHost && (clipHost.getAttribute("clip-path").match(/#([^)]+)/) || [])[1];
+    const clipShape = clipId && svg.querySelector(`[id="${clipId}"] path`);
+    const win = clipShape ? (({ x, y, width, height }) => [x - 1, y - 1, x + width + 1, y + height + 1])(clipShape.getBBox()) : null;
+    const TONES = [0, 1, 2, 3].map((t) => `var(--anatomy-shade-${t})`).concat("var(--anatomy-top)");
+    const blades = R.blades.map((B) => ({ ...B, dx: B.s * step[0], dy: B.s * step[1], sh: null, depth: 0 }));
+    // Slots: fixed blade drawings in painter's order in each half (behind and in front of the shaft), added as needed.
+    // A redraw writes the sorted blades' shapes into them, so no node is ever moved (a moved node had its style and
+    // layout rebuilt), and a face's tone is a variable on it rather than a class (a class change restyles by rule).
+    const EMPTY = { faces: [["", -1], ["", -1], ["", -1]], edge: "" };
+    const slots = { back: [], front: [] };
+    function slot(name, j) {
+      const list = slots[name];
+      while (list.length <= j) {
+        const node = el("g", { class: "iso-solid" }, layers[name]);
+        const faces = [0, 1, 2].map(() => el("path", { class: "iso-shade ln-bf" }, node));
+        const edge = el("path", { class: "iso-line iso-edge", "data-tone": "hi" }, node);
+        list.push({ node, faces, edge, sh: EMPTY, dx: NaN, dy: NaN, tones: [-1, -1, -1] });
+      }
+      return list[j];
+    }
+    function put(sl, sh, dx, dy) {
+      if (sh !== EMPTY && (sl.dx !== dx || sl.dy !== dy)) { sl.dx = dx; sl.dy = dy; sl.node.setAttribute("transform", `translate(${f1(dx)} ${f1(dy)})`); }
+      const prev = sl.sh;
+      if (prev === sh) return;
+      sl.sh = sh;
+      for (let k = 0; k < 3; k++) {
+        const [d, tone] = sh.faces[k];
+        if (prev.faces[k][0] !== d) sl.faces[k].setAttribute("d", d);
+        if (tone >= 0 && sl.tones[k] !== tone) { sl.tones[k] = tone; sl.faces[k].style.setProperty("--t", TONES[tone]); }
+      }
+      if (prev.edge !== sh.edge) sl.edge.setAttribute("d", sh.edge);
+    }
     const flights = R.flight ? [...root.querySelectorAll("[data-flight]")] : [];
     let box = null;
+    const halves = { back: [], front: [] };
     function draw(theta) {
-      for (const bd of blades) {
-        let key = Math.round(((bd.phase + theta) / TAU) * STEPS) % STEPS;
+      halves.back.length = 0; halves.front.length = 0;
+      for (const b of blades) {
+        let key = Math.round(((b.phase + theta) / TAU) * STEPS) % STEPS;
         if (key < 0) key += STEPS;
-        if (key === bd.key) continue;
-        bd.key = key;
-        const sh = shapeAt(bd.type || 0, key);
-        for (let slot = 0; slot < 3; slot++) {
-          const [d, tone] = sh.faces[slot];
-          const path = bd.faces[slot];
-          if (tone >= 0 && bd.tones[slot] !== tone) {
-            bd.tones[slot] = tone;
-            if (tone >= 4) { path.setAttribute("class", "iso-top"); path.removeAttribute("data-shade"); }
-            else { path.setAttribute("class", "iso-shade"); path.setAttribute("data-shade", tone); }
-          }
-          path.setAttribute("d", d);
+        const sh = shapeAt(b.type || 0, key);
+        if (win) {
+          const [x0, y0, x1, y1] = sh.box;
+          if (x1 + b.dx < win[0] || x0 + b.dx > win[2] || y1 + b.dy < win[1] || y0 + b.dy > win[3]) continue;
         }
-        bd.fill.setAttribute("d", sh.fill);
-        bd.edge.setAttribute("d", sh.edge);
-        bd.depth = bd.s * axisDepth + sh.depth;
-        const layer = sh.back ? "back" : "front";
-        if (layer !== bd.layer) { bd.layer = layer; layers[layer].appendChild(bd.node); }
+        b.sh = sh;
+        b.depth = b.s * axisDepth + sh.depth;
+        halves[sh.back ? "back" : "front"].push(b);
       }
       for (const name of ["back", "front"]) {
-        const list = blades.filter((b) => b.layer === name).sort((a, b) => a.depth - b.depth);
-        const nodes = layers[name].children;
-        let ordered = nodes.length === list.length;
-        for (let i = 0; ordered && i < list.length; i++) if (nodes[i] !== list[i].node) ordered = false;
-        if (!ordered) { const frag = document.createDocumentFragment(); list.forEach((b) => frag.appendChild(b.node)); layers[name].appendChild(frag); }
+        const list = halves[name].sort((a, c) => a.depth - c.depth), have = slots[name];
+        const n = Math.max(list.length, have.length);
+        for (let j = 0; j < n; j++) {
+          if (j < list.length) put(slot(name, j), list[j].sh, list[j].dx, list[j].dy);
+          else put(have[j], EMPTY);
+        }
       }
       if (flights.length) {
         const { pitch, hand } = R.flight;
@@ -162,7 +179,7 @@ export function makeSlides(svg, F) {
 
 }
 
-// Material: dots along polylines, moved at most 30 times a second.
+// Material: dots along polylines; the caller sets how often they move.
 export function makeFlows(svg, F) {
   const { iso, f1, el } = projector(F);
   return (F.flows || []).map((spec) => {
@@ -182,11 +199,7 @@ export function makeFlows(svg, F) {
       const t = (d - cum[i - 1]) / (cum[i] - cum[i - 1] || 1);
       return [0, 1, 2].map((c) => pts[i - 1][c] + (pts[i][c] - pts[i - 1][c]) * t);
     }
-    let acc = 0;
     function move(dt) {
-      acc += dt;
-      if (dt > 0 && acc < 1 / 30) return;
-      dt = acc; acc = 0;
       for (const p of dots) {
         p.u = (p.u + (dt * spec.speed) / total) % 1;
         const w = at(p.u);
@@ -195,7 +208,12 @@ export function makeFlows(svg, F) {
         p.node.setAttribute("cy", f1(q[1]));
       }
     }
-    return { move, unit: unitIndex(host) };
+    // The trail's box in drawing units, for culling on a close view.
+    const pad = spec.spread * Math.abs(iso(1, 0, 0)[0] - iso(0, 0, 0)[0]) * 1.5 + spec.size * 2;
+    const flat = pts.map((p) => iso(...p));
+    const xs = flat.map((q) => q[0]), ys = flat.map((q) => q[1]);
+    const box = { x: Math.min(...xs) - pad, y: Math.min(...ys) - pad, w: Math.max(...xs) - Math.min(...xs) + 2 * pad, h: Math.max(...ys) - Math.min(...ys) + 2 * pad };
+    return { move, unit: unitIndex(host), box };
   }).filter(Boolean);
 
 }

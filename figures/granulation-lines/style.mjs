@@ -54,6 +54,10 @@ export const CSS = figureCss(`
 /* Glow and flow marks follow variables the page writes at its own frame rate (no CSS animations: each frame of one
    repaints the whole live layer). */
 .fig-svg .ln-hot .iso-solid>:is(.iso-shade,.iso-top){fill:color-mix(in srgb,var(--ln-hot2) var(--hg,40%),var(--ln-hot1))}
+/* Rotor blades: the page sets each face's tone as a variable (no class change per frame); lit, the tone mixes with the
+   accent. A stroke of the same colour closes the seams between faces. */
+.fig-svg .ln-bf{fill:var(--t);stroke:var(--t);stroke-width:.4;stroke-linejoin:round}
+.fig-svg [data-on] .iso-solid>.iso-shade.ln-bf{fill:color-mix(in srgb,var(--t) 35%,var(--anatomy-lit-shade));stroke:color-mix(in srgb,var(--t) 35%,var(--anatomy-lit-shade))}
 .ln-cavity{fill:var(--ln-cavity);stroke:none}
 .ln-glass{fill:var(--ln-glass);stroke:none}
 .ln-water[data-water=clean]{fill:var(--ln-clean-fill);stroke:none}
