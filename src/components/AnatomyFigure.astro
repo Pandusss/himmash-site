@@ -30,7 +30,7 @@ const controlsLabel = { ru: 'Управление схемой', en: 'Figure con
       </div>
       {t.controls && (
         <div class="anatomy-controls" role="group" aria-label={controlsLabel}>
-          {t.controls.map((c: { key?: string; label: string; flash?: string; zoom?: string; labelBack?: string }) => <button type="button" class="anatomy-control" data-key={c.key} data-flash={c.flash} data-zoom={c.zoom} data-label-back={c.labelBack}>{c.label}</button>)}
+          {t.controls.map((c: { key?: string; label: string; short?: string; flash?: string; zoom?: string; labelBack?: string }) => <button type="button" class="anatomy-control" data-key={c.key} data-flash={c.flash} data-zoom={c.zoom} data-label-back={c.labelBack} aria-label={c.short ? c.label : undefined}>{c.short ? <><span class="anatomy-control-long">{c.label}</span><span class="anatomy-control-short" aria-hidden="true">{c.short}</span></> : c.label}</button>)}
         </div>
       )}
       <div class="anatomy-foot">{!t.controls && <button type="button" class="anatomy-hint" data-key={t.hintKey ?? ' '}>{t.hint}</button>}<span data-readout aria-hidden="true">{t.idle}</span></div>
@@ -141,6 +141,20 @@ const controlsLabel = { ru: 'Управление схемой', en: 'Figure con
   }
   .anatomy-caption { margin-top: 14px; font-size: 13px; line-height: 1.6; color: var(--muted); max-width: 62ch; }
   .anatomy-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .anatomy-control-short { display: none; }
+  /* The whole line has its own card and readout: the press toast would only repeat them over the drawing. */
+  .anatomy-wide .anatomy-stage :global(.anatomy-toast) { display: none; }
+  @media (max-width: 640px) {
+    .anatomy-controls { gap: 6px; }
+    .anatomy-control { min-height: 36px; padding: 7px 13px; }
+    .anatomy-control:has(.anatomy-control-short) .anatomy-control-long { display: none; }
+    .anatomy-control-short { display: inline; }
+    /* A taller stage for the whole line on a phone: a picked unit fills it, the whole line sits between bands. The card
+       under the controls takes the readout's place. */
+    .anatomy-wide .anatomy-stage { aspect-ratio: 1000 / 640 !important; }
+    .anatomy-wide .anatomy-stage :global(svg) { height: 100%; }
+    .anatomy-wide .anatomy-foot { display: none; }
+  }
   @media (max-width: 700px) {
     .anatomy-plate { padding: 14px 14px 12px; }
     .anatomy-stage { margin: 6px -6px; }

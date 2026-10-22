@@ -20,7 +20,7 @@ export function mount(stage, { text: T, data: F }) {
   // The camera moves an HTML box holding both layers: the browser's compositor runs a transform animation on a box but
   // not on an svg element (on the svg it fell back to the page's own thread, and a move stuttered). The stage clips it.
   const cam = document.createElement("div");
-  cam.style.cssText = "position:relative;transform-origin:0 0;will-change:transform";
+  cam.style.cssText = "position:relative;height:100%;transform-origin:0 0;will-change:transform";
   base0.before(cam);
   cam.appendChild(base0);
   stage.style.overflow = "hidden";
@@ -37,7 +37,17 @@ export function mount(stage, { text: T, data: F }) {
 
   // ---------- camera: the viewBox eases between the whole line and the box round a unit
   const base = svg.viewBox.baseVal;
-  const full = { x: base.x, y: base.y, w: base.width, h: base.height };
+  // The drawing's own box; the whole-line view is that box widened or heightened to the stage's proportions (on a phone
+  // the stage is taller than the drawing, so a picked unit fills more of it and the whole line sits between bands).
+  const drawn = { x: base.x, y: base.y, w: base.width, h: base.height };
+  function fitted() {
+    const ratio = base0.clientWidth / base0.clientHeight, own = drawn.w / drawn.h;
+    if (!(ratio > 0) || Math.abs(ratio - own) < 0.01) return { ...drawn };
+    if (ratio < own) { const h = drawn.w / ratio; return { x: drawn.x, y: drawn.y - (h - drawn.h) / 2, w: drawn.w, h }; }
+    const w = drawn.h * ratio;
+    return { x: drawn.x - (w - drawn.w) / 2, y: drawn.y, w, h: drawn.h };
+  }
+  let full = fitted();
   let view = { ...full }, from = view, to = view, zoomStart = 0, zoomed = null, clockMs = 0, lastVb = "";
   const recording = location.hash === "#record";
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
@@ -189,7 +199,16 @@ export function mount(stage, { text: T, data: F }) {
   }
   const due = rotors.map((_, i) => i * 0.0137);
   let svgPx = base0.getBoundingClientRect().width || 1000;
-  new ResizeObserver(() => { svgPx = base0.getBoundingClientRect().width || svgPx; }).observe(base0);
+  new ResizeObserver(() => {
+    svgPx = base0.getBoundingClientRect().width || svgPx;
+    // The stage changed proportions (a phone turned, the window crossed the narrow layout): refit the views.
+    const next = fitted();
+    if (moving || (Math.abs(next.w - full.w) < 0.5 && Math.abs(next.h - full.h) < 0.5)) return;
+    full = next;
+    view = from = to = zoomed === null ? { ...full } : boxOf(zoomed) || { ...full };
+    zoomStart = clockMs - ZOOM_MS;
+    setViewBox(view);
+  }).observe(base0);
   function turn(dt) {
     const wide = view.w > full.w * 0.6;
     rotors.forEach((r, i) => {
@@ -229,7 +248,13 @@ export function mount(stage, { text: T, data: F }) {
 .ln-info .r button:hover{color:var(--green,#145445)}
 .ln-info[data-story] b{font-size:24px}
 .ln-info[data-story] p{font-size:15px}
-@media (max-width:640px){.ln-info{left:6px;top:6px;padding:6px 8px;font-size:11px;max-width:75%}.ln-info b,.ln-info[data-story] b{font-size:14px}.ln-info[data-story] p{font-size:11px}}`;
+/* On a phone the card leaves the drawing and stands under the controls, always showing what is lit (or the whole line). */
+.ln-info[data-below]{position:relative;left:auto;top:auto;z-index:auto;max-width:none;min-height:8.5em;margin:2px 0 10px;background:none;opacity:1;transform:none;transition:none;pointer-events:auto}
+.ln-info[data-below] b,.ln-info[data-below][data-story] b{font-size:16px}
+.ln-info[data-below][data-story] p{font-size:13px}
+.ln-info[data-below] .r{gap:0}
+.ln-info[data-below] .r button{min-height:30px;padding:4px 0;text-align:left}
+.ln-info[data-below] a{padding:6px 0 2px}`;
     document.head.appendChild(css);
   }
   if (getComputedStyle(stage).position === "static") stage.style.position = "relative";
@@ -248,10 +273,17 @@ export function mount(stage, { text: T, data: F }) {
     run();
   });
   let cardFor = -1, cardStory = false;
+  // i: a unit, null for no card, -1 for the whole line (on a phone, where the card always stands under the controls).
   function showCard(i, asStory) {
     if (i === cardFor && asStory === cardStory) return;
     cardFor = i; cardStory = asStory;
-    if (i === null || i < 0) { card.removeAttribute("data-show"); return; }
+    if (i === null) { card.removeAttribute("data-show"); return; }
+    if (i < 0) {
+      card.innerHTML = `<div class="n">${T.overview.n}</div><b>${T.overview.title}</b><p>${T.overview.text}</p>`;
+      card.removeAttribute("data-story");
+      card.setAttribute("data-show", "");
+      return;
+    }
     const [title, a, b] = T.info[i];
     const slug = F.links && F.links[F.units[i]];
     // Where the material comes from and goes next, along the material chain (the water treatment and the cabinet stand
@@ -264,6 +296,15 @@ export function mount(stage, { text: T, data: F }) {
     card.toggleAttribute("data-story", asStory);
     card.setAttribute("data-show", "");
   }
+  const narrow = matchMedia("(max-width: 640px)");
+  function placeCard() {
+    card.toggleAttribute("data-below", narrow.matches);
+    if (narrow.matches) (plate.querySelector(".anatomy-controls") || stage).after(card);
+    else stage.appendChild(card);
+    cardFor = undefined;
+  }
+  placeCard();
+  narrow.addEventListener("change", () => { placeCard(); run(); });
 
   let clock = 0, last = 0, frame = 0, visible = false, phrase = "";
   let story = null;          // { i, t } while the material path plays
@@ -313,7 +354,7 @@ export function mount(stage, { text: T, data: F }) {
     const booting = boot !== Infinity && boot < BOOT_STEP * count;
     const toured = touring && !overview ? tourAt(tourClock) : null;
     const on = story ? story.i : hovered !== null ? hovered : selected !== null ? selected : toured;
-    showCard(story ? story.i : selected, !!story);
+    showCard(story ? story.i : selected !== null ? selected : narrow.matches ? (on ?? -1) : null, !!story);
     if (on !== lastOn) {
       lastOn = on;
       groups.forEach((list, i) => list.forEach((node) => node.toggleAttribute("data-on", i === on)));
@@ -412,9 +453,24 @@ export function mount(stage, { text: T, data: F }) {
     if (i !== hovered) { hovered = i; run(); }
   });
   base0.addEventListener("pointerleave", () => { if (hovered === null) return; hovered = null; run(); });
+  // On a touch screen a unit on the whole line is a few pixels across: a tap near one picks it.
+  const coarse = matchMedia("(pointer: coarse)");
+  function nearUnit(event) {
+    if (zoomed !== null || !coarse.matches) return null;
+    const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(base0.getScreenCTM().inverse());
+    const reach = (24 * view.w) / svgPx;
+    let best = null, bestD = Infinity;
+    for (let i = 0; i < count; i++) {
+      const b = unitBox(i);
+      if (!b) continue;
+      const d = Math.hypot(Math.max(b[0] - p.x, 0, p.x - b[2]), Math.max(b[1] - p.y, 0, p.y - b[3]));
+      if (d < reach && d < bestD) { best = i; bestD = d; }
+    }
+    return best;
+  }
   base0.addEventListener("click", (event) => {
     if (story) { story = null; }
-    const i = unitOf(event);
+    const i = unitOf(event) ?? nearUnit(event);
     takeOver();
     hovered = null;
     pick(i !== null && i !== selected ? i : null);
