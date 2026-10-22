@@ -60,14 +60,28 @@ export function mount(stage, { text: T, data: F }) {
     return { x, y, w, h };
   }
   // The camera. Re-rastering thousands of paths at every step of a zoom made it stutter, so a move renders once the box
-  // that holds both the start and the end view, slides and scales that picture with a CSS transform (the compositor
-  // does it), and renders the end view sharp when the move is done. A recording keeps exact frames instead.
-  let rendered = null, moving = false;
-  function setTransform(v) {
-    if (!v) { layers2.forEach((layer) => { layer.style.transform = ""; }); return; }
+  // that holds both the start and the end view, and the browser's compositor slides and scales that picture (a Web
+  // Animation of the transform, sampled along the camera's own path, so no work on the page can delay a frame of it);
+  // the end view is rendered sharp when the move is done. While the camera moves, the drawing holds still. A recording
+  // keeps exact frames instead.
+  let rendered = null, shown = null, moving = false, flights = [], flightId = 0;
+  const transformOf = (v) => {
     const W = base0.clientWidth || 1000, sc = W / v.w;
-    const t = `translate(${((rendered.x - v.x) * sc).toFixed(2)}px,${((rendered.y - v.y) * sc).toFixed(2)}px) scale(${(rendered.w / v.w).toFixed(5)})`;
-    layers2.forEach((layer) => { layer.style.transform = t; });
+    return `translate(${((rendered.x - v.x) * sc).toFixed(2)}px,${((rendered.y - v.y) * sc).toFixed(2)}px) scale(${(rendered.w / v.w).toFixed(5)})`;
+  };
+  const viewAt = (e) => ({ x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, w: from.w + (to.w - from.w) * e, h: from.h + (to.h - from.h) * e });
+  function fly(start) {
+    flights.forEach((a) => a.cancel());
+    const frames = [];
+    for (let i = 0; i <= 24; i++) frames.push({ transform: transformOf(viewAt(ease(i / 24))) });
+    flights = layers2.map((layer) => { const a = layer.animate(frames, { duration: ZOOM_MS, easing: "linear", fill: "forwards" }); a.startTime = start; return a; });
+  }
+  const holds = (a, b) => a.x <= b.x + 0.5 && a.y <= b.y + 0.5 && a.x + a.w >= b.x + b.w - 0.5 && a.y + a.h >= b.y + b.h - 0.5;
+  function land() {
+    // The sharp end view and the end of the flight in one task, so they reach the screen in the same frame.
+    setViewBox(to);
+    flights.forEach((a) => a.cancel());
+    flights = [];
   }
   function zoomTo(i, k = 1.5) {
     const target = i === null ? full : boxOf(i, k) || full;
@@ -83,22 +97,34 @@ export function mount(stage, { text: T, data: F }) {
       const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
       rendered = { x: Math.min(Math.max(cx - w / 2, full.x), full.x + full.w - w), y: Math.min(Math.max(cy - h / 2, full.y), full.y + full.h - h), w, h };
       moving = true;
-      setViewBox(rendered);
-      setTransform(from);
+      const union = rendered, start = document.timeline.currentTime, id = ++flightId;
+      if (shown && holds(shown, union)) { rendered = shown; fly(start); }
+      else {
+        // Take off at once on the picture already on screen (an eased move barely leaves it in its first frames), then
+        // render the union and carry on the same flight on it: the compositor keeps flying on the old picture while
+        // the new one is rastered, so the re-render costs no frame.
+        rendered = shown || full;
+        fly(start);
+        requestAnimationFrame(() => {
+          if (id !== flightId || !moving) return;
+          rendered = union;
+          setViewBox(union);
+          fly(start);
+        });
+      }
     }
     run();
   }
   function setViewBox(r) {
     const vb = `${r.x.toFixed(2)} ${r.y.toFixed(2)} ${r.w.toFixed(2)} ${r.h.toFixed(2)}`;
     if (vb !== lastVb) { lastVb = vb; layers2.forEach((layer) => layer.setAttribute("viewBox", vb)); }
+    shown = { ...r };
   }
   function moveCamera(now) {
     const t = still.matches ? 1 : Math.min(1, (now - zoomStart) / ZOOM_MS);
-    const e = ease(t);
-    view = { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, w: from.w + (to.w - from.w) * e, h: from.h + (to.h - from.h) * e };
+    view = viewAt(ease(t));
     if (!moving) setViewBox(view);
-    else if (t < 1) setTransform(view);
-    else { moving = false; setViewBox(to); setTransform(null); }
+    else if (t >= 1) { moving = false; land(); }
     return t < 1;
   }
 
@@ -266,6 +292,9 @@ export function mount(stage, { text: T, data: F }) {
     const booting = boot !== Infinity && boot < BOOT_STEP * count;
     const toured = touring && !overview ? tourAt(tourClock) : null;
     const on = story ? story.i : hovered !== null ? hovered : selected !== null ? selected : toured;
+    // A new highlight and card wait until the flight has taken off: restyling a unit in the same frame delayed the
+    // flight's first frame on a slow machine.
+    if (moving && clockMs - zoomStart < 40) return;
     showCard(story ? story.i : selected, !!story);
     if (on !== lastOn) {
       lastOn = on;
@@ -285,6 +314,7 @@ export function mount(stage, { text: T, data: F }) {
   const due1 = (d, dt, every) => (d > 0 && dt > 0 ? d : Math.max(d + every, 0) || every);
   function update(dt) {
     step(dt);
+    if (moving) { draw(); return; }
     turn(dt);
     const P = PACE[level], every = still.matches || recording ? 0 : view.w > full.w * 0.6 ? P.wide : P.close;
     flows.forEach((f, i) => {
