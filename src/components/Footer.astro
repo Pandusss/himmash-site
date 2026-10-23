@@ -1,11 +1,12 @@
 ---
 import { type Lang, localePath, useTranslations } from '../i18n';
-import { company, phoneDisplay, presentationFor } from '../data/company';
+import { contactsFor, phoneDisplay, presentationFor } from '../data/company';
 import { countersFor } from '../data/analytics';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const contacts = contactsFor(lang);
 const year = new Date().getFullYear();
 const presentation = presentationFor(lang);
 ---
@@ -20,8 +21,8 @@ const presentation = presentationFor(lang);
       </div>
       <div class="footer-contact">
         <div class="footer-label">{t.footer.discuss}</div>
-        <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
-        <a href={`mailto:${company.email}`}>{company.email}</a>
+        {contacts.phone && <a href={`tel:${contacts.phone}`}>{phoneDisplay(lang)}</a>}
+        <a href={`mailto:${contacts.email}`}>{contacts.email}</a>
       </div>
       <div class="footer-address">
         <div class="footer-label">{t.footer.company}</div>

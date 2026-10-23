@@ -1,12 +1,13 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
 import { type Lang, localePath, asset, useTranslations } from '../i18n';
-import { company, phoneDisplay } from '../data/company';
+import { contactsFor, phoneDisplay } from '../data/company';
 
 // Each language is its own site (.ru / .com): no switch to the other one.
 interface Props { lang: Lang; path: string }
 const { lang, path } = Astro.props;
 const t = useTranslations(lang);
+const contacts = contactsFor(lang);
 const links = [
   { href: localePath(lang, '/equipment/'), label: t.nav.equipment, match: '/equipment/' },
   { href: localePath(lang, '/#modernization'), label: t.nav.modernization },
@@ -30,7 +31,7 @@ const current = (match?: string) => (match && path.startsWith(match) ? 'page' : 
     <div class="header-side">
       <ThemeToggle lang={lang} />
       <div class="header-contact">
-        <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
+        {contacts.phone ? <a href={`tel:${contacts.phone}`}>{phoneDisplay(lang)}</a> : <a href={`mailto:${contacts.email}`}>{contacts.email}</a>}
         <small>{t.contact.hours}</small>
       </div>
       <button class="btn header-cta" type="button" data-inquiry={t.form.defaultSubject}>{t.nav.cta}</button>
@@ -47,8 +48,8 @@ const current = (match?: string) => (match && path.startsWith(match) ? 'page' : 
       </div>
       <div class="mobile-contacts">
         <div class="footer-label">{t.footer.discuss}</div>
-        <a class="mobile-phone" href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
-        <a href={`mailto:${company.email}`}>{company.email}</a>
+        {contacts.phone && <a class="mobile-phone" href={`tel:${contacts.phone}`}>{phoneDisplay(lang)}</a>}
+        <a href={`mailto:${contacts.email}`}>{contacts.email}</a>
         <small>{t.contact.hours}</small>
       </div>
       <button class="btn full" type="button" data-inquiry={t.form.defaultSubject}>{t.nav.cta} <span class="arrow" aria-hidden="true">↗</span></button>

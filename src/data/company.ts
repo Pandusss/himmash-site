@@ -29,6 +29,18 @@ export function presentationFor(lang: Lang): { href: string; size: string } | nu
   return { href: asset(file), size };
 }
 
+// Contacts per site: the Russian site gives the company's phone and mailbox; the English one no phone and the
+// mailbox for foreign customers (Dima, 23.10.2026).
+const contacts: Record<Lang, { phone: string | null; email: string }> = {
+  ru: { phone: company.phone, email: company.email },
+  en: { phone: null, email: 'himmash24@gmail.com' },
+};
+
+/** The phone (null where the site shows none) and the email of the site in this language. */
+export function contactsFor(lang: Lang) {
+  return contacts[lang];
+}
+
 export function phoneDisplay(lang: Lang): string {
   return lang === 'ru' ? company.phoneDisplay.ru : company.phoneDisplay.intl;
 }
@@ -40,8 +52,8 @@ export function organizationJsonLd(lang: Lang, absolute: (href: string) => strin
     name: company.name[lang],
     url: absolute(localePath(lang, '/')),
     logo: absolute(asset('img/logo-01-122x122.webp')),
-    telephone: company.phone,
-    email: company.email,
+    ...(contacts[lang].phone ? { telephone: contacts[lang].phone } : {}),
+    email: contacts[lang].email,
     address: {
       '@type': 'PostalAddress',
       streetAddress: company.address.streetAddress[lang],
@@ -52,8 +64,8 @@ export function organizationJsonLd(lang: Lang, absolute: (href: string) => strin
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: company.phone,
-      email: company.email,
+      ...(contacts[lang].phone ? { telephone: contacts[lang].phone } : {}),
+      email: contacts[lang].email,
       contactType: 'sales',
       hoursAvailable: {
         '@type': 'OpeningHoursSpecification',

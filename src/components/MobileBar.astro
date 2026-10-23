@@ -1,14 +1,15 @@
 ---
 import { type Lang, useTranslations } from '../i18n';
-import { company } from '../data/company';
+import { contactsFor } from '../data/company';
 
 interface Props { lang: Lang; subject?: string; need?: string }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const { subject = t.form.defaultSubject, need } = Astro.props;
+const { phone, email } = contactsFor(lang);
 ---
-<div class="mobile-bar" aria-label={t.home.contactCta.eyebrow} role="group">
-  <a href={`tel:${company.phone}`}><span aria-hidden="true">☎</span>{t.mobileBar.call}</a>
-  <a href={`mailto:${company.email}`}><span aria-hidden="true">✉</span>{t.mobileBar.email}</a>
+<div class:list={["mobile-bar", { "mobile-bar-two": !phone }]} aria-label={t.home.contactCta.eyebrow} role="group">
+  {phone && <a href={`tel:${phone}`}><span aria-hidden="true">☎</span>{t.mobileBar.call}</a>}
+  <a href={`mailto:${email}`}><span aria-hidden="true">✉</span>{t.mobileBar.email}</a>
   <button type="button" class="mobile-bar-main" data-inquiry={subject} data-need={need}>{t.mobileBar.request} <span aria-hidden="true">↗</span></button>
 </div>

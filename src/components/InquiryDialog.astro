@@ -1,11 +1,12 @@
 ---
 import { type Lang, localePath, useTranslations } from '../i18n';
-import { company, phoneDisplay } from '../data/company';
+import { company, contactsFor, phoneDisplay } from '../data/company';
 import { CONSENT_VERSION } from '../data/legal';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const contacts = contactsFor(lang);
 const f = t.form;
 // Without PUBLIC_FORM_ENDPOINT the form prepares an email in the visitor's mail app.
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
@@ -32,8 +33,8 @@ const errors = {
       </div>
       <div class="inquiry-direct">
         <p class="inquiry-direct-title">{f.directTitle}</p>
-        <a href={`tel:${company.phone}`}>{phoneDisplay(lang)}</a>
-        <a href={`mailto:${company.email}`}>{company.email}</a>
+        {contacts.phone && <a href={`tel:${contacts.phone}`}>{phoneDisplay(lang)}</a>}
+        <a href={`mailto:${contacts.email}`}>{contacts.email}</a>
         <small>{f.hours}</small>
       </div>
     </div>
@@ -45,7 +46,7 @@ const errors = {
           id="inquiry-form"
           novalidate
           data-endpoint={endpoint}
-          data-mailto={company.email}
+          data-mailto={contacts.email}
           data-mail-subject={f.mailSubject}
           data-errors={JSON.stringify(errors)}
           data-consent-text={`${f.consentMail}: ${f.consentGiven} (${f.consentVersion} ${CONSENT_VERSION})`}
@@ -140,7 +141,7 @@ const errors = {
             <button class="btn" type="submit"><span class="btn-label">{f.submit}</span> <span class="arrow" aria-hidden="true">↗</span></button>
             <p class="form-note">{f.requiredNote} {f.note} <a href={localePath(lang, '/privacy/')} target="_blank" rel="noopener">{f.policyLink}</a></p>
           </div>
-          <p class="field-error send-error" id="send-error" role="alert" hidden>{f.errorSend} <a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a> · <a href={`mailto:${company.email}`}>{company.email}</a></p>
+          <p class="field-error send-error" id="send-error" role="alert" hidden>{f.errorSend} {contacts.phone && <><a href={`tel:${contacts.phone}`}>{company.phoneDisplay.intl}</a> · </>}<a href={`mailto:${contacts.email}`}>{contacts.email}</a></p>
         </form>
       </div>
       <div id="success-view" class="success-view" role="status" hidden>
@@ -156,7 +157,7 @@ const errors = {
         <h2 set:html={f.mailtoTitle} />
         <p>{f.mailtoText}</p>
         <p class="mailto-files" id="mailto-files" hidden>{f.mailtoFiles} <b></b></p>
-        <p class="mailto-contacts"><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:${company.phone}`}>{company.phoneDisplay.intl}</a></p>
+        <p class="mailto-contacts"><a href={`mailto:${contacts.email}`}>{contacts.email}</a>{contacts.phone && <a href={`tel:${contacts.phone}`}>{company.phoneDisplay.intl}</a>}</p>
         <button class="btn" type="button" data-close="inquiry-dialog">{f.back} <span aria-hidden="true">↗</span></button>
       </div>
     </div>
