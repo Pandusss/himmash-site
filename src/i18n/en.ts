@@ -369,7 +369,7 @@ const en: UI = {
   cookies: {
     label: 'Cookie notice',
     text: 'We use cookies and Google Analytics to understand how visitors use the site. The counter stays off unless you agree.',
-    textBoth: 'We use cookies and web analytics to understand how visitors use the site. The counters stay off unless you agree.',
+    textBoth: 'We use cookies, Google Analytics and Yandex Metrica to understand how visitors use the site. The counters stay off unless you agree.',
     policy: 'See the privacy policy',
     accept: 'Accept',
     decline: 'Decline',

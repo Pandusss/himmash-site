@@ -8,8 +8,9 @@ export const CONSENT_VERSION = '1.3-draft';
 
 // `analytics: true` sections appear only on a site with a web analytics counter (see src/data/analytics.ts),
 // `analytics: false` ones only on a site without it; likewise `ga` for a Google Analytics counter (on the Russian site
-// it comes in addition to Metrika and makes the transfer of visit data cross-border).
-export interface LegalSection { heading?: string; paragraphs?: string[]; bullets?: string[]; analytics?: boolean; ga?: boolean }
+// it comes in addition to Metrika and makes the transfer of visit data cross-border) and `metrika` for a Yandex Metrika
+// counter (on the English site it comes in addition to Google Analytics).
+export interface LegalSection { heading?: string; paragraphs?: string[]; bullets?: string[]; analytics?: boolean; ga?: boolean; metrika?: boolean }
 export interface LegalTexts { privacy: LegalSection[]; consent: LegalSection[] }
 
 const ru: LegalTexts = {
@@ -202,6 +203,10 @@ const en: LegalTexts = {
       ],
     },
     {
+      metrika: true,
+      paragraphs: ['With the same consent, the same data are collected by the Yandex Metrica web analytics service (YANDEX LLC, Russia); its session recording (Webvisor) is off.'],
+    },
+    {
       analytics: true,
       paragraphs: ['The contents of form fields are not collected. Analytics cookies can be declined in the cookie notice or via “Cookie settings” at the bottom of the page; the site works without them.'],
     },
@@ -241,7 +246,13 @@ const en: LegalTexts = {
     },
     {
       analytics: true,
+      metrika: false,
       paragraphs: ['The Operator does not disclose personal data to third parties except as required by Russian law. Data collected by Google Analytics with the visitor’s consent are processed by Google LLC on servers outside Russia, which is a cross-border transfer of personal data.'],
+    },
+    {
+      analytics: true,
+      metrika: true,
+      paragraphs: ['The Operator does not disclose personal data to third parties except as required by Russian law, and web analytics data collected with the visitor’s consent: Yandex Metrica data are processed on the Operator’s behalf by YANDEX LLC on servers in Russia, and Google Analytics data by Google LLC on servers outside Russia, which is a cross-border transfer of personal data.'],
     },
     {
       heading: '6. Retention',

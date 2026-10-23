@@ -17,8 +17,8 @@ const description = doc === 'privacy' ? l.privacyMeta : l.consentMeta;
 const domain = domainToUnicode(new URL(siteUrl(lang) ?? Astro.site!).hostname);
 const fill = (text: string) => text.replaceAll('{site}', domain).replaceAll('{email}', company.email);
 const counters = countersFor(lang);
-const withAnalytics = counters.length > 0, withGa = counters.some((c) => c.provider === 'ga');
-const sections = legalTexts[lang][doc].filter((s) => (s.analytics === undefined || s.analytics === withAnalytics) && (s.ga === undefined || s.ga === withGa));
+const withAnalytics = counters.length > 0, withGa = counters.some((c) => c.provider === 'ga'), withMetrika = counters.some((c) => c.provider === 'metrika');
+const sections = legalTexts[lang][doc].filter((s) => (s.analytics === undefined || s.analytics === withAnalytics) && (s.ga === undefined || s.ga === withGa) && (s.metrika === undefined || s.metrika === withMetrika));
 const other = doc === 'privacy'
   ? { href: localePath(lang, '/consent/'), label: l.consentTitle }
   : { href: localePath(lang, '/privacy/'), label: l.privacyTitle };

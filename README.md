@@ -116,9 +116,10 @@ PUBLIC_SITE_URL_RU=https://<домен>.ru PUBLIC_SITE_URL_EN=https://<доме�
 
 ## Аналитика
 
-Русский сайт — Яндекс Метрика и, по желанию, Google Analytics 4; английский — Google Analytics 4 (`src/data/analytics.ts`). Включаются переменными при сборке:
+На обоих сайтах — Яндекс Метрика и Google Analytics 4, у каждого сайта свои счётчики (`src/data/analytics.ts`). Включаются переменными при сборке:
 
-- `PUBLIC_YANDEX_METRIKA_ID` — номер счётчика Метрики (только цифры);
+- `PUBLIC_YANDEX_METRIKA_ID` — номер счётчика Метрики русского сайта (только цифры);
+- `PUBLIC_YANDEX_METRIKA_ID_EN` — номер счётчика Метрики английского сайта;
 - `PUBLIC_GA_ID` — идентификатор потока GA4 английского сайта вида `G-XXXXXXX`;
 - `PUBLIC_GA_ID_RU` — идентификатор потока GA4 русского сайта (вместе с Метрикой; в политике тогда появляется трансграничная передача сведений Google Analytics);
 - `PUBLIC_YANDEX_VERIFICATION`, `PUBLIC_GOOGLE_VERIFICATION` — значения `content` мета-тегов подтверждения для Вебмастера и Search Console.
